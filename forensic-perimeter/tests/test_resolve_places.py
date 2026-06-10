@@ -571,7 +571,7 @@ def test_main_exits_nonzero_on_failure(capsys):
     )
 
     with patch.dict("os.environ", {"GOOGLE_GEOCODING_API_KEY": "test-key"}):
-        with patch("sys.argv", ["resolve-places.py", "nonexistent_place_xyz"]):
+        with patch("sys.argv", ["resolve-places.py", "geo", "nonexistent_place_xyz"]):
             with pytest.raises(SystemExit) as exc_info:
                 mod.main()
             assert exc_info.value.code == 1
@@ -744,8 +744,8 @@ def test_resolve_input_reverse_mode_non_coord_falls_back_to_geocode():
 
 
 @responses.activate
-def test_main_reverse_mode_outputs_tsv(capsys):
-    """main() with --reverse outputs name<tab>lat,lng."""
+def test_main_whats_here_outputs_tsv(capsys):
+    """main() whats-here outputs name<tab>lat,lng."""
     mod = _load_module()
 
     responses.add(
@@ -764,7 +764,7 @@ def test_main_reverse_mode_outputs_tsv(capsys):
     )
 
     with patch.dict("os.environ", {"GOOGLE_GEOCODING_API_KEY": "test-key"}):
-        with patch("sys.argv", ["resolve-places.py", "--reverse", "52.529414,13.594044"]):
+        with patch("sys.argv", ["resolve-places.py", "whats-here", "52.529414,13.594044"]):
             mod.main()
 
     captured = capsys.readouterr()
@@ -772,8 +772,8 @@ def test_main_reverse_mode_outputs_tsv(capsys):
 
 
 @responses.activate
-def test_main_reverse_mode_json_output(capsys):
-    """main() with --reverse --format json outputs valid JSON."""
+def test_main_whats_here_json_output(capsys):
+    """main() whats-here --format json outputs valid JSON."""
     import json as json_mod
     mod = _load_module()
 
@@ -793,7 +793,7 @@ def test_main_reverse_mode_json_output(capsys):
     )
 
     with patch.dict("os.environ", {"GOOGLE_GEOCODING_API_KEY": "test-key"}):
-        with patch("sys.argv", ["resolve-places.py", "--reverse", "--format", "json", "52.549336,13.599921"]):
+        with patch("sys.argv", ["resolve-places.py", "whats-here", "--format", "json", "52.549336,13.599921"]):
             mod.main()
 
     captured = capsys.readouterr()
@@ -912,3 +912,132 @@ def test_write_output_empty_file(tmp_path):
     out = tmp_path / "output.tsv"
     mod.write_output("", str(out))
     assert out.read_text() == ""
+
+
+# ---------------------------------------------------------------------------
+# End-to-end CLI: geo subcommand
+# ---------------------------------------------------------------------------
+
+
+@responses.activate
+def test_main_geo_outputs_tsv(capsys):
+    """main() geo resolves name to coordinates in TSV."""
+    mod = _load_module()
+
+    responses.add(
+        responses.GET,
+        "https://maps.googleapis.com/maps/api/geocode/json",
+        json={
+            "status": "OK",
+            "results": [{"geometry": {"location": {"lat": 52.5162746, "lng": 13.377704}}}],
+        },
+        status=200,
+    )
+
+    with patch.dict("os.environ", {"GOOGLE_GEOCODING_API_KEY": "test-key"}):
+        with patch("sys.argv", ["resolve-places.py", "geo", "Brandenburger Tor"]):
+            mod.main()
+
+    captured = capsys.readouterr()
+    assert captured.out.strip() == "Brandenburger Tor\t52.5162746,13.377704"
+
+
+@responses.activate
+def test_main_geo_with_input_file(capsys, tmp_path):
+    """main() geo --input FILE reads coordinates from file."""
+    mod = _load_module()
+
+    f = tmp_path / "places.txt"
+    f.write_text("Brandenburger Tor\n")
+
+    responses.add(
+        responses.GET,
+        "https://maps.googleapis.com/maps/api/geocode/json",
+        json={
+            "status": "OK",
+            "results": [{"geometry": {"location": {"lat": 52.5162746, "lng": 13.377704}}}],
+        },
+        status=200,
+    )
+
+    with patch.dict("os.environ", {"GOOGLE_GEOCODING_API_KEY": "test-key"}):
+        with patch("sys.argv", ["resolve-places.py", "geo", "--input", str(f)]):
+            mod.main()
+
+    captured = capsys.readouterr()
+    assert captured.out.strip() == "Brandenburger Tor\t52.5162746,13.377704"
+
+
+@responses.activate
+def test_main_geo_with_output_file(tmp_path):
+    """main() geo --output FILE writes result to file."""
+    mod = _load_module()
+
+    out = tmp_path / "result.tsv"
+
+    responses.add(
+        responses.GET,
+        "https://maps.googleapis.com/maps/api/geocode/json",
+        json={
+            "status": "OK",
+            "results": [{"geometry": {"location": {"lat": 52.5162746, "lng": 13.377704}}}],
+        },
+        status=200,
+    )
+
+    with patch.dict("os.environ", {"GOOGLE_GEOCODING_API_KEY": "test-key"}):
+        with patch("sys.argv", ["resolve-places.py", "geo", "--output", str(out), "Brandenburger Tor"]):
+            mod.main()
+
+    assert "Brandenburger Tor" in out.read_text()
+    assert "52.5162746" in out.read_text()
+
+
+@responses.activate
+def test_main_geo_infers_json_format_from_output_extension(tmp_path):
+    """main() geo infers JSON format from .json output extension."""
+    import json as json_mod
+    mod = _load_module()
+
+    out = tmp_path / "result.json"
+
+    responses.add(
+        responses.GET,
+        "https://maps.googleapis.com/maps/api/geocode/json",
+        json={
+            "status": "OK",
+            "results": [{"geometry": {"location": {"lat": 52.5162746, "lng": 13.377704}}}],
+        },
+        status=200,
+    )
+
+    with patch.dict("os.environ", {"GOOGLE_GEOCODING_API_KEY": "test-key"}):
+        with patch("sys.argv", ["resolve-places.py", "geo", "--output", str(out), "Brandenburger Tor"]):
+            mod.main()
+
+    parsed = json_mod.loads(out.read_text())
+    assert parsed[0]["name"] == "Brandenburger Tor"
+    assert parsed[0]["lat"] == 52.5162746
+
+
+@responses.activate
+def test_main_geo_gen_link(capsys):
+    """main() geo --gen-link adds maps URL to output."""
+    mod = _load_module()
+
+    responses.add(
+        responses.GET,
+        "https://maps.googleapis.com/maps/api/geocode/json",
+        json={
+            "status": "OK",
+            "results": [{"geometry": {"location": {"lat": 52.5162746, "lng": 13.377704}}}],
+        },
+        status=200,
+    )
+
+    with patch.dict("os.environ", {"GOOGLE_GEOCODING_API_KEY": "test-key"}):
+        with patch("sys.argv", ["resolve-places.py", "geo", "--gen-link", "Brandenburger Tor"]):
+            mod.main()
+
+    captured = capsys.readouterr()
+    assert "google.com/maps/place" in captured.out

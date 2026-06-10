@@ -340,50 +340,52 @@ def write_output(content: str, output_path: str | None) -> None:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Resolve Google Maps links or place names to coordinates.",
-        epilog="Output: TSV lines with name and coordinates (lat,lng) by default.",
+        description="Resolve Google Maps places.",
     )
-    parser.add_argument(
-        "inputs",
-        nargs="*",
-        metavar="INPUT",
-        help="Google Maps URL(s) or place name(s) to resolve",
-    )
-    parser.add_argument(
-        "--setup",
-        action="store_true",
-        help="Configure Google Geocoding API key interactively",
-    )
-    parser.add_argument(
-        "--format",
-        choices=["tsv", "csv", "json"],
-        default="tsv",
-        dest="fmt",
-        help="Output format (default: tsv)",
-    )
-    parser.add_argument(
-        "--link",
-        action="store_true",
-        help="Include Google Maps link in output",
-    )
-    parser.add_argument(
-        "--reverse",
-        action="store_true",
-        help="Reverse geocode: resolve coordinates to place names (via Places Nearby Search)",
-    )
+    subs = parser.add_subparsers(dest="command", required=True)
+
+    geo_p = subs.add_parser("geo", help="Resolve names/URLs to lat,lng coordinates")
+    geo_p.add_argument("inputs", nargs="*", metavar="INPUT",
+                       help="Place name(s) or Google Maps URL(s)")
+    geo_p.add_argument("--input", metavar="FILE", dest="input_file",
+                       help="Read inputs from file or - for stdin (one per line)")
+    geo_p.add_argument("--output", metavar="FILE", dest="output_file",
+                       help="Write output to file (default: stdout)")
+    geo_p.add_argument("--format", choices=["tsv", "csv", "json"], default=None,
+                       dest="fmt", help="Output format (default: tsv, inferred from --output extension)")
+    geo_p.add_argument("--gen-link", action="store_true",
+                       help="Include Google Maps link in output")
+
+    here_p = subs.add_parser("whats-here", help="Resolve lat,lng coordinates to place names")
+    here_p.add_argument("inputs", nargs="*", metavar="COORDS",
+                        help="Coordinate string(s) as 'lat,lng'")
+    here_p.add_argument("--input", metavar="FILE", dest="input_file",
+                        help="Read coordinates from file or - for stdin (one per line)")
+    here_p.add_argument("--output", metavar="FILE", dest="output_file",
+                        help="Write output to file (default: stdout)")
+    here_p.add_argument("--format", choices=["tsv", "csv", "json"], default=None,
+                        dest="fmt", help="Output format (default: tsv, inferred from --output extension)")
+    here_p.add_argument("--gen-link", action="store_true",
+                        help="Include Google Maps link in output")
+
+    subs.add_parser("setup", help="Configure Google API key interactively")
 
     args = parser.parse_args()
 
-    if args.setup:
+    if args.command == "setup":
         setup_api_key()
         return
 
-    if not args.inputs:
-        parser.error("at least one URL or place name is required (or use --setup)")
+    all_inputs = read_inputs(args.inputs, args.input_file)
+    if not all_inputs:
+        parser.error("at least one input is required")
+
+    fmt = resolve_format(args.fmt, args.output_file)
+    reverse = args.command == "whats-here"
 
     results = []
-    for arg in args.inputs:
-        result = resolve_input(arg, reverse=args.reverse)
+    for arg in all_inputs:
+        result = resolve_input(arg, reverse=reverse)
         if result:
             name, coords = result
             lat, lng = coords.split(",")
@@ -391,9 +393,8 @@ def main():
         else:
             results.append({"name": arg, "lat": None, "lng": None, "error": "FAILED"})
 
-    output = format_results(results, fmt=args.fmt, gen_link=args.link)
-    if output:
-        print(output)
+    output = format_results(results, fmt=fmt, gen_link=args.gen_link)
+    write_output(output, args.output_file)
 
     if any(r["error"] for r in results):
         sys.exit(1)
