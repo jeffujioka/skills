@@ -7,15 +7,36 @@ description: Batch-register known places in the tracker from Google Maps links. 
 
 Batch-register known places in the tracker from Google Maps links.
 
+## Setup
+
+The script requires a Google Geocoding API key to resolve search URLs (`/maps/search/`).
+
+Run once:
+```bash
+~/projects/jeffujioka/skills/forensic-perimeter/resolve-places.py --setup
+```
+
+This creates `~/.config/forensic-perimeter/config.toml` with the API key (masked input).
+
+Alternative: set the `GOOGLE_GEOCODING_API_KEY` environment variable (takes precedence over config file).
+
+> Note: URLs with `/place/` pattern do NOT require an API key — coordinates are parsed directly from the URL.
+
 ## Input
 
 One entry per line. Each line contains a Google Maps URL (required) plus optional name and radius, in any order.
+
+Supported URL formats:
+- **Place URLs**: `https://www.google.com/maps/place/Name/...` — name + coords parsed from URL
+- **Search URLs**: `https://www.google.com/maps/search/?api=1&query=...` — name from query param, coords via Geocoding API
+- **Short URLs**: `https://maps.app.goo.gl/...` — redirect followed, then resolved as place or search URL
 
 ```
 Kaufpark Eich https://maps.app.goo.gl/xyz 300m
 https://www.google.com/maps/place/Skatepark+Liberty+2/... Kaufpark Eich
 https://maps.app.goo.gl/abc
 https://www.google.com/maps/place/Bäckerei+Müller/... 200m
+Reichstagsgebäude https://www.google.com/maps/search/?api=1&query=Reichstagsgebäude+Berlin
 ```
 
 Parsing rules per line:
@@ -42,7 +63,7 @@ Split input into lines. For each line, extract URL, optional name, and optional 
 For each URL, run:
 
 ```bash
-~/projects/jeffujioka/skills/forensic-perimeter/resolve-places.py <url>
+uv run ~/projects/jeffujioka/skills/forensic-perimeter/resolve-places.py <url>
 ```
 
 Output: TSV `name\tlat,lng`. Use the script output only for coordinates and as fallback name.
@@ -83,7 +104,8 @@ Added: N | Skipped (duplicate): N | Errors: N
 
 ## Key rules
 
-- Short URLs (`maps.app.goo.gl`): resolve via `curl -sI` (302 redirect).
-- Coordinates: `!3d<lat>!4d<lng>` from URL (pin position). Fallback: `@lat,lng`.
-- Name from URL: `/place/<Name>/` path segment, URL-decoded.
+- Short URLs (`maps.app.goo.gl`): resolve via `requests` redirect following.
+- Place URLs (`/place/`): name from path segment, coords from `!3d<lat>!4d<lng>` or `@lat,lng`. No API key needed.
+- Search URLs (`/maps/search/?api=1&query=`): name from `query` param (URL-decoded), coords from Google Geocoding API.
+- API key precedence: `GOOGLE_GEOCODING_API_KEY` env var > `~/.config/forensic-perimeter/config.toml`.
 - Communicate in the user's language.
