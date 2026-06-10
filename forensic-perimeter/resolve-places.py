@@ -204,12 +204,20 @@ def resolve_url(url: str) -> tuple[str, str] | None:
     return None
 
 
-def resolve_input(arg: str) -> tuple[str, str] | None:
+_COORD_PATTERN = re.compile(r"^-?\d+\.?\d*,-?\d+\.?\d*$")
+
+
+def resolve_input(arg: str, reverse: bool = False) -> tuple[str, str] | None:
     """Resolve any input (URL or plain name) to (name, "lat,lng").
 
+    If reverse=True and arg matches "lat,lng", does reverse geocoding.
     If arg starts with http, delegates to resolve_url().
     Otherwise, treats arg as a place name and geocodes it.
     """
+    if reverse and _COORD_PATTERN.match(arg.strip()):
+        lat, lng = arg.strip().split(",")
+        return reverse_geocode(float(lat), float(lng))
+
     if arg.startswith("http"):
         return resolve_url(arg)
 
@@ -325,6 +333,11 @@ def main():
         action="store_true",
         help="Include Google Maps link in output",
     )
+    parser.add_argument(
+        "--reverse",
+        action="store_true",
+        help="Reverse geocode: resolve coordinates to place names (via Places Nearby Search)",
+    )
 
     args = parser.parse_args()
 
@@ -337,7 +350,7 @@ def main():
 
     results = []
     for arg in args.inputs:
-        result = resolve_input(arg)
+        result = resolve_input(arg, reverse=args.reverse)
         if result:
             name, coords = result
             lat, lng = coords.split(",")

@@ -682,3 +682,57 @@ def test_reverse_geocode_returns_none_when_no_api_key(tmp_path):
             result = mod.reverse_geocode(52.5, 13.4)
 
     assert result is None
+
+
+# ---------------------------------------------------------------------------
+# --reverse mode via resolve_input
+# ---------------------------------------------------------------------------
+
+
+@responses.activate
+def test_resolve_input_reverse_mode():
+    """In reverse mode, coordinate input is reverse-geocoded."""
+    mod = _load_module()
+
+    responses.add(
+        responses.POST,
+        "https://places.googleapis.com/v1/places:searchNearby",
+        json={
+            "places": [
+                {
+                    "displayName": {"text": "Kaufpark Eiche", "languageCode": "de"},
+                    "location": {"latitude": 52.549336, "longitude": 13.599921},
+                    "types": ["shopping_mall"],
+                }
+            ]
+        },
+        status=200,
+    )
+
+    with patch.dict("os.environ", {"GOOGLE_GEOCODING_API_KEY": "test-key-123"}):
+        result = mod.resolve_input("52.549336,13.599921", reverse=True)
+
+    assert result == ("Kaufpark Eiche", "52.549336,13.599921")
+
+
+@responses.activate
+def test_resolve_input_reverse_mode_non_coord_falls_back_to_geocode():
+    """In reverse mode, non-coordinate input still geocodes normally."""
+    mod = _load_module()
+
+    responses.add(
+        responses.GET,
+        "https://maps.googleapis.com/maps/api/geocode/json",
+        json={
+            "status": "OK",
+            "results": [
+                {"geometry": {"location": {"lat": 52.52, "lng": 13.40}}}
+            ],
+        },
+        status=200,
+    )
+
+    with patch.dict("os.environ", {"GOOGLE_GEOCODING_API_KEY": "test-key"}):
+        result = mod.resolve_input("Alexanderplatz", reverse=True)
+
+    assert result == ("Alexanderplatz", "52.52,13.4")
