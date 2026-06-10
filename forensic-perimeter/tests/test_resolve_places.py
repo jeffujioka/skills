@@ -736,3 +736,66 @@ def test_resolve_input_reverse_mode_non_coord_falls_back_to_geocode():
         result = mod.resolve_input("Alexanderplatz", reverse=True)
 
     assert result == ("Alexanderplatz", "52.52,13.4")
+
+
+# ---------------------------------------------------------------------------
+# End-to-end CLI: --reverse mode
+# ---------------------------------------------------------------------------
+
+
+@responses.activate
+def test_main_reverse_mode_outputs_tsv(capsys):
+    """main() with --reverse outputs name<tab>lat,lng."""
+    mod = _load_module()
+
+    responses.add(
+        responses.POST,
+        "https://places.googleapis.com/v1/places:searchNearby",
+        json={
+            "places": [
+                {
+                    "displayName": {"text": "REWE", "languageCode": "de"},
+                    "location": {"latitude": 52.529414, "longitude": 13.594044},
+                    "types": ["supermarket"],
+                }
+            ]
+        },
+        status=200,
+    )
+
+    with patch.dict("os.environ", {"GOOGLE_GEOCODING_API_KEY": "test-key"}):
+        with patch("sys.argv", ["resolve-places.py", "--reverse", "52.529414,13.594044"]):
+            mod.main()
+
+    captured = capsys.readouterr()
+    assert captured.out.strip() == "REWE\t52.529414,13.594044"
+
+
+@responses.activate
+def test_main_reverse_mode_json_output(capsys):
+    """main() with --reverse --format json outputs valid JSON."""
+    import json as json_mod
+    mod = _load_module()
+
+    responses.add(
+        responses.POST,
+        "https://places.googleapis.com/v1/places:searchNearby",
+        json={
+            "places": [
+                {
+                    "displayName": {"text": "Kaufpark Eiche", "languageCode": "de"},
+                    "location": {"latitude": 52.549336, "longitude": 13.599921},
+                    "types": ["shopping_mall"],
+                }
+            ]
+        },
+        status=200,
+    )
+
+    with patch.dict("os.environ", {"GOOGLE_GEOCODING_API_KEY": "test-key"}):
+        with patch("sys.argv", ["resolve-places.py", "--reverse", "--format", "json", "52.549336,13.599921"]):
+            mod.main()
+
+    captured = capsys.readouterr()
+    parsed = json_mod.loads(captured.out)
+    assert parsed == [{"name": "Kaufpark Eiche", "lat": 52.549336, "lng": 13.599921}]
