@@ -606,3 +606,79 @@ def test_reverse_geocode_returns_name_and_coords():
         result = mod.reverse_geocode(52.529414, 13.594044)
 
     assert result == ("REWE", "52.529414,13.594044")
+
+
+@responses.activate
+def test_reverse_geocode_escalates_radius():
+    """Escalates radius from 10m until a place is found."""
+    mod = _load_module()
+
+    # First call (10m) returns empty
+    responses.add(
+        responses.POST,
+        "https://places.googleapis.com/v1/places:searchNearby",
+        json={},
+        status=200,
+    )
+    # Second call (20m) returns empty
+    responses.add(
+        responses.POST,
+        "https://places.googleapis.com/v1/places:searchNearby",
+        json={"places": []},
+        status=200,
+    )
+    # Third call (50m) returns a result
+    responses.add(
+        responses.POST,
+        "https://places.googleapis.com/v1/places:searchNearby",
+        json={
+            "places": [
+                {
+                    "displayName": {"text": "Großer Tiergarten", "languageCode": "de"},
+                    "location": {"latitude": 52.5141, "longitude": 13.3592},
+                    "types": ["park"],
+                }
+            ]
+        },
+        status=200,
+    )
+
+    with patch.dict("os.environ", {"GOOGLE_GEOCODING_API_KEY": "test-key-123"}):
+        result = mod.reverse_geocode(52.5141, 13.3592)
+
+    assert result == ("Großer Tiergarten", "52.5141,13.3592")
+    assert len(responses.calls) == 3
+
+
+@responses.activate
+def test_reverse_geocode_returns_none_when_no_place_found():
+    """Returns None after exhausting all radii without finding a place."""
+    mod = _load_module()
+
+    # All 5 radii return empty
+    for _ in range(5):
+        responses.add(
+            responses.POST,
+            "https://places.googleapis.com/v1/places:searchNearby",
+            json={},
+            status=200,
+        )
+
+    with patch.dict("os.environ", {"GOOGLE_GEOCODING_API_KEY": "test-key-123"}):
+        result = mod.reverse_geocode(0.0, 0.0)
+
+    assert result is None
+    assert len(responses.calls) == 5
+
+
+def test_reverse_geocode_returns_none_when_no_api_key(tmp_path):
+    """No API key configured => None."""
+    mod = _load_module()
+
+    env_copy = os.environ.copy()
+    env_copy.pop("GOOGLE_GEOCODING_API_KEY", None)
+    with patch.dict("os.environ", env_copy, clear=True):
+        with patch.object(Path, "home", return_value=tmp_path):
+            result = mod.reverse_geocode(52.5, 13.4)
+
+    assert result is None
