@@ -42,7 +42,7 @@ Split input into lines. For each line, extract URL, optional name, and optional 
 For each URL, run:
 
 ```bash
-~/projects/jeffujioka/skills/forensic-perimeter/resolve-places.sh <url>
+~/projects/jeffujioka/skills/forensic-perimeter/resolve-places.py <url>
 ```
 
 Output: TSV `name\tlat,lng`. Use the script output only for coordinates and as fallback name.
