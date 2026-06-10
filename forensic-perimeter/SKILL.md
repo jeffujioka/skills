@@ -1,80 +1,89 @@
 ---
 name: forensic-perimeter
-description: Add known places to the tracker from Google Maps links (batch). Resolves short/full URLs, extracts name + coordinates, shows preview, then runs tracker.py add-place for each. Use when user wants to add places, register locations, says "add places", "forensic-perimeter", "registrar locais", or pastes multiple Google Maps links.
+description: Batch-register known places in the tracker from Google Maps links. Resolves short/full URLs, extracts name + coordinates, shows preview table, then runs tracker.py add-place for each. Use when user wants to add places, register locations, says "add places", "forensic-perimeter", "registrar locais", or pastes Google Maps links.
 ---
 
 # Forensic Perimeter
 
-Register known places in the tracker from Google Maps links — one or many at once.
+Batch-register known places in the tracker from Google Maps links.
 
 ## Input
 
-Google Maps links (full or short `maps.app.goo.gl`). Passed inline in args or provided conversationally.
+One entry per line. Each line contains a Google Maps URL (required) plus optional name and radius, in any order.
 
-Optional:
-- `--radius <N>` — global radius override (default: 150m)
-- Per-link radius override via preview table editing
+```
+Kaufpark Eich https://maps.app.goo.gl/xyz 300m
+https://www.google.com/maps/place/Skatepark+Liberty+2/... Kaufpark Eich
+https://maps.app.goo.gl/abc
+https://www.google.com/maps/place/Bäckerei+Müller/... 200m
+```
+
+Parsing rules per line:
+- **URL**: token starting with `http`
+- **Radius**: token matching `\d+m` (e.g., `300m`)
+- **Name**: all remaining tokens joined with spaces
+
+Global option: `--radius <N>` sets the default radius for all entries.
+
+**Radius precedence** (highest wins): inline per-line > `--radius` global > 150m.
+**Name precedence** (highest wins): inline per-line > extracted from URL path (`/place/<Name>/`).
+
+Entries are passed inline in args or provided conversationally. If no entries in args, ask:
+> "Cole os links do Google Maps (um por linha):"
 
 ## Workflow
 
-### 1. Collect links
+### 1. Parse entries
 
-If links are in the args, use them directly. Otherwise ask:
-> "Cole os links do Google Maps (um por linha):"
+Split input into lines. For each line, extract URL, optional name, and optional radius using the parsing rules above.
 
-### 2. Resolve each link
+### 2. Resolve URLs
 
-Run the resolve script for each URL:
+For each URL, run:
 
 ```bash
-~/projects/jeffujioka/skills/forensic-perimeter/resolve-places.sh <url1> [url2] ...
+~/projects/jeffujioka/skills/forensic-perimeter/resolve-places.sh <url>
 ```
 
-Output is TSV: `name\tlat,lng`
+Output: TSV `name\tlat,lng`. Use the script output only for coordinates and as fallback name.
 
-If a short URL fails to resolve, report the error and continue with the others.
+If a URL fails to resolve, mark it as `ERROR` in the preview table — do not halt.
 
-### 3. Show preview table
+### 3. Preview table
 
-Present a markdown table:
+| # | Name | Coordinates | Radius | Notes |
+|---|------|-------------|--------|-------|
+| 1 | Kaufpark Eich | 52.5366048,13.5732627 | 300 | |
+| 2 | Skatepark Liberty 2 | 52.5377989,13.5954429 | 150 | |
+| 3 | ??? | — | 150 | ERROR: could not resolve |
 
-| # | Name | Coordinates | Radius |
-|---|------|-------------|--------|
-| 1 | Skatepark Liberty 2 | 52.5377989,13.5954429 | 150 |
-| 2 | Bäckerei Müller | 52.5200000,13.4050000 | 150 |
-
-If the user specified `--radius`, use that as the default instead of 150.
+Rows with `???` as name require user input before proceeding.
 
 Ask: "Confirma? Edite nomes ou radius se necessário."
 
 The user may:
 - Confirm as-is
-- Edit names (e.g., "rename #1 to skatepark")
-- Edit radius (e.g., "#2 radius 200")
-- Remove entries (e.g., "remove #1")
+- Edit names (e.g., "rename #2 to skatepark")
+- Edit radius (e.g., "#1 radius 200")
+- Remove entries (e.g., "remove #3")
 
 ### 4. Execute
 
-For each confirmed place, run:
+For each confirmed entry (no `???`, no `ERROR`), run:
 
 ```bash
 uv run ~/projects/jeffujioka/tracker/tracker.py add-place "<name>" "<lat,lng>" --radius <N>
 ```
 
-Report results: added, skipped (duplicate name), or errored.
-
 ### 5. Summary
 
-Show final summary:
-- N places added
-- N skipped (already exist)
-- N errors
+```
+Added: N | Skipped (duplicate): N | Errors: N
+```
 
 ## Key rules
 
-- Resolve short URLs via `curl -sI` (follows 302 redirect).
-- Extract name from `/place/<Name>/` path segment (URL-decoded).
-- Extract coordinates from `!3d<lat>!4d<lng>` markers (pin position, not viewport).
-- Fallback: `@lat,lng` from URL if `!3d/!4d` not present.
-- If name extraction fails, ask the user for the name.
+- Short URLs (`maps.app.goo.gl`): resolve via `curl -sI` (302 redirect).
+- Coordinates: `!3d<lat>!4d<lng>` from URL (pin position). Fallback: `@lat,lng`.
+- Name from URL: `/place/<Name>/` path segment, URL-decoded.
 - Communicate in the user's language.
