@@ -117,6 +117,55 @@ def geocode(query: str) -> str | None:
     return f"{location['lat']},{location['lng']}"
 
 
+REVERSE_RADII = [10, 20, 50, 100, 150]
+
+
+def reverse_geocode(lat: float, lng: float) -> tuple[str, str] | None:
+    """Reverse geocode coordinates via Google Places Nearby Search API.
+
+    Tries escalating radii (10m, 20m, 50m, 100m, 150m) until a result is found.
+    Returns (place_name, "lat,lng") or None if no place found at any radius.
+    """
+    api_key = _get_api_key()
+    if not api_key:
+        return None
+
+    for radius in REVERSE_RADII:
+        try:
+            resp = requests.post(
+                "https://places.googleapis.com/v1/places:searchNearby",
+                headers={
+                    "Content-Type": "application/json",
+                    "X-Goog-Api-Key": api_key,
+                    "X-Goog-FieldMask": "places.displayName,places.location,places.types",
+                },
+                json={
+                    "locationRestriction": {
+                        "circle": {
+                            "center": {"latitude": lat, "longitude": lng},
+                            "radius": float(radius),
+                        }
+                    },
+                    "maxResultCount": 1,
+                },
+                timeout=10,
+            )
+            resp.raise_for_status()
+            data = resp.json()
+        except requests.RequestException as e:
+            print(f"ERROR: reverse geocoding request failed: {e}", file=sys.stderr)
+            return None
+
+        places = data.get("places", [])
+        if places:
+            name = places[0]["displayName"]["text"]
+            location = places[0]["location"]
+            return (name, f"{location['latitude']},{location['longitude']}")
+
+    print(f"ERROR: no place found near {lat},{lng} (max radius {REVERSE_RADII[-1]}m)", file=sys.stderr)
+    return None
+
+
 def resolve_url(url: str) -> tuple[str, str] | None:
     """Resolve any Google Maps URL to (name, "lat,lng").
 

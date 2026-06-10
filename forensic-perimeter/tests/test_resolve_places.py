@@ -575,3 +575,34 @@ def test_main_exits_nonzero_on_failure(capsys):
             with pytest.raises(SystemExit) as exc_info:
                 mod.main()
             assert exc_info.value.code == 1
+
+
+# ---------------------------------------------------------------------------
+# Reverse geocoding (Places Nearby Search API)
+# ---------------------------------------------------------------------------
+
+
+@responses.activate
+def test_reverse_geocode_returns_name_and_coords():
+    """Reverse geocode resolves lat,lng to nearest place name."""
+    mod = _load_module()
+
+    responses.add(
+        responses.POST,
+        "https://places.googleapis.com/v1/places:searchNearby",
+        json={
+            "places": [
+                {
+                    "displayName": {"text": "REWE", "languageCode": "de"},
+                    "location": {"latitude": 52.529414, "longitude": 13.594044},
+                    "types": ["supermarket"],
+                }
+            ]
+        },
+        status=200,
+    )
+
+    with patch.dict("os.environ", {"GOOGLE_GEOCODING_API_KEY": "test-key-123"}):
+        result = mod.reverse_geocode(52.529414, 13.594044)
+
+    assert result == ("REWE", "52.529414,13.594044")
