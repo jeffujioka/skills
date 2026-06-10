@@ -40,7 +40,7 @@ def _get_api_key() -> str | None:
     print(
         "ERROR: No Google Geocoding API key found.\n"
         "Set GOOGLE_GEOCODING_API_KEY env var or run:\n"
-        "  resolve-places.py --setup",
+        "  resolve-places.py setup",
         file=sys.stderr,
     )
     return None
@@ -227,7 +227,7 @@ def resolve_input(arg: str, reverse: bool = False) -> tuple[str, str] | None:
     return (arg, coords)
 
 
-def format_results(results: list[dict], fmt: str = "tsv", link: bool = False) -> str:
+def format_results(results: list[dict], fmt: str = "tsv", gen_link: bool = False) -> str:
     """Format a list of result dicts into the specified output format.
 
     Each result dict has: name, lat, lng, error (None if success).
@@ -242,7 +242,7 @@ def format_results(results: list[dict], fmt: str = "tsv", link: bool = False) ->
             entry = {"name": r["name"], "lat": r["lat"], "lng": r["lng"]}
             if r["error"]:
                 entry["error"] = r["error"]
-            if link and r["lat"] is not None:
+            if gen_link and r["lat"] is not None:
                 name_encoded = urllib.parse.quote_plus(r["name"])
                 entry["link"] = f"https://www.google.com/maps/place/{name_encoded}/@{r['lat']},{r['lng']},17z"
             entries.append(entry)
@@ -254,13 +254,13 @@ def format_results(results: list[dict], fmt: str = "tsv", link: bool = False) ->
     if fmt == "csv":
         buf = io.StringIO(newline="")
         headers = ["name", "lat", "lng"]
-        if link:
+        if gen_link:
             headers.append("link")
         writer = csv.writer(buf, lineterminator="\n")
         writer.writerow(headers)
         for r in ok_results:
             row = [r["name"], r["lat"], r["lng"]]
-            if link:
+            if gen_link:
                 name_encoded = urllib.parse.quote_plus(r["name"])
                 row.append(f"https://www.google.com/maps/place/{name_encoded}/@{r['lat']},{r['lng']},17z")
             writer.writerow(row)
@@ -270,7 +270,7 @@ def format_results(results: list[dict], fmt: str = "tsv", link: bool = False) ->
     lines = []
     for r in ok_results:
         parts = [r["name"], f"{r['lat']},{r['lng']}"]
-        if link:
+        if gen_link:
             name_encoded = urllib.parse.quote_plus(r["name"])
             parts.append(f"https://www.google.com/maps/place/{name_encoded}/@{r['lat']},{r['lng']},17z")
         lines.append("\t".join(str(p) for p in parts))
@@ -358,7 +358,7 @@ def main():
         else:
             results.append({"name": arg, "lat": None, "lng": None, "error": "FAILED"})
 
-    output = format_results(results, fmt=args.fmt, link=args.link)
+    output = format_results(results, fmt=args.fmt, gen_link=args.link)
     if output:
         print(output)
 

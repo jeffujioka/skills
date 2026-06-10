@@ -446,7 +446,7 @@ def test_format_results_tsv():
         {"name": "Place A", "lat": 52.52, "lng": 13.40, "error": None},
         {"name": "Place B", "lat": 48.13, "lng": 11.58, "error": None},
     ]
-    output = mod.format_results(results, fmt="tsv", link=False)
+    output = mod.format_results(results, fmt="tsv")
     assert output == "Place A\t52.52,13.4\nPlace B\t48.13,11.58"
 
 
@@ -456,7 +456,7 @@ def test_format_results_csv():
     results = [
         {"name": "Place A", "lat": 52.52, "lng": 13.40, "error": None},
     ]
-    output = mod.format_results(results, fmt="csv", link=False)
+    output = mod.format_results(results, fmt="csv")
     assert output == "name,lat,lng\nPlace A,52.52,13.4"
 
 
@@ -467,7 +467,7 @@ def test_format_results_json():
     results = [
         {"name": "Place A", "lat": 52.52, "lng": 13.40, "error": None},
     ]
-    output = mod.format_results(results, fmt="json", link=False)
+    output = mod.format_results(results, fmt="json")
     parsed = json.loads(output)
     assert parsed == [{"name": "Place A", "lat": 52.52, "lng": 13.4}]
 
@@ -480,7 +480,7 @@ def test_format_results_json_includes_errors():
         {"name": "Place A", "lat": 52.52, "lng": 13.40, "error": None},
         {"name": "Bad Place", "lat": None, "lng": None, "error": "ZERO_RESULTS"},
     ]
-    output = mod.format_results(results, fmt="json", link=False)
+    output = mod.format_results(results, fmt="json")
     parsed = json.loads(output)
     assert parsed[0] == {"name": "Place A", "lat": 52.52, "lng": 13.4}
     assert parsed[1] == {"name": "Bad Place", "lat": None, "lng": None, "error": "ZERO_RESULTS"}
@@ -493,7 +493,7 @@ def test_format_results_tsv_skips_errors():
         {"name": "Place A", "lat": 52.52, "lng": 13.40, "error": None},
         {"name": "Bad Place", "lat": None, "lng": None, "error": "ZERO_RESULTS"},
     ]
-    output = mod.format_results(results, fmt="tsv", link=False)
+    output = mod.format_results(results, fmt="tsv")
     assert output == "Place A\t52.52,13.4"
 
 
@@ -504,7 +504,7 @@ def test_format_results_csv_skips_errors():
         {"name": "Place A", "lat": 52.52, "lng": 13.40, "error": None},
         {"name": "Bad Place", "lat": None, "lng": None, "error": "ZERO_RESULTS"},
     ]
-    output = mod.format_results(results, fmt="csv", link=False)
+    output = mod.format_results(results, fmt="csv")
     assert output == "name,lat,lng\nPlace A,52.52,13.4"
 
 
@@ -514,12 +514,12 @@ def test_format_results_csv_skips_errors():
 
 
 def test_format_results_tsv_with_link():
-    """TSV with --link appends maps URL as third column."""
+    """TSV with --gen-link appends maps URL as third column."""
     mod = _load_module()
     results = [
         {"name": "Kino International", "lat": 52.5204781, "lng": 13.4228483, "error": None},
     ]
-    output = mod.format_results(results, fmt="tsv", link=True)
+    output = mod.format_results(results, fmt="tsv", gen_link=True)
     assert output == (
         "Kino International\t52.5204781,13.4228483\t"
         "https://www.google.com/maps/place/Kino+International/@52.5204781,13.4228483,17z"
@@ -527,25 +527,25 @@ def test_format_results_tsv_with_link():
 
 
 def test_format_results_csv_with_link():
-    """CSV with --link adds link column."""
+    """CSV with --gen-link adds link column."""
     mod = _load_module()
     results = [
         {"name": "Kino International", "lat": 52.5204781, "lng": 13.4228483, "error": None},
     ]
-    output = mod.format_results(results, fmt="csv", link=True)
+    output = mod.format_results(results, fmt="csv", gen_link=True)
     lines = output.split("\n")
     assert lines[0] == "name,lat,lng,link"
     assert "https://www.google.com/maps/place/Kino+International/@52.5204781,13.4228483,17z" in lines[1]
 
 
 def test_format_results_json_with_link():
-    """JSON with --link adds link field."""
+    """JSON with --gen-link adds link field."""
     import json
     mod = _load_module()
     results = [
         {"name": "Kino International", "lat": 52.5204781, "lng": 13.4228483, "error": None},
     ]
-    output = mod.format_results(results, fmt="json", link=True)
+    output = mod.format_results(results, fmt="json", gen_link=True)
     parsed = json.loads(output)
     assert parsed[0]["link"] == (
         "https://www.google.com/maps/place/Kino+International/@52.5204781,13.4228483,17z"
