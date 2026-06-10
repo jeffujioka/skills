@@ -799,3 +799,116 @@ def test_main_reverse_mode_json_output(capsys):
     captured = capsys.readouterr()
     parsed = json_mod.loads(captured.out)
     assert parsed == [{"name": "Kaufpark Eiche", "lat": 52.549336, "lng": 13.599921}]
+
+
+# ---------------------------------------------------------------------------
+# resolve_format
+# ---------------------------------------------------------------------------
+
+
+def test_resolve_format_explicit_overrides_extension():
+    """--format flag overrides file extension inference."""
+    mod = _load_module()
+    assert mod.resolve_format("csv", "/tmp/output.json") == "csv"
+
+
+def test_resolve_format_infers_json_from_extension():
+    """No --format + .json extension => json."""
+    mod = _load_module()
+    assert mod.resolve_format(None, "/tmp/output.json") == "json"
+
+
+def test_resolve_format_infers_csv_from_extension():
+    """No --format + .csv extension => csv."""
+    mod = _load_module()
+    assert mod.resolve_format(None, "/tmp/output.csv") == "csv"
+
+
+def test_resolve_format_defaults_to_tsv_no_output():
+    """No --format + no --output => tsv."""
+    mod = _load_module()
+    assert mod.resolve_format(None, None) == "tsv"
+
+
+def test_resolve_format_defaults_to_tsv_unknown_extension():
+    """No --format + unknown extension => tsv."""
+    mod = _load_module()
+    assert mod.resolve_format(None, "/tmp/output.txt") == "tsv"
+
+
+# ---------------------------------------------------------------------------
+# read_inputs
+# ---------------------------------------------------------------------------
+
+
+def test_read_inputs_positional_only():
+    """Positional args returned as-is when no input file."""
+    mod = _load_module()
+    assert mod.read_inputs(["a", "b"], None) == ["a", "b"]
+
+
+def test_read_inputs_from_file(tmp_path):
+    """Inputs read from file, one per line."""
+    mod = _load_module()
+    f = tmp_path / "coords.txt"
+    f.write_text("52.1,13.1\n52.2,13.2\n")
+    assert mod.read_inputs([], str(f)) == ["52.1,13.1", "52.2,13.2"]
+
+
+def test_read_inputs_combines_positional_and_file(tmp_path):
+    """Positional args prepended to file contents."""
+    mod = _load_module()
+    f = tmp_path / "coords.txt"
+    f.write_text("52.3,13.3\n")
+    assert mod.read_inputs(["52.1,13.1"], str(f)) == ["52.1,13.1", "52.3,13.3"]
+
+
+def test_read_inputs_skips_blank_lines(tmp_path):
+    """Blank lines in input file are ignored."""
+    mod = _load_module()
+    f = tmp_path / "coords.txt"
+    f.write_text("52.1,13.1\n\n52.2,13.2\n")
+    assert mod.read_inputs([], str(f)) == ["52.1,13.1", "52.2,13.2"]
+
+
+def test_read_inputs_stdin(monkeypatch):
+    """--input - reads from stdin."""
+    import io
+    mod = _load_module()
+    monkeypatch.setattr("sys.stdin", io.StringIO("52.1,13.1\n52.2,13.2\n"))
+    assert mod.read_inputs([], "-") == ["52.1,13.1", "52.2,13.2"]
+
+
+# ---------------------------------------------------------------------------
+# write_output
+# ---------------------------------------------------------------------------
+
+
+def test_write_output_to_stdout(capsys):
+    """No output path => prints to stdout."""
+    mod = _load_module()
+    mod.write_output("hello", None)
+    assert capsys.readouterr().out == "hello\n"
+
+
+def test_write_output_empty_no_stdout(capsys):
+    """Empty content => nothing printed."""
+    mod = _load_module()
+    mod.write_output("", None)
+    assert capsys.readouterr().out == ""
+
+
+def test_write_output_to_file(tmp_path):
+    """Output path => writes content to file with trailing newline."""
+    mod = _load_module()
+    out = tmp_path / "output.tsv"
+    mod.write_output("Place A\t52.52,13.4", str(out))
+    assert out.read_text() == "Place A\t52.52,13.4\n"
+
+
+def test_write_output_empty_file(tmp_path):
+    """Empty content + output path => writes empty file."""
+    mod = _load_module()
+    out = tmp_path / "output.tsv"
+    mod.write_output("", str(out))
+    assert out.read_text() == ""

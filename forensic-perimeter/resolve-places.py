@@ -305,6 +305,39 @@ def setup_api_key():
     print(f"Saved to {config_path}")
 
 
+def resolve_format(explicit_fmt: str | None, output_path: str | None) -> str:
+    """Determine output format: explicit_fmt > extension inference > tsv."""
+    if explicit_fmt:
+        return explicit_fmt
+    if output_path:
+        ext = Path(output_path).suffix.lower()
+        if ext == ".json":
+            return "json"
+        if ext == ".csv":
+            return "csv"
+    return "tsv"
+
+
+def read_inputs(positional: list[str], input_file: str | None) -> list[str]:
+    """Combine positional args and --input file/stdin into a flat list."""
+    lines = list(positional)
+    if input_file == "-":
+        lines.extend(line.rstrip("\n") for line in sys.stdin if line.strip())
+    elif input_file:
+        with open(input_file) as f:
+            lines.extend(line.rstrip("\n") for line in f if line.strip())
+    return lines
+
+
+def write_output(content: str, output_path: str | None) -> None:
+    """Write content to file or stdout."""
+    if not output_path:
+        if content:
+            print(content)
+        return
+    Path(output_path).write_text(content + "\n" if content else "", encoding="utf-8")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Resolve Google Maps links or place names to coordinates.",
