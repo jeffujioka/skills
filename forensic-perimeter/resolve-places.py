@@ -155,6 +155,71 @@ def resolve_url(url: str) -> tuple[str, str] | None:
     return None
 
 
+def resolve_input(arg: str) -> tuple[str, str] | None:
+    """Resolve any input (URL or plain name) to (name, "lat,lng").
+
+    If arg starts with http, delegates to resolve_url().
+    Otherwise, treats arg as a place name and geocodes it.
+    """
+    if arg.startswith("http"):
+        return resolve_url(arg)
+
+    coords = geocode(arg)
+    if not coords:
+        return None
+    return (arg, coords)
+
+
+def format_results(results: list[dict], fmt: str = "tsv", link: bool = False) -> str:
+    """Format a list of result dicts into the specified output format.
+
+    Each result dict has: name, lat, lng, error (None if success).
+    """
+    import csv
+    import io
+    import json
+
+    if fmt == "json":
+        entries = []
+        for r in results:
+            entry = {"name": r["name"], "lat": r["lat"], "lng": r["lng"]}
+            if r["error"]:
+                entry["error"] = r["error"]
+            if link and r["lat"] is not None:
+                name_encoded = urllib.parse.quote_plus(r["name"])
+                entry["link"] = f"https://www.google.com/maps/place/{name_encoded}/@{r['lat']},{r['lng']},17z"
+            entries.append(entry)
+        return json.dumps(entries, ensure_ascii=False, indent=2)
+
+    # TSV and CSV: skip errors
+    ok_results = [r for r in results if r["error"] is None]
+
+    if fmt == "csv":
+        buf = io.StringIO(newline="")
+        headers = ["name", "lat", "lng"]
+        if link:
+            headers.append("link")
+        writer = csv.writer(buf, lineterminator="\n")
+        writer.writerow(headers)
+        for r in ok_results:
+            row = [r["name"], r["lat"], r["lng"]]
+            if link:
+                name_encoded = urllib.parse.quote_plus(r["name"])
+                row.append(f"https://www.google.com/maps/place/{name_encoded}/@{r['lat']},{r['lng']},17z")
+            writer.writerow(row)
+        return buf.getvalue().rstrip("\n")
+
+    # TSV (default)
+    lines = []
+    for r in ok_results:
+        parts = [r["name"], f"{r['lat']},{r['lng']}"]
+        if link:
+            name_encoded = urllib.parse.quote_plus(r["name"])
+            parts.append(f"https://www.google.com/maps/place/{name_encoded}/@{r['lat']},{r['lng']},17z")
+        lines.append("\t".join(str(p) for p in parts))
+    return "\n".join(lines)
+
+
 def setup_api_key():
     """Interactive setup: prompt for API key and save to config.toml."""
     config_path = _config_path()
@@ -185,19 +250,31 @@ def setup_api_key():
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Resolve Google Maps links to place name + coordinates.",
-        epilog="Output: TSV lines with name and coordinates (lat,lng).",
+        description="Resolve Google Maps links or place names to coordinates.",
+        epilog="Output: TSV lines with name and coordinates (lat,lng) by default.",
     )
     parser.add_argument(
-        "urls",
+        "inputs",
         nargs="*",
-        metavar="URL",
-        help="Google Maps URL(s) to resolve",
+        metavar="INPUT",
+        help="Google Maps URL(s) or place name(s) to resolve",
     )
     parser.add_argument(
         "--setup",
         action="store_true",
         help="Configure Google Geocoding API key interactively",
+    )
+    parser.add_argument(
+        "--format",
+        choices=["tsv", "csv", "json"],
+        default="tsv",
+        dest="fmt",
+        help="Output format (default: tsv)",
+    )
+    parser.add_argument(
+        "--link",
+        action="store_true",
+        help="Include Google Maps link in output",
     )
 
     args = parser.parse_args()
@@ -206,14 +283,25 @@ def main():
         setup_api_key()
         return
 
-    if not args.urls:
-        parser.error("at least one URL is required (or use --setup)")
+    if not args.inputs:
+        parser.error("at least one URL or place name is required (or use --setup)")
 
-    for url in args.urls:
-        result = resolve_url(url)
+    results = []
+    for arg in args.inputs:
+        result = resolve_input(arg)
         if result:
             name, coords = result
-            print(f"{name}\t{coords}")
+            lat, lng = coords.split(",")
+            results.append({"name": name, "lat": float(lat), "lng": float(lng), "error": None})
+        else:
+            results.append({"name": arg, "lat": None, "lng": None, "error": "FAILED"})
+
+    output = format_results(results, fmt=args.fmt, link=args.link)
+    if output:
+        print(output)
+
+    if any(r["error"] for r in results):
+        sys.exit(1)
 
 
 if __name__ == "__main__":

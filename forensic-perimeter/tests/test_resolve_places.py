@@ -374,3 +374,204 @@ def test_setup_overwrites_when_confirmed(tmp_path):
 
     content = (config_dir / "config.toml").read_text()
     assert 'api_key = "new-key-abc"' in content
+
+
+# ---------------------------------------------------------------------------
+# Plain name input (no URL)
+# ---------------------------------------------------------------------------
+
+
+@responses.activate
+def test_resolve_input_plain_name_geocodes():
+    """Plain text (no http) is geocoded directly."""
+    mod = _load_module()
+
+    responses.add(
+        responses.GET,
+        "https://maps.googleapis.com/maps/api/geocode/json",
+        json={
+            "status": "OK",
+            "results": [
+                {"geometry": {"location": {"lat": 52.5204781, "lng": 13.4228483}}}
+            ],
+        },
+        status=200,
+    )
+
+    with patch.dict("os.environ", {"GOOGLE_GEOCODING_API_KEY": "test-key"}):
+        result = mod.resolve_input("Kino International Berlin")
+
+    assert result == ("Kino International Berlin", "52.5204781,13.4228483")
+
+
+@responses.activate
+def test_resolve_input_url_delegates_to_resolve_url():
+    """Input starting with http delegates to resolve_url."""
+    mod = _load_module()
+    url = (
+        "https://www.google.com/maps/place/Kaufpark+Eich/"
+        "@52.5366048,13.5732627,17z/data=!3d52.5366048!4d13.5732627"
+    )
+    result = mod.resolve_input(url)
+    assert result == ("Kaufpark Eich", "52.5366048,13.5732627")
+
+
+@responses.activate
+def test_resolve_input_plain_name_returns_none_on_failure():
+    """Plain name that fails geocoding returns None."""
+    mod = _load_module()
+
+    responses.add(
+        responses.GET,
+        "https://maps.googleapis.com/maps/api/geocode/json",
+        json={"status": "ZERO_RESULTS", "results": []},
+        status=200,
+    )
+
+    with patch.dict("os.environ", {"GOOGLE_GEOCODING_API_KEY": "test-key"}):
+        result = mod.resolve_input("xyznonexistent12345")
+
+    assert result is None
+
+
+# ---------------------------------------------------------------------------
+# Output formatting
+# ---------------------------------------------------------------------------
+
+
+def test_format_results_tsv():
+    """TSV format: name<tab>lat,lng — no header."""
+    mod = _load_module()
+    results = [
+        {"name": "Place A", "lat": 52.52, "lng": 13.40, "error": None},
+        {"name": "Place B", "lat": 48.13, "lng": 11.58, "error": None},
+    ]
+    output = mod.format_results(results, fmt="tsv", link=False)
+    assert output == "Place A\t52.52,13.4\nPlace B\t48.13,11.58"
+
+
+def test_format_results_csv():
+    """CSV format: header + name,lat,lng rows."""
+    mod = _load_module()
+    results = [
+        {"name": "Place A", "lat": 52.52, "lng": 13.40, "error": None},
+    ]
+    output = mod.format_results(results, fmt="csv", link=False)
+    assert output == "name,lat,lng\nPlace A,52.52,13.4"
+
+
+def test_format_results_json():
+    """JSON format: array of objects with name, lat, lng."""
+    import json
+    mod = _load_module()
+    results = [
+        {"name": "Place A", "lat": 52.52, "lng": 13.40, "error": None},
+    ]
+    output = mod.format_results(results, fmt="json", link=False)
+    parsed = json.loads(output)
+    assert parsed == [{"name": "Place A", "lat": 52.52, "lng": 13.4}]
+
+
+def test_format_results_json_includes_errors():
+    """JSON format includes error field for failed entries."""
+    import json
+    mod = _load_module()
+    results = [
+        {"name": "Place A", "lat": 52.52, "lng": 13.40, "error": None},
+        {"name": "Bad Place", "lat": None, "lng": None, "error": "ZERO_RESULTS"},
+    ]
+    output = mod.format_results(results, fmt="json", link=False)
+    parsed = json.loads(output)
+    assert parsed[0] == {"name": "Place A", "lat": 52.52, "lng": 13.4}
+    assert parsed[1] == {"name": "Bad Place", "lat": None, "lng": None, "error": "ZERO_RESULTS"}
+
+
+def test_format_results_tsv_skips_errors():
+    """TSV format skips entries with errors."""
+    mod = _load_module()
+    results = [
+        {"name": "Place A", "lat": 52.52, "lng": 13.40, "error": None},
+        {"name": "Bad Place", "lat": None, "lng": None, "error": "ZERO_RESULTS"},
+    ]
+    output = mod.format_results(results, fmt="tsv", link=False)
+    assert output == "Place A\t52.52,13.4"
+
+
+def test_format_results_csv_skips_errors():
+    """CSV format skips entries with errors."""
+    mod = _load_module()
+    results = [
+        {"name": "Place A", "lat": 52.52, "lng": 13.40, "error": None},
+        {"name": "Bad Place", "lat": None, "lng": None, "error": "ZERO_RESULTS"},
+    ]
+    output = mod.format_results(results, fmt="csv", link=False)
+    assert output == "name,lat,lng\nPlace A,52.52,13.4"
+
+
+# ---------------------------------------------------------------------------
+# --link flag
+# ---------------------------------------------------------------------------
+
+
+def test_format_results_tsv_with_link():
+    """TSV with --link appends maps URL as third column."""
+    mod = _load_module()
+    results = [
+        {"name": "Kino International", "lat": 52.5204781, "lng": 13.4228483, "error": None},
+    ]
+    output = mod.format_results(results, fmt="tsv", link=True)
+    assert output == (
+        "Kino International\t52.5204781,13.4228483\t"
+        "https://www.google.com/maps/place/Kino+International/@52.5204781,13.4228483,17z"
+    )
+
+
+def test_format_results_csv_with_link():
+    """CSV with --link adds link column."""
+    mod = _load_module()
+    results = [
+        {"name": "Kino International", "lat": 52.5204781, "lng": 13.4228483, "error": None},
+    ]
+    output = mod.format_results(results, fmt="csv", link=True)
+    lines = output.split("\n")
+    assert lines[0] == "name,lat,lng,link"
+    assert "https://www.google.com/maps/place/Kino+International/@52.5204781,13.4228483,17z" in lines[1]
+
+
+def test_format_results_json_with_link():
+    """JSON with --link adds link field."""
+    import json
+    mod = _load_module()
+    results = [
+        {"name": "Kino International", "lat": 52.5204781, "lng": 13.4228483, "error": None},
+    ]
+    output = mod.format_results(results, fmt="json", link=True)
+    parsed = json.loads(output)
+    assert parsed[0]["link"] == (
+        "https://www.google.com/maps/place/Kino+International/@52.5204781,13.4228483,17z"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Exit code on errors
+# ---------------------------------------------------------------------------
+
+
+@responses.activate
+def test_main_exits_nonzero_on_failure(capsys):
+    """main() exits with code 1 if any input fails to resolve."""
+    import pytest
+    mod = _load_module()
+
+    responses.add(
+        responses.GET,
+        "https://maps.googleapis.com/maps/api/geocode/json",
+        json={"status": "ZERO_RESULTS", "results": []},
+        status=200,
+    )
+
+    with patch.dict("os.environ", {"GOOGLE_GEOCODING_API_KEY": "test-key"}):
+        with patch("sys.argv", ["resolve-places.py", "nonexistent_place_xyz"]):
+            with pytest.raises(SystemExit) as exc_info:
+                mod.main()
+            assert exc_info.value.code == 1

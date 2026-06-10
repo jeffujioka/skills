@@ -26,7 +26,8 @@ Alternative: set the `GOOGLE_GEOCODING_API_KEY` environment variable (takes prec
 
 One entry per line. Each line contains a Google Maps URL (required) plus optional name and radius, in any order.
 
-Supported URL formats:
+Supported input formats:
+- **Plain names**: `"Kino International Berlin"` — geocoded via Google Geocoding API
 - **Place URLs**: `https://www.google.com/maps/place/Name/...` — name + coords parsed from URL
 - **Search URLs**: `https://www.google.com/maps/search/?api=1&query=...` — name from query param, coords via Geocoding API
 - **Short URLs**: `https://maps.app.goo.gl/...` — redirect followed, then resolved as place or search URL
@@ -60,13 +61,17 @@ Split input into lines. For each line, extract URL, optional name, and optional 
 
 ### 2. Resolve URLs
 
-For each URL, run:
+For each entry (URL or plain name), run:
 
 ```bash
-uv run ~/projects/jeffujioka/skills/forensic-perimeter/resolve-places.py <url>
+uv run ~/projects/jeffujioka/skills/forensic-perimeter/resolve-places.py <input> [<input2> ...]
 ```
 
-Output: TSV `name\tlat,lng`. Use the script output only for coordinates and as fallback name.
+Options:
+- `--format tsv|csv|json` — output format (default: tsv)
+- `--link` — include Google Maps link in output
+
+Output (TSV default): `name\tlat,lng`. Use the script output only for coordinates and as fallback name.
 
 If a URL fails to resolve, mark it as `ERROR` in the preview table — do not halt.
 
@@ -104,8 +109,11 @@ Added: N | Skipped (duplicate): N | Errors: N
 
 ## Key rules
 
+- Plain names: geocoded via Google Geocoding API. Requires API key.
 - Short URLs (`maps.app.goo.gl`): resolve via `requests` redirect following.
 - Place URLs (`/place/`): name from path segment, coords from `!3d<lat>!4d<lng>` or `@lat,lng`. No API key needed.
 - Search URLs (`/maps/search/?api=1&query=`): name from `query` param (URL-decoded), coords from Google Geocoding API.
 - API key precedence: `GOOGLE_GEOCODING_API_KEY` env var > `~/.config/forensic-perimeter/config.toml`.
+- Output: TSV/CSV skip errors (exit code 1); JSON includes `"error"` field.
+- `--link`: generates `https://www.google.com/maps/place/{name}/@{lat},{lng},17z`.
 - Communicate in the user's language.
