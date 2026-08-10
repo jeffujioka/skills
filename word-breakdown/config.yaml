@@ -1,0 +1,13 @@
+# word-breakdown skill configuration
+vault_path: /Users/JFUJIOK/Documents/cache-b
+study_path: Study/Deutschkurs A2 Enhanced
+default_level: A2
+templates_path: Templates
+# Template mapping: classification → template filename (without .md)
+templates:
+  verb: Deutsch Verb
+  adjective: Deutsch Adjective
+  noun: Deutsch Noun
+  modal_verb: Deutsch Modal Verb
+  pronoun: Deutsch Pronoun
+  adverb: Deutsch Adverb
