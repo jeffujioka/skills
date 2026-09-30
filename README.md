@@ -40,7 +40,7 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 
 ### Tooling
 
-- **gh-over-mcp** — Prefer `gh` CLI over GitHub MCP server tools for all GitHub operations.
+- **github-cli** — Work with GitHub through the `gh` CLI: PRs, issues, CI, code search and `gh api`.
 	```sh
-	npx skills@latest add https://github.com/jeffujioka/skills.git -s gh-over-mcp
+	npx skills@latest add https://github.com/jeffujioka/skills.git -s github-cli
 	```
