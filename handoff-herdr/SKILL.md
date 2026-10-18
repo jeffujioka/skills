@@ -1,6 +1,6 @@
 ---
 name: handoff-herdr
-description: "Use when handing off the current conversation to a fresh session in a new Herdr tab, pane, or workspace. Triggers on: handoff in herdr, handoff to a new tab/pane/workspace, continue in a new session on herdr. Requires HERDR_ENV=1."
+description: "Use when handing off the current conversation to a fresh session in a new Herdr tab, pane, or workspace. Triggers on: handoff in herdr, handoff to a new tab/pane/workspace, continue in a new session on herdr. Requires running inside a Herdr pane."
 ---
 
 # Handoff to a new Herdr session
@@ -11,11 +11,11 @@ Load the `herdr` skill first. It is the authority on CLI syntax, IDs, and agent 
 
 ## Steps
 
-1. **Check Herdr.** Run `test "${HERDR_ENV:-}" = 1`. On failure, tell the user you are not inside Herdr and stop.
+1. **Resolve the calling pane.** If `HERDR_PANE_ID` is set, use it with `HERDR_WORKSPACE_ID`. Tool shells of some harnesses (opencode) do not inherit these, so otherwise run `herdr agent list` and select the entry whose `.agent_session.value` equals your own session ID (`$OPENCODE_SESSION_ID` for opencode); read its `pane_id`, `tab_id`, `workspace_id`. Use these resolved IDs below as `<pane>`, `<tab>`, `<workspace>`. If neither route yields a pane, tell the user you are not inside Herdr and stop.
 2. **Write the handoff document.** Load the `handoff` skill and follow it. Pass the user's focus description as its argument. Note the saved absolute path. Done when the file exists and the path is known.
 3. **Pick the location** from the user's words:
-   - none given, or "tab": `herdr tab create --workspace "$HERDR_WORKSPACE_ID" --cwd "$PWD" --label <slug> --no-focus`. Read `.result.root_pane.pane_id`.
-   - "pane" or "split": `herdr pane split --current --direction <right|down> --cwd "$PWD" --no-focus`. Choose direction as in the `herdr` skill (`herdr pane layout`). Read `.result.pane.pane_id`.
+   - none given, or "tab": `herdr tab create --workspace <workspace> --cwd "$PWD" --label <slug> --no-focus`. Read `.result.root_pane.pane_id`.
+   - "pane" or "split": `herdr pane split <pane> --direction <right|down> --cwd "$PWD" --no-focus`. Choose direction as in the `herdr` skill (`herdr pane layout`). Read `.result.pane.pane_id`.
    - "workspace": `herdr workspace create --cwd "$PWD" --label <slug> --no-focus`. Read `.result.root_pane.pane_id`.
    - Add `--focus` only when the user asks to jump over.
 4. **Identify the current harness, model, and reasoning level** (see table). Done when all three are known, or the unknown reasoning level is reported to the user.
@@ -26,11 +26,11 @@ Load the `herdr` skill first. It is the authority on CLI syntax, IDs, and agent 
 
 ## Harness, model, reasoning
 
-The harness comes from env vars: `OPENCODE=1` is opencode, `CLAUDECODE=1` is claude, `PI_CODING_AGENT` set is pi. For anything else, run `herdr agent list`, find your own pane, and read its kind. The model comes from your own system prompt. The reasoning level comes from the session config or your system prompt. Never guess any of them: omit a flag whose value is unknown and say so in the report.
+The harness comes from env vars (or the `agent` field of your `herdr agent list` entry): `OPENCODE=1` is opencode, `CLAUDECODE=1` is claude, `PI_CODING_AGENT` set is pi. For anything else, run `herdr agent list`, find your own pane, and read its kind. The model comes from your own system prompt. The reasoning level comes from the session config or your system prompt. Never guess any of them: omit a flag whose value is unknown and say so in the report.
 
 | kind | model flags |
 |------|-------------|
-| `opencode` | `--model <provider/model>` |
+| `opencode` | none: the TUI has only `--session`, `--continue`, `--prompt`. Start without flags and report the model for the user to select |
 | `claude` | `--model <model> --effort <level>` |
 | `pi` | `--model <provider/model> --thinking <level>` |
 
