@@ -30,7 +30,7 @@ The harness comes from env vars (or the `agent` field of your `herdr agent list`
 
 | kind | model flags |
 |------|-------------|
-| `opencode` | none: the TUI has only `--session`, `--continue`, `--prompt`. Start without flags and report the model for the user to select |
+| `opencode` | none: the TUI has only `--session`, `--continue`, `--prompt`. `--model` is rejected ("Unrecognized flag"). Start without flags and report the model for the user to select |
 | `claude` | `--model <model> --effort <level>` |
 | `pi` | `--model <provider/model> --thinking <level>` |
 
