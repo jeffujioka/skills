@@ -21,6 +21,7 @@ Load the `herdr` skill first. It is the authority on CLI syntax, IDs, and agent 
 4. **Identify the current harness, model, and reasoning level** (see table). Done when all three are known, or the unknown reasoning level is reported to the user.
 5. **Start the same harness** in the new pane. Name it `handoff-<slug>` (`[a-z][a-z0-9_-]{0,31}`, unique among live agents):
    `herdr agent start handoff-<slug> --kind <kind> --pane <pane-id> -- <model-flags>`
+   For `opencode`, `agent start` cannot set the model (see table): run `herdr pane run <pane-id> "opencode mini --model <provider/model>"`, wait until `herdr agent list` shows the pane as an `opencode` agent, then `herdr agent rename <pane-id> handoff-<slug>`. Prompt it by name as in step 6.
 6. **Prompt it** with `herdr agent prompt handoff-<slug> "Read <handoff-path> and continue from it."` (no `--wait`).
 7. **Report** the workspace, tab, and pane IDs, the agent name, and the model and reasoning level used. Done when the user can attach to or close the session from that report.
 
@@ -30,7 +31,7 @@ The harness comes from env vars (or the `agent` field of your `herdr agent list`
 
 | kind | model flags |
 |------|-------------|
-| `opencode` | none: the TUI has only `--session`, `--continue`, `--prompt`. `--model` is rejected ("Unrecognized flag"). Start without flags and report the model for the user to select |
+| `opencode` | `agent start` rejects `--model` (the TUI has only `--session`, `--continue`, `--prompt`). `opencode mini --model <provider/model>[#variant]` accepts it, and Herdr detects it as an `opencode` agent |
 | `claude` | `--model <model> --effort <level>` |
 | `pi` | `--model <provider/model> --thinking <level>` |
 
