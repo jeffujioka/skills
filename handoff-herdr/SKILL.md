@@ -21,7 +21,11 @@ Load the `herdr` skill first. It is the authority on CLI syntax, IDs, and agent 
 4. **Identify the current harness, model, and reasoning level** (see table). Done when all three are known, or the unknown reasoning level is reported to the user.
 5. **Start the same harness** in the new pane. Name it `handoff-<slug>` (`[a-z][a-z0-9_-]{0,31}`, unique among live agents):
    `herdr agent start handoff-<slug> --kind <kind> --pane <pane-id> -- <model-flags>`
-   For `opencode`, the TUI has no model flag, so seed a session that carries the model and open it: `opencode run -m <provider/model>[#variant] --title handoff-<slug> --format json "ready"`, read `sessionID` from the first JSON line, then `herdr agent start handoff-<slug> --kind opencode --pane <pane-id> -- --session <sessionID>`.
+   For `opencode`, the TUI has no model flag, so seed a session that carries the model and open it. Both steps must hit the same server:
+   - **Server.** Run `zsh -ic 'alias occ'` (the user's alias for the OpenChamber server) and strip ANSI codes from the output. If it contains `opencode --server <url>`, use `<url>` and `occ` below; otherwise use plain `opencode` with no `--server`.
+   - **Seed.** The server password (`OPENCODE_PASSWORD`) exists only in the user's interactive shell, so run the seed through it, discarding stderr and stdin: `zsh -ic "opencode run [--server <url>] -m <provider/model>[#variant] --title handoff-<slug> --format json ready" 2>/dev/null </dev/null | grep -a -m1 -o 'ses_[A-Za-z0-9]*'`. The output is the session ID. Write the server flag after `run` (`occ run` expands to an invalid order). Done when the ID is non-empty.
+   - **Open, plain opencode:** `herdr agent start handoff-<slug> --kind opencode --pane <pane-id> -- --session <sessionID>`.
+   - **Open, with `occ`:** `agent start` runs plain `opencode` and cannot use the alias. Run `herdr pane run <pane-id> "occ --session <sessionID>"`, wait until `herdr agent list` shows the pane as an `opencode` agent, then `herdr agent rename <pane-id> handoff-<slug>`.
 6. **Prompt it** with `herdr agent prompt handoff-<slug> "Read <handoff-path> and continue from it."` (no `--wait`).
 7. **Report** the workspace, tab, and pane IDs, the agent name, and the model and reasoning level used. Done when the user can attach to or close the session from that report.
 
