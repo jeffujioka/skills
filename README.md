@@ -59,3 +59,8 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s captain-away
 	```
+
+- **logbook** — Keeps a session's progress, decisions and blocked actions on disk so context compaction loses no state; also compacts on request.
+	```sh
+	npx skills@latest add https://github.com/jeffujioka/skills.git -s logbook
+	```
