@@ -49,3 +49,8 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s handoff-herdr
 	```
+
+- **hire** — Run a task on a subagent pinned to a chosen model and reasoning level, by rank (intern to cto) or raw `model#effort`.
+	```sh
+	npx skills@latest add https://github.com/jeffujioka/skills.git -s hire
+	```
