@@ -54,3 +54,8 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s hire
 	```
+
+- **captain-away** — Unattended runs: the agent decides every open question itself, never pushes, merges, deletes or writes to Jira/Confluence, caps spend, and leaves a report for when you return.
+	```sh
+	npx skills@latest add https://github.com/jeffujioka/skills.git -s captain-away
+	```
