@@ -82,7 +82,7 @@ Scripts under `scripts/` may use any shippable language. They handle errors with
 |---|---|---|
 | R10 | FAIL | No secrets in any file: keys, tokens, private keys, `password=` values. Read secrets at runtime or ask the user. |
 
-Conditional guardrails live in `references/guardrails.md`. Prompt-leak hardening is not added: it degrades task performance.
+Conditional guardrails live in the guardrails reference. Prompt-leak hardening is not added: it degrades task performance.
 
 ## Sources
 

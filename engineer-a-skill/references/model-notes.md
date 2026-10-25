@@ -45,7 +45,7 @@ How the 5.5 family reads skill text. Each note is tagged with the models Anthrop
 - Efficient and responsive to instructions; the most literal about named stop conditions. Name which stops are wanted.
 - Unattended skills: list the open items in a file and treat a text-only turn end as a report, not as done.
 - A skill that works across several apps says to look through the relevant sources before acting.
-- Pasted text in user messages can carry instructions the user did not write; see `references/guardrails.md`.
+- Pasted text in user messages can carry instructions the user did not write; add the untrusted-content guardrail.
 
 ## Sources
 

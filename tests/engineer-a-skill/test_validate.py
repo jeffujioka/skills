@@ -1,3 +1,4 @@
+import shutil
 import sys
 import tempfile
 import unittest
@@ -29,12 +30,12 @@ def rules(skill: Path) -> set[tuple[str, str]]:
     return {(item[0], item[1]) for item in findings.items}
 
 
-class FenceTests(unittest.TestCase):
+class SkillTestCase(unittest.TestCase):
     def addCleanup_tmp(self, skill: Path):
-        import shutil
-
         self.addCleanup(shutil.rmtree, skill.parent, ignore_errors=True)
 
+
+class FenceTests(SkillTestCase):
     def test_untagged_fence_with_loop_fails(self):
         skill = make_skill({
             "SKILL.md": FM + "Body.\n\n```\nfor f in *; do rm \"$f\"; done\n```\n",
@@ -56,6 +57,36 @@ class FenceTests(unittest.TestCase):
         self.addCleanup_tmp(skill)
         ids = {rule_id for _, rule_id in rules(skill)}
         self.assertNotIn("R07", ids)
+
+
+class NestingTests(SkillTestCase):
+    def test_backticked_md_path_in_reference_fails(self):
+        skill = make_skill({
+            "SKILL.md": FM + "See `references/a.md`.\n",
+            "references/a.md": "See `references/b.md`.\n",
+            "references/b.md": "x\n",
+        })
+        self.addCleanup_tmp(skill)
+        self.assertIn(("FAIL", "R04"), rules(skill))
+
+    def test_backticked_script_path_in_reference_ok(self):
+        skill = make_skill({
+            "SKILL.md": FM + "See `references/a.md`.\n",
+            "references/a.md": "See `scripts/run.py`.\n",
+            "scripts/run.py": "x\n",
+        })
+        self.addCleanup_tmp(skill)
+        ids = {rule_id for _, rule_id in rules(skill)}
+        self.assertNotIn("R04", ids)
+
+    def test_backticked_md_path_in_skill_md_ok(self):
+        skill = make_skill({
+            "SKILL.md": FM + "See `references/a.md`.\n",
+            "references/a.md": "x\n",
+        })
+        self.addCleanup_tmp(skill)
+        ids = {rule_id for _, rule_id in rules(skill)}
+        self.assertNotIn("R04", ids)
 
 
 if __name__ == "__main__":

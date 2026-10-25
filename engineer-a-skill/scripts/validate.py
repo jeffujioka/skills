@@ -245,8 +245,11 @@ def check_references(skill_dir, rel_path, text_lines, is_skill_md, f):
             elif not is_skill_md and dest.suffix == ".md":
                 f.fail("R04", where, f"reference links to another .md ({target}); keep references one level deep")
         for target in PATH_RE.findall(line):
+            where = f"{rel_path}:{n}"
+            if not is_skill_md and target.endswith(".md"):
+                f.fail("R04", where, f"reference names another .md ({target}); keep references one level deep")
             if not (skill_dir / target).exists():
-                f.fail("R08", f"{rel_path}:{n}", f"referenced file not found: {target}")
+                f.fail("R08", where, f"referenced file not found: {target}")
 
 
 def check_scripts(skill_dir, f):
