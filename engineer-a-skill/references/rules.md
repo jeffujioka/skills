@@ -72,7 +72,7 @@ Manual rules:
 |---|---|---|
 | R07 | FAIL | In `SKILL.md`, a fenced code block has max 3 non-blank lines. Shell blocks: pipes allowed; no `&&`, `||`, `;`, heredocs, loops or conditionals. |
 
-Fences tagged text, markdown, yaml, json, xml, diff or untagged are not code and are exempt.
+Fences tagged text, markdown, yaml, json, xml or diff are not code and are exempt. Untagged fences are checked as shell.
 
 Scripts under `scripts/` may use any shippable language. They handle errors with explicit messages, justify every constant in a comment, and are run, not read. `SKILL.md` says "run" or "see" explicitly.
 

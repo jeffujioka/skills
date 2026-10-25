@@ -64,10 +64,10 @@ TERM_GROUPS = [
     ("manual-only", "user-invoked", "manual only"),
 ]
 NON_CODE_LANGS = {
-    "", "text", "txt", "plaintext", "markdown", "md", "yaml", "yml", "json", "xml",
+    "text", "txt", "plaintext", "markdown", "md", "yaml", "yml", "json", "xml",
     "toml", "ini", "diff", "output", "csv", "html",
 }
-SHELL_LANGS = {"bash", "sh", "shell", "zsh", "console", "fish"}
+SHELL_LANGS = {"", "bash", "sh", "shell", "zsh", "console", "fish"}
 SHELL_KEYWORD_RE = re.compile(r"^\s*(?:for|while|until|if|case|select|function|then|do|done|fi|esac)\b")
 QUOTED_RE = re.compile(r"'[^']*'|\"[^\"]*\"")
 
@@ -203,10 +203,13 @@ def check_fences(rel, lines, f):
             continue
         code = [ln for ln in body if ln.strip()]
         where = f"{rel}:{first}"
+        label = "untagged" if lang == "" else lang
+        untagged_suffix = "; tag non-shell blocks as text" if lang == "" else ""
         if len(code) > MAX_FENCE_LINES:
             f.fail(
                 "R07", where,
-                f"{lang} block has {len(code)} lines (max {MAX_FENCE_LINES}); move it to scripts/",
+                f"{label} block has {len(code)} lines (max {MAX_FENCE_LINES}); move it to scripts/"
+                f"{untagged_suffix}",
             )
         if lang not in SHELL_LANGS:
             continue
@@ -214,13 +217,19 @@ def check_fences(rel, lines, f):
             bare = QUOTED_RE.sub("''", ln).replace("\\;", "")
             at = f"{rel}:{first + 1 + offset}"
             if "&&" in bare or "||" in bare:
-                f.fail("R07", at, "'&&' and '||' are forbidden; use separate commands or a script")
+                f.fail(
+                    "R07", at,
+                    f"'&&' and '||' are forbidden; use separate commands or a script{untagged_suffix}",
+                )
             if ";" in bare:
-                f.fail("R07", at, "';' chaining is forbidden; use one command per line")
+                f.fail("R07", at, f"';' chaining is forbidden; use one command per line{untagged_suffix}")
             if "<<" in bare:
-                f.fail("R07", at, "heredocs are forbidden; move to scripts/")
+                f.fail("R07", at, f"heredocs are forbidden; move to scripts/{untagged_suffix}")
             if SHELL_KEYWORD_RE.match(bare):
-                f.fail("R07", at, "loops and conditionals are forbidden; move to scripts/")
+                f.fail(
+                    "R07", at,
+                    f"loops and conditionals are forbidden; move to scripts/{untagged_suffix}",
+                )
 
 
 def check_references(skill_dir, rel_path, text_lines, is_skill_md, f):
