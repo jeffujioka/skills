@@ -89,5 +89,60 @@ class NestingTests(SkillTestCase):
         self.assertNotIn("R04", ids)
 
 
+class FalsePositiveTests(SkillTestCase):
+    def test_number_with_unit_not_dated(self):
+        skill = make_skill({
+            "SKILL.md": FM + "Read buffers in 2048 byte chunks.\n",
+        })
+        self.addCleanup_tmp(skill)
+        ids = {rule_id for _, rule_id in rules(skill)}
+        self.assertNotIn("R11", ids)
+
+    def test_hyphenated_number_not_dated(self):
+        skill = make_skill({
+            "SKILL.md": FM + "Use in 2048-byte blocks.\n",
+        })
+        self.addCleanup_tmp(skill)
+        ids = {rule_id for _, rule_id in rules(skill)}
+        self.assertNotIn("R11", ids)
+
+    def test_real_year_dated(self):
+        skill = make_skill({
+            "SKILL.md": FM + "Valid as of 2025.\n",
+        })
+        self.addCleanup_tmp(skill)
+        self.assertIn(("FAIL", "R11"), rules(skill))
+
+    def test_month_year_dated(self):
+        skill = make_skill({
+            "SKILL.md": FM + "Deprecated before March 2026.\n",
+        })
+        self.addCleanup_tmp(skill)
+        self.assertIn(("FAIL", "R11"), rules(skill))
+
+    def test_password_label_not_secret(self):
+        skill = make_skill({
+            "SKILL.md": FM + "Set password: required in the form.\n",
+        })
+        self.addCleanup_tmp(skill)
+        ids = {rule_id for _, rule_id in rules(skill)}
+        self.assertNotIn("R10", ids)
+
+    def test_quoted_password_secret(self):
+        secret = "pass" + "word"
+        skill = make_skill({
+            "SKILL.md": FM + f'{secret}: "hunter22"\n',
+        })
+        self.addCleanup_tmp(skill)
+        self.assertIn(("FAIL", "R10"), rules(skill))
+
+    def test_mixed_unquoted_key_secret(self):
+        skill = make_skill({
+            "SKILL.md": FM + "api_key=abc123def456\n",
+        })
+        self.addCleanup_tmp(skill)
+        self.assertIn(("FAIL", "R10"), rules(skill))
+
+
 if __name__ == "__main__":
     unittest.main()

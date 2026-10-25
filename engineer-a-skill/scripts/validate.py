@@ -40,7 +40,9 @@ REASONING_RE = re.compile(
     re.I,
 )
 DATED_RE = re.compile(
-    r"\b(?:before|after|until|since|as of|by|in|starting)\s+(?:[A-Za-z]+\s+)?20\d{2}\b", re.I
+    r"\b(?:before|after|until|since|as of|by|in|starting)\s+(?:[A-Za-z]+\s+)?20\d{2}"
+    r"(?![\d-])(?!\s*(?:bytes?|bits?|[kmg]i?b|ms|px|lines?|chars?|characters|tokens?|rows?|items?)\b)\b",
+    re.I,
 )
 PLACEHOLDER_RE = re.compile(r"<<FILL|\{\{\w+\}\}")
 SECRET_RES = [
@@ -51,9 +53,13 @@ SECRET_RES = [
     ("Slack token", re.compile(r"xox[baprs]-[A-Za-z0-9-]{10}")),
     ("API secret key", re.compile(r"\bsk-[A-Za-z0-9]{20}")),
     (
+        # value must be quoted, or unquoted with both a letter and a digit,
+        # to avoid flagging labels like "password: required" as secrets
         "hardcoded credential",
         re.compile(
-            r"(?i)\b(?:password|passwd|secret|api[_-]?key|token)\b\s*[:=]\s*['\"]?[A-Za-z0-9/+_-]{8}"
+            r"(?i)\b(?:password|passwd|secret|api[_-]?key|token)\b\s*[:=]\s*"
+            r"(?:['\"][^'\"\s]{8,}['\"]"
+            r"|(?=[A-Za-z0-9/+_-]*[A-Za-z])(?=[A-Za-z0-9/+_-]*\d)[A-Za-z0-9/+_-]{8,})"
         ),
     ),
 ]
