@@ -144,5 +144,34 @@ class FalsePositiveTests(SkillTestCase):
         self.assertIn(("FAIL", "R10"), rules(skill))
 
 
+class LimitTests(SkillTestCase):
+    def test_body_limit_excludes_frontmatter(self):
+        # Frontmatter with 10 x-pad lines + 495 body lines = 505 total lines
+        # But body is only 495, so should NOT trigger R03
+        fm_lines = ["---", "name: probe", 'description: "Use when testing."']
+        for i in range(10):
+            fm_lines.append("x-pad: 1")
+        fm_lines.append("---")
+        fm_text = "\n".join(fm_lines) + "\n"
+
+        body_lines = ["Body line."] * 495
+        skill_md = fm_text + "\n".join(body_lines) + "\n"
+
+        skill = make_skill({"SKILL.md": skill_md})
+        self.addCleanup_tmp(skill)
+        ids = {rule_id for _, rule_id in rules(skill)}
+        self.assertNotIn("R03", ids)
+
+    def test_body_over_500_fails(self):
+        # Minimal frontmatter + 501 body lines should trigger R03
+        fm_text = FM
+        body_lines = ["Body line."] * 501
+        skill_md = fm_text + "\n".join(body_lines) + "\n"
+
+        skill = make_skill({"SKILL.md": skill_md})
+        self.addCleanup_tmp(skill)
+        self.assertIn(("FAIL", "R03"), rules(skill))
+
+
 if __name__ == "__main__":
     unittest.main()

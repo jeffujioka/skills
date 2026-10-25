@@ -27,7 +27,7 @@ PATH_RE = re.compile(r"`((?:scripts|references|templates)/[\w.-]+(?:/[\w.-]+)*)`
 FENCE_OPEN_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})\s*([\w+#.-]*)")
 FENCE_CLOSE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})\s*$")
 FIRST_PERSON_CS_RE = re.compile(r"\bI(?:'m|'ll|'ve|'d)?\b")
-SECOND_PERSON_RE = re.compile(r"\b(?:my|you|your|we|our)\b", re.I)
+NOT_THIRD_PERSON_RE = re.compile(r"\b(?:my|you|your|we|our)\b", re.I)  # first- and second-person words
 WHEN_RE = re.compile(
     r"\b(?:use when|use for|call by hand|when|whenever|triggers? on|if the user)\b", re.I
 )
@@ -193,7 +193,7 @@ def check_frontmatter(fields, skill_md, f):
     if XML_TAG_RE.search(desc):
         f.fail("R02", where, "description contains XML tags")
     plain = INLINE_CODE_RE.sub("", desc)
-    if FIRST_PERSON_CS_RE.search(plain) or SECOND_PERSON_RE.search(plain):
+    if FIRST_PERSON_CS_RE.search(plain) or NOT_THIRD_PERSON_RE.search(plain):
         f.fail("R02", where, "description must be third person (found I/my/you/your/we/our)")
     if not WHEN_RE.search(desc):
         f.warn("W02", where, "description has no 'when' clause (Use when... / Call by hand...)")
@@ -308,11 +308,11 @@ def validate(skill_dir):
     skill_md = skill_dir / "SKILL.md"
     text = skill_md.read_text(encoding="utf-8")
     lines = text.splitlines()
-    fields, _ = parse_frontmatter(lines)
+    fields, body_start = parse_frontmatter(lines)
     check_frontmatter(fields, skill_md, f)
 
-    if len(lines) > MAX_BODY_LINES:
-        f.fail("R03", "SKILL.md", f"{len(lines)} lines (max {MAX_BODY_LINES}); split into reference files")
+    if len(lines) - body_start > MAX_BODY_LINES:
+        f.fail("R03", "SKILL.md", f"body is {len(lines) - body_start} lines (max {MAX_BODY_LINES}); split into reference files")
 
     docs = [(Path("SKILL.md"), lines, True)]
     for path in sorted(skill_dir.rglob("*.md")):

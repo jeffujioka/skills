@@ -35,7 +35,7 @@ Name style: prefer gerund or verb form. Avoid vague names (helper, utils, tools)
 
 | Id | Level | Rule |
 |---|---|---|
-| R03 | FAIL | `SKILL.md` max 500 lines. |
+| R03 | FAIL | `SKILL.md` body (after frontmatter) max 500 lines. |
 | R04 | FAIL | References one level deep: a reference file never links to another `.md`. |
 | R05 | FAIL | Reference file over 100 lines has a `## Contents` section. |
 | R08 | FAIL | Every linked file or `scripts/`, `references/`, `templates/` path named in backticks exists. |
