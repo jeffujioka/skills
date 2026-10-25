@@ -43,6 +43,18 @@ class FenceTests(SkillTestCase):
         self.addCleanup_tmp(skill)
         self.assertIn(("FAIL", "R07"), rules(skill))
 
+    def test_untagged_fence_message_mentions_tagging_as_text(self):
+        skill = make_skill({
+            "SKILL.md": FM + "Body.\n\n```\nfor f in *; do rm \"$f\"; done\n```\n",
+        })
+        self.addCleanup_tmp(skill)
+        findings = validate.validate(skill)
+        messages = [item[3] for item in findings.items if item[1] == "R07"]
+        self.assertTrue(
+            any("tag non-shell blocks as text" in m for m in messages),
+            messages,
+        )
+
     def test_untagged_fence_over_3_lines_fails(self):
         skill = make_skill({
             "SKILL.md": FM + "Body.\n\n```\na\nb\nc\nd\n```\n",
@@ -120,6 +132,28 @@ class FalsePositiveTests(SkillTestCase):
         self.addCleanup_tmp(skill)
         self.assertIn(("FAIL", "R11"), rules(skill))
 
+    def test_iso_date_as_of_dated(self):
+        skill = make_skill({
+            "SKILL.md": FM + "as of 2025-06-01 the API changed\n",
+        })
+        self.addCleanup_tmp(skill)
+        self.assertIn(("FAIL", "R11"), rules(skill))
+
+    def test_iso_date_in_dated(self):
+        skill = make_skill({
+            "SKILL.md": FM + "Deprecated in 2025-03.\n",
+        })
+        self.addCleanup_tmp(skill)
+        self.assertIn(("FAIL", "R11"), rules(skill))
+
+    def test_number_with_pixels_not_dated(self):
+        skill = make_skill({
+            "SKILL.md": FM + "Use in 2048x2048 images.\n",
+        })
+        self.addCleanup_tmp(skill)
+        ids = {rule_id for _, rule_id in rules(skill)}
+        self.assertNotIn("R11", ids)
+
     def test_password_label_not_secret(self):
         skill = make_skill({
             "SKILL.md": FM + "Set password: required in the form.\n",
@@ -136,9 +170,56 @@ class FalsePositiveTests(SkillTestCase):
         self.addCleanup_tmp(skill)
         self.assertIn(("FAIL", "R10"), rules(skill))
 
-    def test_mixed_unquoted_key_secret(self):
+    def test_quoted_env_var_ref_not_secret(self):
+        secret = "TOKEN"
         skill = make_skill({
-            "SKILL.md": FM + "api_key=abc123def456\n",
+            "SKILL.md": FM + f'{secret}="${{GITHUB_TOKEN}}"\n',
+        })
+        self.addCleanup_tmp(skill)
+        ids = {rule_id for _, rule_id in rules(skill)}
+        self.assertNotIn("R10", ids)
+
+    def test_quoted_dollar_var_ref_not_secret(self):
+        secret = "api_" + "key"
+        skill = make_skill({
+            "SKILL.md": FM + f'{secret}: "$API_KEY"\n',
+        })
+        self.addCleanup_tmp(skill)
+        ids = {rule_id for _, rule_id in rules(skill)}
+        self.assertNotIn("R10", ids)
+
+    def test_quoted_angle_placeholder_not_secret(self):
+        secret = "pass" + "word"
+        skill = make_skill({
+            "SKILL.md": FM + f'{secret}: "<your-password>"\n',
+        })
+        self.addCleanup_tmp(skill)
+        ids = {rule_id for _, rule_id in rules(skill)}
+        self.assertNotIn("R10", ids)
+
+    def test_quoted_asterisk_placeholder_not_secret(self):
+        secret = "secret"
+        skill = make_skill({
+            "SKILL.md": FM + f'{secret}: "********"\n',
+        })
+        self.addCleanup_tmp(skill)
+        ids = {rule_id for _, rule_id in rules(skill)}
+        self.assertNotIn("R10", ids)
+
+    def test_quoted_all_caps_placeholder_not_secret(self):
+        secret = "to" + "ken"
+        skill = make_skill({
+            "SKILL.md": FM + f'{secret}: "YOUR_TOKEN"\n',
+        })
+        self.addCleanup_tmp(skill)
+        ids = {rule_id for _, rule_id in rules(skill)}
+        self.assertNotIn("R10", ids)
+
+    def test_mixed_unquoted_key_secret(self):
+        prefix = "api_" + "key"
+        value = "abc123def456"
+        skill = make_skill({
+            "SKILL.md": FM + f"{prefix}={value}\n",
         })
         self.addCleanup_tmp(skill)
         self.assertIn(("FAIL", "R10"), rules(skill))

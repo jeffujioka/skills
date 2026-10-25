@@ -41,7 +41,10 @@ REASONING_RE = re.compile(
 )
 DATED_RE = re.compile(
     r"\b(?:before|after|until|since|as of|by|in|starting)\s+(?:[A-Za-z]+\s+)?20\d{2}"
-    r"(?![\d-])(?!\s*(?:bytes?|bits?|[kmg]i?b|ms|px|lines?|chars?|characters|tokens?|rows?|items?)\b)\b",
+    # (?!\d) lets ISO dates (2025-06-01) through; the unit lookahead still
+    # absorbs hyphenated units (2048-byte); the trailing \b is load-bearing:
+    # it rejects "2048x2048" by requiring a word boundary right after the year.
+    r"(?!\d)(?![\s-]*(?:bytes?|bits?|[kmg]i?b|ms|px|lines?|chars?|characters|tokens?|rows?|items?)\b)\b",
     re.I,
 )
 PLACEHOLDER_RE = re.compile(r"<<FILL|\{\{\w+\}\}")
@@ -58,7 +61,11 @@ SECRET_RES = [
         "hardcoded credential",
         re.compile(
             r"(?i)\b(?:password|passwd|secret|api[_-]?key|token)\b\s*[:=]\s*"
-            r"(?:['\"][^'\"\s]{8,}['\"]"
+            # quoted branch: skip env-var refs ($X, ${X}) and placeholders
+            # (<...>, ***). Also skip all-caps/underscore-only placeholder
+            # words like YOUR_TOKEN (no lowercase, no digit) via the second
+            # lookahead.
+            r"(?:['\"](?![$<{%*])(?!(?-i:[A-Z0-9_]{8,})['\"])[^'\"\s]{8,}['\"]"
             r"|(?=[A-Za-z0-9/+_-]*[A-Za-z])(?=[A-Za-z0-9/+_-]*\d)[A-Za-z0-9/+_-]{8,})"
         ),
     ),

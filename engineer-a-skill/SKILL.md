@@ -16,7 +16,7 @@ Modes:
 
 ## 1. Intake
 
-Look up facts yourself: target dir contents, sibling skills, existing scripts, README presence. Ask only what is still missing, one message, max 7 questions:
+If the target dir is not given, ask for it first. Then look up facts yourself: target dir contents, sibling skills, existing scripts, README presence. Ask only what is still missing, one message, max 7 questions:
 
 1. Purpose and the one-line "when".
 2. Auto or manual-only? Undecided: manual-only if the skill has side effects, auto if it is read-only reference.
@@ -24,7 +24,7 @@ Look up facts yourself: target dir contents, sibling skills, existing scripts, R
 4. Per step: high, medium or low freedom (see rules).
 5. Scripts needed? Language: the user's pick, else the one common in the target repo.
 6. Reads untrusted content, or takes irreversible or shared actions?
-7. Target dir. Always ask: no default, no guessing.
+7. Target dir, if not already given.
 
 *Done when:* all seven answered.
 
