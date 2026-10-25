@@ -1,6 +1,6 @@
 # Model notes
 
-How the 5.5 family reads skill text. Each note is tagged with the models Anthropic measured it on. Re-check against real use before applying elsewhere.
+How the 5.5 family reads skill text. Notes are grouped by the models Anthropic measured them on. Re-check them when a new model family ships.
 
 ## Contents
 
