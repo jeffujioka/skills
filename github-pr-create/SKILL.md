@@ -1,6 +1,6 @@
 ---
 name: github-pr-create
-description: "Create a GitHub pull request with gh from the current branch: find the repo's PR template, fill it, show the draft, create only after approval."
+description: "Create a GitHub pull request with gh from the current branch: find the repo's PR template, fill it, show the draft, create only after approval. Use when opening a GitHub PR, creating a pull request, or the user asks for a GitHub PR on the current branch."
 ---
 
 # GitHub PR Create
@@ -10,6 +10,8 @@ description: "Create a GitHub pull request with gh from the current branch: find
 Creates one GitHub PR for the current branch. Two hard rules: nothing is published before the user approves the draft, and nothing is pushed. The user commits and pushes; this skill checks that the branch is pushed and stops if not.
 
 GitHub and `gh` only. Scripts live in `scripts/`, the fallback template in `templates/`; paths below are relative to this skill dir. Run the scripts with the target repo as working directory and the skill dir as the script path (`bash <skill-dir>/scripts/<name>.sh`).
+
+Steps 1 and 2 run independent, read-only scripts: call both in the same step, before reading either output.
 
 ## Steps
 
@@ -41,6 +43,26 @@ Fill only what the commits, the diff, or the branch name support. Leave everythi
 - **Fallback template:** `## Why` is prose: the problem or motivation, from commit bodies. `## What` is terse bullets of the change, no code snippets unless essential. `## Verification` is how it was tested or can be verified, with no test statistics (say "`npm test` passes", not "2431 of 2431"); state any model-call cost as a percentage of the eval budget, never dollars or token counts; delete it for docs-only changes. Delete `## Notes` unless there is something worth flagging — breaking changes, caveats, or what is not yet verified; do not keep it empty just to fill it. Delete `## Breaking change` unless a commit has `!` after its type or a `BREAKING CHANGE:` footer. Keep `## Screenshots` only for UI changes and mark it as a gap; otherwise delete it. Use `## Related issues` for issue or Jira keys from the branch name or commit footers (`Fixes #123`, `Issue-ID:`).
 - **Gaps:** where the source does not support a part, leave a visible `TODO: <what is missing>` in the description. Never invent issue numbers, checkboxes, or PR links. Examples of typical gaps: a project checkbox, a definition ticket, related PRs, a motivation nothing in the commits states.
 - **Issue keys:** if there are several candidates or none, do not pick one. Make it a gap.
+
+<example>
+Commits: `fix(auth): reject expired refresh tokens` plus a body explaining the prior check used `<=` instead of `<`. No issue key in branch name or commits.
+
+## Why
+
+The refresh-token check accepted tokens at their exact expiry instant, letting one extra request through.
+
+## What
+
+- Change the expiry comparison from `<=` to `<` in the refresh-token check.
+
+## Verification
+
+`go test ./auth/...` passes.
+
+## Related issues
+
+TODO: no issue or Jira key found in the branch name or commits.
+</example>
 
 *Done when:* every section is either filled from a source or holds a `TODO:` that you will list in step 4.
 
@@ -76,7 +98,8 @@ If the script fails, report the error text and stop. Do not retry on your own: `
 
 ## Rules
 
-- Never create or publish a PR before the user approves the draft.
+- Reading templates, gathering context, and drafting are local and reversible; proceed without asking. Creating the PR is visible to others: never do it before the user approves the draft.
 - Never push and never commit. A branch that is not pushed means: stop and tell the user.
+- If `create-pr.sh` fails, report the error text and stop. Never bypass `check-pushed.sh` or retry with a forcing flag: `gh` may have already created the PR before failing.
 - The description is normal prose, following the template structure. No emoji, no decorative formatting.
 - Do not invent content the sources do not support. A `TODO:` is better than a guess.

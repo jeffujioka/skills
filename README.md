@@ -45,6 +45,11 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s github-cli
 	```
 
+- **github-pr-create** — Create a GitHub pull request with `gh` from the current branch: find the repo's PR template, fill it, show the draft, create only after approval.
+	```sh
+	npx skills@latest add https://github.com/jeffujioka/skills.git -s github-pr-create
+	```
+
 - **handoff-herdr** — Hand off the current conversation to a new Herdr tab, pane, or workspace: same harness, model, and reasoning level. Requires the `herdr` and `handoff` skills.
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s handoff-herdr
