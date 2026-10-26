@@ -65,6 +65,7 @@ Manual rules:
 - Multi-step workflows end each step with an observable done condition.
 - Output-heavy or batch steps get a validate-then-fix loop.
 - Colleague test: a reader with no context could follow each step.
+- No fact that expires. Model-specific notes name the model family they apply to.
 
 ## Embedded commands
 

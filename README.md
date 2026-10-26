@@ -65,7 +65,7 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s logbook
 	```
 
-- **engineer-a-skill** — Create, edit or audit an agent skill: batched intake, scaffold, write, then validate with a script (frontmatter, size, one-level references, embedded-command limits, secrets). Call with `@engineer-a-skill`; never auto-loads.
+- **engineer-a-skill** — Create, edit or audit an agent skill against binding authoring rules, model notes and guardrails: batched intake, scaffold, write, then validate with a script (frontmatter, size, one-level references, embedded-command limits, secrets). Call with `@engineer-a-skill`; never auto-loads.
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s engineer-a-skill
 	```
