@@ -8,4 +8,6 @@ disable-model-invocation: true
 
 1. Run the tests.
 2. Build the image.
-3. Push the image to staging.
+3. Tag the image with the commit hash.
+4. Push the image to staging.
+5. Check the staging health endpoint.

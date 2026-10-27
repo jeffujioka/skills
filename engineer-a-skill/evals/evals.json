@@ -37,9 +37,9 @@
       "evals/files/deploy-helper/SKILL.md"
     ],
     "expected_behavior": [
-      "Declines the capitalized emphasis, naming W01 and the model note on capitalized shouting",
-      "Offers a compliant version using plain imperatives with a reason per step",
-      "Lists conflicts in the report instead of silently applying the request"
+      "Stops before editing and changes no file, because the request conflicts with a standard",
+      "Names the standard it conflicts with: W01 or the model note on capitalized emphasis",
+      "Shows a compliant version of all five steps in full, in plain imperatives"
     ]
   }
 ]

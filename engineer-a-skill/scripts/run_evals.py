@@ -32,8 +32,8 @@ ISOLATION = [  # keep user hooks, plugins, skills and MCP servers out of the run
     "--no-session-persistence",
 ]
 RUN_PROMPT = """Read {skill_md} and follow it to handle the request below. \
-No user is available to answer: where the skill says to ask or stop, stop and \
-state what you would ask.
+No user is available to answer. If the skill needs an answer from the user \
+before it can go on, stop there and state the question.
 
 Request: {query}"""
 JUDGE_PROMPT = """You grade one run of an agent skill. For each expected \
@@ -165,7 +165,7 @@ def run_one(skill_dir, scenario, idx, model, args, out):
     prompt = RUN_PROMPT.format(skill_md=copy / "SKILL.md", query=scenario["query"])
     cmd = ["claude", "-p", prompt, "--model", model, "--output-format", "stream-json", "--verbose",
            *ISOLATION, "--permission-mode", "acceptEdits",
-           "--allowedTools", "Read", "Write", "Edit", "Glob", "Grep", f"Bash(python3 {work}/*)"]
+           "--allowedTools", "Read", "Write", "Edit", "Glob", "Grep", f"Bash(python3 {work}/*)", f"Bash(chmod +x {work}/*)"]
     transcript = run_dir / "transcript.jsonl"
     try:
         with transcript.open("w") as fh, (run_dir / "stderr.txt").open("w") as err:
