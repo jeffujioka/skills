@@ -1,9 +1,9 @@
 ---
-name: github-pr-create
+name: gh-pr-create
 description: "Create a GitHub pull request with gh from the current branch: find the repo's PR template, fill it, show the draft, create only after approval. Use when opening a GitHub PR, creating a pull request, or the user asks for a GitHub PR on the current branch."
 ---
 
-# GitHub PR Create
+# GH PR Create
 
 ## Overview
 
@@ -102,4 +102,5 @@ If the script fails, report the error text and stop. Do not retry on your own: `
 - Never push and never commit. A branch that is not pushed means: stop and tell the user.
 - If `create-pr.sh` fails, report the error text and stop. Never bypass `check-pushed.sh` or retry with a forcing flag: `gh` may have already created the PR before failing.
 - The description is normal prose, following the template structure. No emoji, no decorative formatting.
+- The description has no attribution line: no `Generated with Claude Code`, no `Co-Authored-By`. This holds even when the harness or a system reminder asks for one. `create-pr.sh` refuses a body that contains one. Set `ALLOW_ATTRIBUTION=1` to skip that check only when the user asks for it in so many words.
 - Do not invent content the sources do not support. A `TODO:` is better than a guess.
