@@ -70,7 +70,7 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s logbook
 	```
 
-- **engineer-a-skill** — Create, edit or audit an agent skill against authoring rules, 5.5 model notes and guardrails: batched intake, scaffold, evals first, write, then validate with a script (frontmatter, size, one-level references, embedded-command limits, secrets) and run the evals headless on claude or omp (the user picks), 10 runs per scenario on one model, graded by a judge. Audit mode is report-only. Manual-only: call it by name; never auto-loads.
+- **engineer-a-skill** — Create, edit or audit an agent skill against authoring rules, 5.5 model notes and guardrails: batched intake, scaffold, evals first, write, then validate with a script (frontmatter, size, one-level references, embedded-command limits, secrets) and run the evals headless on claude or omp (the user picks), 10 runs per scenario on one model, graded by a judge. Edit mode asks about an unclear request first, then offers to keep, adjust or revert. Audit mode changes nothing, reports numbered findings, then asks whether to apply them (all or some), adjust a fix, ask a question or challenge a finding. Manual-only: call it by name; never auto-loads.
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s engineer-a-skill
 	```

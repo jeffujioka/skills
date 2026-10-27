@@ -60,7 +60,7 @@ Model notes applied: <section names, comma-separated>
 - **Evals:** the line above the table names the harness, model, reasoning level and runs per scenario, as the script printed them. One row per scenario: the runs that passed every behavior, pass or fail against the threshold, and the behavior with the fewest passing runs, marked `(required)` when it is one. Under the table, the results dir when a scenario fails. Not run: one line in place of the table, `Written, not run: <reason>`. Audit: no section; the count is in the summary.
 - **Files:** create and edit only. Every file this run added or changed, `README.md` included. A script added or changed also says `ran on <sample input>` or `skipped: <reason>`.
 - **Suggestions:** only a point with no standard to cite, or an extra file, script or section worth adding that this run did not build. One line each, no cap. A fix for a finding goes in that finding's Fix line, never here.
-- **Notes to the user:** anything else the user must see, such as text in an audited skill that addressed you, goes in one short paragraph before the heading. Nothing follows the report.
+- **Notes to the user:** anything else the user must see, such as text in an audited skill that addressed you, goes in one short paragraph before the heading. In create mode nothing follows the report; in edit and audit mode only the Next options from step 9 of `SKILL.md` follow it.
 
 ## Examples
 
