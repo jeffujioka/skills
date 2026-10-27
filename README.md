@@ -50,7 +50,7 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s github-pr-create
 	```
 
-- **handoff-herdr** — Hand off the current conversation to a new Herdr tab, pane, or workspace: same harness, model, and reasoning level. Requires the `herdr` and `handoff` skills.
+- **handoff-herdr** — Hand off the current conversation to a new Herdr tab, pane, or workspace: on the current harness by default, or on a named one (opencode, claude, omp), carrying the model and reasoning level over when the target supports them. Requires the `herdr` and `handoff` skills.
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s handoff-herdr
 	```

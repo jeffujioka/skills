@@ -1,0 +1,53 @@
+[
+  {
+    "skills": [
+      "handoff-herdr"
+    ],
+    "query": "Handoff this conversation to omp in a new herdr tab. I'm running claude with model claude-sonnet-5-5 at medium effort, inside Herdr pane w1:p1. The focus for the next session is: finish the README.",
+    "files": [],
+    "expected_behavior": [
+      "Reads the omp reference file and runs omp models to find the model",
+      "Starts omp with --model github-copilot/claude-sonnet-5.5 and --thinking medium, without asking the user to pick",
+      "Creates the tab only after the model is resolved",
+      "Sends the prompt without --wait",
+      "Reports workspace, tab and pane IDs, the agent name, harness, model and reasoning level"
+    ]
+  },
+  {
+    "skills": [
+      "handoff-herdr"
+    ],
+    "query": "Handoff to codex in a new herdr pane. I'm inside Herdr pane w1:p1 running claude.",
+    "files": [],
+    "expected_behavior": [
+      "Stops and says supported harnesses are opencode, claude, omp",
+      "Creates no tab, pane, workspace or agent",
+      "Does not fall back to the current harness"
+    ]
+  },
+  {
+    "skills": [
+      "handoff-herdr"
+    ],
+    "query": "Handoff to opencode in a new herdr tab using claude-sonnet-5-5. I'm inside Herdr pane w1:p1.",
+    "files": [],
+    "expected_behavior": [
+      "Lists only the matching models github-copilot/claude-sonnet-5.5 and openrouter/anthropic/claude-sonnet-5.5 and asks the user to pick",
+      "Creates no tab before the user picks",
+      "Does not choose a provider on the user's behalf"
+    ]
+  },
+  {
+    "skills": [
+      "handoff-herdr"
+    ],
+    "query": "Handoff to claude in a new herdr tab. I'm inside Herdr pane w1:p1 running claude. The Skill tool refuses the handoff skill because it is manual-only, and ~/.claude/skills/handoff/SKILL.md does not exist on this machine.",
+    "files": [],
+    "expected_behavior": [
+      "Tries to load the handoff skill, then tries to read ~/.claude/skills/handoff/SKILL.md",
+      "Stops and asks the user to run /handoff and give the saved path",
+      "Creates no tab, pane, workspace or agent before the user answers",
+      "Does not write the handoff document itself"
+    ]
+  }
+]
