@@ -32,12 +32,16 @@ ISOLATION = [  # keep user hooks, plugins, skills and MCP servers out of the run
     "--strict-mcp-config",
     "--no-session-persistence",
 ]
-BASELINE_PROMPT = """No user is available to answer. If you need an answer from \
+NO_BACKGROUND = [  # a scheduled wakeup or monitor keeps the headless run alive until timeout
+    "--disallowedTools", "ScheduleWakeup", "CronCreate", "Monitor",
+]
+SANDBOX_NOTE = "Bash allows only `python3` and `chmod +x` on files inside {work}."
+BASELINE_PROMPT = """{sandbox} No user is available to answer. If you need an answer from \
 the user before you can go on, stop there and state the question.
 
 Request: {query}"""
 RUN_PROMPT = """Read {skill_md} and follow it to handle the request below. \
-No user is available to answer. If the skill needs an answer from the user \
+{sandbox} No user is available to answer. If the skill needs an answer from the user \
 before it can go on, stop there and state the question.
 
 Request: {query}"""
@@ -169,12 +173,14 @@ def run_one(skill_dir, scenario, idx, model, args, out):
         result["error"] = str(e)
         return result
     if args.baseline:
-        prompt = BASELINE_PROMPT.format(query=scenario["query"])
+        prompt = BASELINE_PROMPT.format(sandbox=SANDBOX_NOTE.format(work=work), query=scenario["query"])
     else:
-        prompt = RUN_PROMPT.format(skill_md=copy / "SKILL.md", query=scenario["query"])
+        prompt = RUN_PROMPT.format(skill_md=copy / "SKILL.md", sandbox=SANDBOX_NOTE.format(work=work),
+                                   query=scenario["query"])
     cmd = ["claude", "-p", prompt, "--model", model, "--output-format", "stream-json", "--verbose",
-           *ISOLATION, "--permission-mode", "acceptEdits",
-           "--allowedTools", "Read", "Write", "Edit", "Glob", "Grep", f"Bash(python3 {work}/*)", f"Bash(chmod +x {work}/*)"]
+           *ISOLATION, *NO_BACKGROUND, "--permission-mode", "acceptEdits",
+           "--allowedTools", "Read", "Write", "Edit", "Glob", "Grep", f"Bash(python3 {work}/*)", "Bash(python3 _skill/*)",
+           f"Bash(chmod +x {work}/*)"]
     transcript = run_dir / "transcript.jsonl"
     try:
         with transcript.open("w") as fh, (run_dir / "stderr.txt").open("w") as err:
@@ -215,6 +221,7 @@ def main():
     ap.add_argument("--jobs", type=int, default=DEFAULT_JOBS, help="runs in parallel")
     ap.add_argument("--out", help="results dir (default: new dir under /tmp/)")
     ap.add_argument("--baseline", action="store_true", help="run the queries without the skill")
+    ap.add_argument("--scenarios", help="comma-separated scenario indexes to run (default: all)")
     args = ap.parse_args()
 
     skill_dir = Path(args.skill_dir).expanduser().resolve()
@@ -227,9 +234,9 @@ def main():
     stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     out = Path(args.out) if args.out else Path(tempfile.mkdtemp(prefix=f"evals-{skill_dir.name}-{stamp}-", dir="/tmp"))
     out.mkdir(parents=True, exist_ok=True)
-    print(f"results: {out}  runs: {len(scenarios) * len(models)}", flush=True)
-
-    jobs = [(s, i, m) for m in models for i, s in enumerate(scenarios)]
+    wanted = {int(x) for x in args.scenarios.split(",")} if args.scenarios else None
+    jobs = [(s, i, m) for m in models for i, s in enumerate(scenarios) if wanted is None or i in wanted]
+    print(f"results: {out}  runs: {len(jobs)}", flush=True)
     results = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.jobs) as pool:
         futures = [pool.submit(run_one, skill_dir, s, i, m, args, out) for s, i, m in jobs]

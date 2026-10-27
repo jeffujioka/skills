@@ -6,6 +6,8 @@ disable-model-invocation: true
 
 # engineer-a-skill
 
+Start here, in every mode: read the three standards (Core) before any other action, and change no file of an existing skill until the requested change is checked against them.
+
 Builds, edits or audits one skill. Terms used below:
 
 - **Own dir:** the directory holding this `SKILL.md`. Resolve it to an absolute path before step 1. Bare `scripts/` and `templates/` paths below are in it.
