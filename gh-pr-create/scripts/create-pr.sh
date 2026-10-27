@@ -16,6 +16,13 @@ if [ ! -f "$desc" ]; then
   exit 1
 fi
 
+if [ "${ALLOW_ATTRIBUTION:-}" = 1 ]; then
+  echo "attribution check skipped (ALLOW_ATTRIBUTION=1)"
+elif grep -qiE 'generated with|co-authored-by|claude\.com/claude-code' "$desc"; then
+  echo "description has an attribution line. Remove it from $desc and rerun." >&2
+  exit 1
+fi
+
 bash "$here/check-pushed.sh"
 
 if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
