@@ -1,4 +1,7 @@
+import json
+import os
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -100,6 +103,40 @@ class NestingTests(SkillTestCase):
         self.addCleanup_tmp(skill)
         ids = {rule_id for _, rule_id in rules(skill)}
         self.assertNotIn("R04", ids)
+
+
+class BackslashPathTests(SkillTestCase):
+    def test_backslash_path_in_code_span_fails_r06_and_r08(self):
+        skill = make_skill({"SKILL.md": FM + "Run `scripts\\cleanup.py` now.\n"})
+        self.addCleanup_tmp(skill)
+        findings = {(rule_id, where) for _, rule_id, where, *_ in validate.validate(skill).items}
+        self.assertIn(("R06", "SKILL.md:5"), findings)
+        self.assertIn(("R08", "SKILL.md:5"), findings)
+
+    def test_backslash_path_to_existing_file_passes_r08(self):
+        skill = make_skill({
+            "SKILL.md": FM + "Run `scripts\\cleanup.py` now.\n",
+            "scripts/cleanup.py": "print()\n",
+        })
+        self.addCleanup_tmp(skill)
+        ids = {rule_id for _, rule_id in rules(skill)}
+        self.assertIn("R06", ids)
+        self.assertNotIn("R08", ids)
+
+    def test_regex_in_code_span_not_backslash_path(self):
+        skill = make_skill({"SKILL.md": FM + "Match `^\\s*\\d+$` or `\\w+`.\n"})
+        self.addCleanup_tmp(skill)
+        self.assertNotIn("R06", {rule_id for _, rule_id in rules(skill)})
+
+
+class FrontmatterLineTests(SkillTestCase):
+    def test_findings_point_at_the_field_line(self):
+        skill = make_skill({"SKILL.md": "---\nname: Bad_Name\ndescription: I help.\n---\nBody.\n"})
+        self.addCleanup_tmp(skill)
+        findings = {(rule_id, where) for _, rule_id, where, *_ in validate.validate(skill).items}
+        self.assertIn(("R01", "SKILL.md:2"), findings)
+        self.assertIn(("R02", "SKILL.md:3"), findings)
+        self.assertIn(("W02", "SKILL.md:3"), findings)
 
 
 class FalsePositiveTests(SkillTestCase):
@@ -312,6 +349,57 @@ class RunEvalsTests(SkillTestCase):
         copy = run_evals.prepare(skill, {"files": ["evals/files/bad-skill/SKILL.md"]}, work, with_skill=False)
         self.assertFalse(copy.exists())
         self.assertTrue((work / "bad-skill" / "SKILL.md").is_file())
+
+    def test_refuses_to_run_inside_an_eval_run(self):
+        skill = make_skill({})
+        self.addCleanup_tmp(skill)
+        script = REPO_ROOT / "engineer-a-skill" / "scripts" / "run_evals.py"
+        env = {**os.environ, run_evals.NESTED_ENV: "1"}
+        proc = subprocess.run([sys.executable, str(script), str(skill), "--harness", "omp"], env=env,
+                              capture_output=True, text=True)
+        self.assertEqual(2, proc.returncode)
+        self.assertIn("no login is available", proc.stderr)
+
+    def test_runs_needed_survives_float_rounding(self):
+        self.assertEqual(7, run_evals.runs_needed(10, 0.7))
+        self.assertEqual(8, run_evals.runs_needed(10, 0.8))
+        self.assertEqual(1, run_evals.runs_needed(1, 0.7))
+
+    def test_grade_threshold_and_required(self):
+        scenario = {"required_behavior": ["safe"], "expected_behavior": ["nice"]}
+        ok_run = {"error": None, "passed": [True, True]}
+        meh_run = {"error": None, "passed": [True, False]}
+        g = run_evals.grade(scenario, [ok_run] * 7 + [meh_run] * 3, 7)
+        self.assertTrue(g["ok"])
+        self.assertEqual([10, 7], [b["passed"] for b in g["behaviors"]])
+        self.assertFalse(run_evals.grade(scenario, [ok_run] * 6 + [meh_run] * 4, 7)["ok"])
+
+    def test_grade_fails_on_one_required_slip_or_broken_run(self):
+        scenario = {"required_behavior": ["safe"], "expected_behavior": ["nice"]}
+        ok_run = {"error": None, "passed": [True, True]}
+        slip = {"error": None, "passed": [False, True]}
+        broken = {"error": "run timed out", "passed": []}
+        self.assertFalse(run_evals.grade(scenario, [ok_run] * 9 + [slip], 7)["ok"])
+        self.assertFalse(run_evals.grade(scenario, [ok_run] * 9 + [broken], 7)["ok"])
+
+    def test_omp_condense_keeps_calls_and_errors_and_drops_thinking(self):
+        events = [
+            {"type": "message_end", "message": {"role": "assistant", "usage": {"cost": {"total": 0.25}},
+                                                "content": [{"type": "thinking", "thinking": "secret plan"},
+                                                            {"type": "toolCall", "name": "bash",
+                                                             "arguments": {"command": "ls /"}}]}},
+            {"type": "message_end", "message": {"role": "toolResult", "isError": True,
+                                                "content": [{"type": "text", "text": "requires approval"}]}},
+            {"type": "message_update", "message": {"role": "assistant", "content": [{"type": "text", "text": "dup"}]}},
+            {"type": "message_end", "message": {"role": "assistant", "usage": {"cost": {"total": 0.5}},
+                                                "content": [{"type": "text", "text": "done"}]}},
+        ]
+        path = Path(tempfile.mkdtemp()) / "t.jsonl"
+        self.addCleanup(shutil.rmtree, path.parent, ignore_errors=True)
+        path.write_text("\n".join(json.dumps(e) for e in events) + "\n")
+        text, cost = run_evals.Omp().condense(path)
+        self.assertEqual('TOOL_CALL bash: {"command": "ls /"}\nTOOL_RESULT (error): requires approval\nASSISTANT: done', text)
+        self.assertEqual(0.75, cost)
 
 
 if __name__ == "__main__":

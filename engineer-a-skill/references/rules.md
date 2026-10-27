@@ -48,7 +48,7 @@ Name reference files by content (`finance.md`), never `doc2.md`. Forward slashes
 
 | Id | Level | Rule |
 |---|---|---|
-| R06 | FAIL | No backslash paths in prose. |
+| R06 | FAIL | No backslash paths in prose or inline code. |
 | R11 | FAIL | No time-sensitive phrases ("before <year>", "as of <year>"). |
 | R12 | FAIL | No unfilled scaffold placeholders left in `.md` files. |
 | W01 | WARN | House rule. Max 3 emphasis words in capitals per file. Plain imperatives otherwise. |
@@ -69,7 +69,7 @@ Manual rules:
 - Output-heavy or batch steps get a validate-then-fix loop.
 - Colleague test: a reader with no context could follow each step.
 - No fact that expires. Model-specific notes name the model family they apply to. A superseded method kept for context goes in a collapsed "Old patterns" section.
-- Ships at least three evals in `evals/evals.json`, written after a baseline run without the skill where one can run: realistic queries, observable expected behaviors, covering the main path, an edge case and a refusal or hand-back. Evals show the skill solves real requests, not imagined ones.
+- Ships at least three evals in `evals/evals.json`, written after a baseline run without the skill where one can run: realistic queries, observable behaviors, covering the main path, an edge case and a refusal or hand-back. A behavior that protects people or data is listed as required, so it must pass on every run. Evals show the skill solves real requests, not imagined ones.
 
 ## Embedded commands
 
