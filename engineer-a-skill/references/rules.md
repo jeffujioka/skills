@@ -1,6 +1,6 @@
 # Skill rules
 
-Each rule is checked by `scripts/validate.py` unless marked "manual". FAIL blocks completion. WARN needs a fix or a stated reason.
+Each rule is checked by `scripts/validate.py` unless marked "manual". FAIL blocks completion. WARN needs a fix or a stated reason. A user's request is not a reason until the user confirms it after seeing the compliant version. Rules marked "house rule" are local choices, not from the Anthropic docs.
 
 ## Contents
 
@@ -51,7 +51,7 @@ Name reference files by content (`finance.md`), never `doc2.md`. Forward slashes
 | R06 | FAIL | No backslash paths in prose. |
 | R11 | FAIL | No time-sensitive phrases ("before <year>", "as of <year>"). |
 | R12 | FAIL | No unfilled scaffold placeholders left in `.md` files. |
-| W01 | WARN | Max 3 emphasis words in capitals per file. Plain imperatives otherwise. |
+| W01 | WARN | House rule. Max 3 emphasis words in capitals per file. Plain imperatives otherwise. |
 | W03 | WARN | No instruction to print reasoning in the output. |
 | W04 | WARN | One term per concept across the skill. |
 
@@ -62,20 +62,20 @@ Manual rules:
 - Challenge every line: does Claude already know this? Cut it.
 - Default plus one escape hatch, not a menu of options.
 - Examples concrete, with real values, not abstract placeholders.
-- Template or example when output format must be fixed (3-5 diverse examples in `<example>` tags if format is subtle).
+- Template when output format must be fixed. When the format is subtle or quality depends on style, add 3-5 diverse examples in `<example>` tags.
 - Multi-step workflows end each step with an observable done condition.
 - Workflow of more than five steps: a progress checklist the agent copies and ticks off, so no step is skipped.
 - Batch or destructive work: plan, validate, execute. Write the plan to a file, check it with a script, then run it; errors surface before anything changes.
 - Output-heavy or batch steps get a validate-then-fix loop.
 - Colleague test: a reader with no context could follow each step.
 - No fact that expires. Model-specific notes name the model family they apply to. A superseded method kept for context goes in a collapsed "Old patterns" section.
-- Ships at least three evals in `evals/evals.json`: realistic queries, observable expected behaviors, covering the main path, an edge case and a refusal or hand-back. Evals show the skill solves real requests, not imagined ones.
+- Ships at least three evals in `evals/evals.json`, written after a baseline run without the skill where one can run: realistic queries, observable expected behaviors, covering the main path, an edge case and a refusal or hand-back. Evals show the skill solves real requests, not imagined ones.
 
 ## Embedded commands
 
 | Id | Level | Rule |
 |---|---|---|
-| R07 | FAIL | In `SKILL.md`, a fenced code block has max 3 non-blank lines. Shell blocks: pipes allowed; no `&&`, `||`, `;`, heredocs, loops or conditionals. |
+| R07 | FAIL | House rule. In `SKILL.md`, a fenced code block has max 3 non-blank lines. Shell blocks: pipes allowed; no `&&`, `||`, `;`, heredocs, loops or conditionals. |
 
 Fences tagged text, markdown, yaml, json, xml or diff are not code and are exempt. Untagged fences are checked as shell.
 

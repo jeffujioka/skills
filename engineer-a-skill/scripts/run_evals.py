@@ -2,12 +2,13 @@
 """Run a skill's evals headless with the Claude Code CLI, then grade them.
 
 Usage: run_evals.py <skill-dir> [--models haiku,sonnet,opus] [--judge sonnet]
-                    [--timeout SECS] [--jobs N] [--out DIR]
+                    [--timeout SECS] [--jobs N] [--out DIR] [--baseline]
 
 Each scenario in <skill-dir>/evals/evals.json runs once per model, in its own
 scratch dir under /tmp/ that holds a copy of the skill and the scenario's
 files. The live skill is never touched. A judge model grades each expected
-behavior from the condensed transcript.
+behavior from the condensed transcript. --baseline runs the same queries
+without the skill, to measure what the skill must fix.
 
 Exit: 0 every behavior passed, 1 at least one failed or a run broke, 2 usage error.
 """
@@ -31,6 +32,10 @@ ISOLATION = [  # keep user hooks, plugins, skills and MCP servers out of the run
     "--strict-mcp-config",
     "--no-session-persistence",
 ]
+BASELINE_PROMPT = """No user is available to answer. If you need an answer from \
+the user before you can go on, stop there and state the question.
+
+Request: {query}"""
 RUN_PROMPT = """Read {skill_md} and follow it to handle the request below. \
 No user is available to answer. If the skill needs an answer from the user \
 before it can go on, stop there and state the question.
@@ -76,10 +81,11 @@ def load_scenarios(skill_dir):
     return data
 
 
-def prepare(skill_dir, scenario, work):
+def prepare(skill_dir, scenario, work, with_skill=True):
     """Copy the skill and the scenario's files into an empty scratch dir."""
     copy = work / "_skill" / skill_dir.name
-    shutil.copytree(skill_dir, copy, ignore=shutil.ignore_patterns("__pycache__", ".git"))
+    if with_skill:
+        shutil.copytree(skill_dir, copy, ignore=shutil.ignore_patterns("__pycache__", ".git"))
     prefix = Path("evals/files")
     for rel in scenario.get("files", []):
         src = skill_dir / rel
@@ -153,16 +159,19 @@ def last_json(text):
 
 
 def run_one(skill_dir, scenario, idx, model, args, out):
-    run_dir = out / f"{model}-{idx}"
+    run_dir = out / f"{model}-{idx}{'-baseline' if args.baseline else ''}"
     work = run_dir / "work"
     work.mkdir(parents=True)
     result = {"scenario": idx, "model": model, "query": scenario["query"], "results": [], "error": None}
     try:
-        copy = prepare(skill_dir, scenario, work)
+        copy = prepare(skill_dir, scenario, work, with_skill=not args.baseline)
     except (OSError, FileNotFoundError) as e:
         result["error"] = str(e)
         return result
-    prompt = RUN_PROMPT.format(skill_md=copy / "SKILL.md", query=scenario["query"])
+    if args.baseline:
+        prompt = BASELINE_PROMPT.format(query=scenario["query"])
+    else:
+        prompt = RUN_PROMPT.format(skill_md=copy / "SKILL.md", query=scenario["query"])
     cmd = ["claude", "-p", prompt, "--model", model, "--output-format", "stream-json", "--verbose",
            *ISOLATION, "--permission-mode", "acceptEdits",
            "--allowedTools", "Read", "Write", "Edit", "Glob", "Grep", f"Bash(python3 {work}/*)", f"Bash(chmod +x {work}/*)"]
@@ -205,6 +214,7 @@ def main():
     ap.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT, help="seconds per run")
     ap.add_argument("--jobs", type=int, default=DEFAULT_JOBS, help="runs in parallel")
     ap.add_argument("--out", help="results dir (default: new dir under /tmp/)")
+    ap.add_argument("--baseline", action="store_true", help="run the queries without the skill")
     args = ap.parse_args()
 
     skill_dir = Path(args.skill_dir).expanduser().resolve()

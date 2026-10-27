@@ -293,6 +293,15 @@ class RunEvalsTests(SkillTestCase):
         self.assertTrue((copy / "SKILL.md").is_file())
         self.assertTrue((work / "bad-skill" / "SKILL.md").is_file())
 
+    def test_prepare_baseline_skips_skill_copy(self):
+        skill = make_skill({"evals/files/bad-skill/SKILL.md": "x\n"})
+        self.addCleanup_tmp(skill)
+        work = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, work, ignore_errors=True)
+        copy = run_evals.prepare(skill, {"files": ["evals/files/bad-skill/SKILL.md"]}, work, with_skill=False)
+        self.assertFalse(copy.exists())
+        self.assertTrue((work / "bad-skill" / "SKILL.md").is_file())
+
 
 if __name__ == "__main__":
     unittest.main()

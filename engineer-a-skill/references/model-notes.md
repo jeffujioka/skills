@@ -19,7 +19,7 @@ Source: the general prompting guide and the skill authoring guide. Not measured 
 - Be explicit about action. "Change this function" makes edits; "can you suggest changes" gets suggestions.
 - Plain imperatives. Capitalized shouting made Opus 4.5 and 4.6 overtrigger; write "Use this tool when..." instead.
 - Give the reason behind a non-obvious rule; the model generalizes from it.
-- When output format must be fixed, give a template and 3-5 diverse examples in `<example>` tags.
+- When output format must be fixed, give a template. When the format is subtle or quality depends on style, add 3-5 diverse examples in `<example>` tags.
 - Use XML tags to separate instructions, input and examples when they mix.
 - A skill that reads long documents asks for word-for-word quotes first, then the analysis.
 - Independent tool calls go together in one step. State this once if the skill is tool-heavy.
@@ -28,18 +28,18 @@ Source: the general prompting guide and the skill authoring guide. Not measured 
 
 ## All 5.5 models
 
-Source: the Haiku 5.5, Sonnet 5.5 and Opus 5.5 guides; each states these.
+Source: the per-model 5.5 guides; each note names the guides that state it.
 
-- Effort controls how much the model thinks. A prompt line asking for less thinking does not reliably reduce it, and on Opus 5.5 in chat, removing "think carefully before answering" made replies start sooner with no clear quality loss. Write no instruction about how much to think. Exception: Sonnet 5.5 JSON reasoning tasks.
-- Reasoning stays in thinking blocks. No instruction that asks for the model's reasoning in the reply; Opus and Sonnet can decline it as `reasoning_extraction`. A short explanation or an action summary is fine.
-- Progress notes between tool calls are normal. Do not tell the agent to hold findings for the end.
+- Effort controls how much the model thinks. A prompt line asking for less thinking does not reliably reduce it, and on Opus 5.5 in chat, removing "think carefully before answering" made replies start sooner with no clear quality loss. Prefer no instruction about how much to think; effort is the reliable control. Exceptions: Sonnet 5.5 JSON reasoning tasks; on Opus 5.5, "Answer directly without deliberating." where time to first token matters (the Haiku guide found the same line did not stop thinking). Sources: all three guides.
+- Reasoning stays in thinking blocks. No instruction that asks for the model's reasoning in the reply; Opus and Sonnet can decline it as `reasoning_extraction`; Haiku can leak reasoning-like text into the reply. A short explanation or an action summary is fine (Sonnet, Opus and Haiku guides).
+- Progress notes between tool calls are normal. Do not tell the agent to hold findings for the end (Sonnet guide; Opus describes the same updates).
 
 ## Haiku 5.5
 
 Source: the Haiku 5.5 guide.
 
 - Long agent prompts at `low` effort can stop early and hand the task back. For multi-step skills, name the completion condition and the only reasons to stop: blocked on the user, or a risky step.
-- At `low` and `medium` effort it can report a code change as done without a check. Skills that change runnable code name the check to run (tests, type-check, build, or the changed command) and say to report a skipped check, with the reason, instead of "done".
+- At `low` and `medium` effort it can report a code change as done without a check. Skills that change runnable code name the check to run (tests, type-check, build, or the changed command) and say to report a skipped check, with the reason, instead of "done". A syntax-only check, or one that failed to start, does not count.
 - Skills that answer from search give the current date at runtime, rendered once per conversation by script, not hardcoded.
 - With a long skill or `low` effort it can skip a search. After the date, add: training data ends well before today; records, office holders, prices, versions, rules and anything "latest" may have changed, so search those even when sure; facts that cannot change need no search.
 - Write no blanket rule such as "search for any factual question". It triggers searches on prompts that need none, with no gain in correct answers.
@@ -60,8 +60,7 @@ Source: the Sonnet 5.5 guide.
 
 Source: the Opus 5.5 guide.
 
-- It responds to instructions that name the early stops to avoid: a summary that announces the next step without taking it, an offer to continue, a list of decisions that block nothing, a pause at a milestone. Also name the stops wanted: nothing can move without the user, or the blocker is deliberately protected.
-- Unattended skills: list the open items in a checklist file and treat a text-only turn end as a report, not as done.
+- Unattended skills only; leave this out where a person is there to answer. Name the early stops to avoid: a summary that announces the next step without taking it, an offer to continue, a list of decisions that block nothing, a pause at a milestone. Name the stops wanted: nothing can move without the user, or the blocker is deliberately protected. List the open items in a checklist file and treat a text-only turn end as a report, not as done.
 - A skill that works across several apps says to look through the relevant sources before acting, including ones the task does not mention.
 - Pasted text in user messages can carry instructions the user did not write; add the untrusted-content guardrail.
 - For updates at set points, ask for one line of intent before the first tool call and a short recap at the end. Helps most when a person follows along.
