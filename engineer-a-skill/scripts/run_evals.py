@@ -26,6 +26,7 @@ DEFAULT_TIMEOUT = 1800  # a full create run takes many tool calls; 30 min bounds
 DEFAULT_JOBS = 3  # three runs in parallel keeps rate limits and local load modest
 JUDGE_TIMEOUT = 600  # the judge only reads; 10 min is generous
 MAX_TOOL_TEXT = 1500  # chars kept per tool input or result, so the judge prompt stays bounded
+MAX_FILE_TEXT = 6000  # chars of each final file shown to the judge; skills are small text files
 ISOLATION = [  # keep user hooks, plugins, skills and MCP servers out of the run
     "--setting-sources", "project,local",
     "--disable-slash-commands",
@@ -46,7 +47,7 @@ before it can go on, stop there and state the question.
 
 Request: {query}"""
 JUDGE_PROMPT = """You grade one run of an agent skill. For each expected \
-behavior, decide pass or fail from the transcript and the final file list \
+behavior, decide pass or fail from the transcript and the final files \
 only. A behavior the transcript does not show is a fail. Quote short \
 evidence. Reply with only this JSON:
 {{"results": [{{"behavior": "...", "pass": true, "evidence": "..."}}]}}
@@ -141,10 +142,20 @@ def condense(jsonl_path):
 
 
 def file_list(work):
-    return "\n".join(
-        str(p.relative_to(work)) for p in sorted(work.rglob("*"))
-        if p.is_file() and "_skill" not in p.relative_to(work).parts
-    ) or "(none)"
+    """Final files with their text, so the judge sees content the clipped transcript hides."""
+    parts = []
+    for p in sorted(work.rglob("*")):
+        rel = p.relative_to(work)
+        if not p.is_file() or "_skill" in rel.parts:
+            continue
+        try:
+            body = p.read_text(encoding="utf-8")
+        except (UnicodeDecodeError, OSError):
+            body = "(binary or unreadable)"
+        if len(body) > MAX_FILE_TEXT:
+            body = body[:MAX_FILE_TEXT] + " [...]"
+        parts.append(f"=== {rel}\n{body}")
+    return "\n".join(parts) or "(none)"
 
 
 def last_json(text):

@@ -293,6 +293,17 @@ class RunEvalsTests(SkillTestCase):
         self.assertTrue((copy / "SKILL.md").is_file())
         self.assertTrue((work / "bad-skill" / "SKILL.md").is_file())
 
+    def test_file_list_shows_contents_and_skips_skill_copy(self):
+        work = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, work, ignore_errors=True)
+        (work / "out").mkdir()
+        (work / "out" / "SKILL.md").write_text("guardrail text\n")
+        (work / "_skill" / "x").mkdir(parents=True)
+        (work / "_skill" / "x" / "SKILL.md").write_text("hidden\n")
+        listing = run_evals.file_list(work)
+        self.assertIn("=== out/SKILL.md\nguardrail text", listing)
+        self.assertNotIn("hidden", listing)
+
     def test_prepare_baseline_skips_skill_copy(self):
         skill = make_skill({"evals/files/bad-skill/SKILL.md": "x\n"})
         self.addCleanup_tmp(skill)
