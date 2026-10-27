@@ -29,7 +29,7 @@ FENCE_CLOSE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})\s*$")
 FIRST_PERSON_CS_RE = re.compile(r"\bI(?:'m|'ll|'ve|'d)?\b")
 NOT_THIRD_PERSON_RE = re.compile(r"\b(?:my|you|your|we|our)\b", re.I)  # first- and second-person words
 WHEN_RE = re.compile(
-    r"\b(?:use when|use for|call by hand|when|whenever|triggers? on|if the user)\b", re.I
+    r"\b(?:use when|use for|call it by name|call by hand|when|whenever|triggers? on|if the user)\b", re.I
 )
 EMPHASIS_RE = re.compile(r"\b(?:MUST NOT|MUST|NEVER|ALWAYS|CRITICAL|IMPORTANT|DO NOT)\b")
 REASONING_RE = re.compile(
@@ -203,7 +203,7 @@ def check_frontmatter(fields, skill_md, f):
     if FIRST_PERSON_CS_RE.search(plain) or NOT_THIRD_PERSON_RE.search(plain):
         f.fail("R02", where, "description must be third person (found I/my/you/your/we/our)")
     if not WHEN_RE.search(desc):
-        f.warn("W02", where, "description has no 'when' clause (Use when... / Call by hand...)")
+        f.warn("W02", where, "description has no 'when' clause (Use when... / Manual-only: call it by name.)")
     flag = fields.get("disable-model-invocation")
     if flag is not None and flag.strip().lower() not in ("true", "false"):
         f.fail("R00", where, "disable-model-invocation must be true or false")
@@ -289,7 +289,7 @@ def check_secrets_and_placeholders(skill_dir, f):
         except (UnicodeDecodeError, OSError):
             continue
         rel = path.relative_to(skill_dir)
-        in_templates = rel.parts[0] == "templates"
+        in_templates = rel.parts[0] in ("templates", "evals")  # fixtures may hold placeholders
         for n, line in enumerate(text.splitlines(), 1):
             for label, rx in SECRET_RES:
                 if rx.search(line):
@@ -326,7 +326,8 @@ def validate(skill_dir):
         rel = path.relative_to(skill_dir)
         if rel.name == "SKILL.md" and len(rel.parts) == 1:
             continue
-        if rel.parts[0] in ("templates", "node_modules", ".git"):
+        # evals/ holds test fixtures, which may break the rules on purpose
+        if rel.parts[0] in ("templates", "evals", "node_modules", ".git"):
             continue
         ref_lines = path.read_text(encoding="utf-8").splitlines()
         if len(ref_lines) > MAX_REF_LINES_NO_TOC and not any(

@@ -27,7 +27,7 @@ Each rule is checked by `scripts/validate.py` unless marked "manual". FAIL block
 | R00 | FAIL | Frontmatter block present. `disable-model-invocation`, if set, is `true` or `false`. |
 | R01 | FAIL | `name`: lowercase letters, digits, hyphens; max 64; no "claude" or "anthropic"; equals the directory name. |
 | R02 | FAIL | `description`: non-empty, max 1024, no XML tags, third person (no I/my/you/your/we/our). Says what the skill does and when. |
-| W02 | WARN | Description has no "when" clause. Auto skill: trigger terms. Manual-only skill: end with "Call by hand with `@<name>`". |
+| W02 | WARN | Description has no "when" clause. Auto skill: trigger terms. Manual-only skill: end with "Manual-only: call it by name." |
 
 Name style: prefer gerund or verb form. Avoid vague names (helper, utils, tools).
 
@@ -61,11 +61,15 @@ Manual rules:
 - Non-obvious rule gets a one-clause reason.
 - Challenge every line: does Claude already know this? Cut it.
 - Default plus one escape hatch, not a menu of options.
+- Examples concrete, with real values, not abstract placeholders.
 - Template or example when output format must be fixed (3-5 diverse examples in `<example>` tags if format is subtle).
 - Multi-step workflows end each step with an observable done condition.
+- Workflow of more than five steps: a progress checklist the agent copies and ticks off, so no step is skipped.
+- Batch or destructive work: plan, validate, execute. Write the plan to a file, check it with a script, then run it; errors surface before anything changes.
 - Output-heavy or batch steps get a validate-then-fix loop.
 - Colleague test: a reader with no context could follow each step.
-- No fact that expires. Model-specific notes name the model family they apply to.
+- No fact that expires. Model-specific notes name the model family they apply to. A superseded method kept for context goes in a collapsed "Old patterns" section.
+- Ships at least three evals in `evals/evals.json`: realistic queries, observable expected behaviors, covering the main path, an edge case and a refusal or hand-back. Evals show the skill solves real requests, not imagined ones.
 
 ## Embedded commands
 
@@ -77,13 +81,19 @@ Fences tagged text, markdown, yaml, json, xml or diff are not code and are exemp
 
 Scripts under `scripts/` may use any shippable language. They handle errors with explicit messages, justify every constant in a comment, and are run, not read. `SKILL.md` says "run" or "see" explicitly.
 
+Manual rules:
+
+- Packages and tools a script needs are listed in `SKILL.md` with the check that they are installed. The agent may run where they are missing.
+- MCP tools are named in full, `ServerName:tool_name`, so the right server is picked when several are loaded.
+- Scripts solve the problem; they do not hand errors back for the agent to work out.
+
 ## Safety
 
 | Id | Level | Rule |
 |---|---|---|
 | R10 | FAIL | No secrets in any file: keys, tokens, private keys, `password=` values. Read secrets at runtime or ask the user. |
 
-Conditional guardrails live in the guardrails reference. Prompt-leak hardening is not added: it degrades task performance.
+Conditional guardrails live in the guardrails file. Prompt-leak hardening is not added: it degrades task performance.
 
 ## Sources
 
