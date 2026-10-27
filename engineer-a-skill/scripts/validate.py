@@ -23,7 +23,9 @@ NAME_RE = re.compile(r"^[a-z0-9-]+$")
 XML_TAG_RE = re.compile(r"</?[A-Za-z][^>]*>")
 INLINE_CODE_RE = re.compile(r"`[^`]*`")
 LINK_RE = re.compile(r"\[[^\]]*\]\(([^)#\s]+)(?:#[^)]*)?\)")
-PATH_RE = re.compile(r"`((?:scripts|references|templates)/[\w.-]+(?:/[\w.-]+)*)`")
+PATH_RE = re.compile(r"`((?:scripts|references|templates)[/\\][\w.-]+(?:[/\\][\w.-]+)*)`")
+BACKSLASH_PATH_RE = re.compile(r"[\w.-]+\\[\w.-]+")
+BACKSLASH_SPAN_RE = re.compile(r"`(?:[A-Za-z]:\\)?[\w.-]+(?:\\[\w.-]+)+`")  # whole span is the path, so regexes pass
 FENCE_OPEN_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})\s*([\w+#.-]*)")
 FENCE_CLOSE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})\s*$")
 FIRST_PERSON_CS_RE = re.compile(r"\bI(?:'m|'ll|'ve|'d)?\b")
@@ -100,17 +102,20 @@ class Findings:
 
 
 def parse_frontmatter(lines):
-    """Return (fields, body_start_index) or (None, 0) when frontmatter is absent."""
+    """Return (fields, field_lines, body_start_index), or (None, {}, 0) when frontmatter is absent.
+
+    field_lines maps each key to the 1-based line it starts on.
+    """
     if not lines or lines[0].strip() != "---":
-        return None, 0
+        return None, {}, 0
     end = None
     for i in range(1, len(lines)):
         if lines[i].strip() == "---":
             end = i
             break
     if end is None:
-        return None, 0
-    fields = {}
+        return None, {}, 0
+    fields, field_lines = {}, {}
     i = 1
     while i < end:
         m = re.match(r"^([A-Za-z0-9_-]+):\s*(.*)$", lines[i])
@@ -118,6 +123,7 @@ def parse_frontmatter(lines):
             i += 1
             continue
         key, raw = m.group(1), m.group(2).strip()
+        field_lines[key] = i + 1
         cont = []
         i += 1
         while i < end and (lines[i].startswith((" ", "\t")) or not lines[i].strip()):
@@ -136,7 +142,7 @@ def parse_frontmatter(lines):
             elif value[:1] == "'" and value[-1:] == "'":
                 value = value[1:-1].replace("''", "'")
         fields[key] = value
-    return fields, end + 1
+    return fields, field_lines, end + 1
 
 
 def scan_fences(lines):
@@ -184,29 +190,31 @@ def check_name(name, dir_name=None):
     return problems
 
 
-def check_frontmatter(fields, skill_md, f):
-    where = f"{skill_md.name}:1"
+def check_frontmatter(fields, field_lines, skill_md, f):
+    def where(key=None):
+        return f"{skill_md.name}:{field_lines.get(key, 1)}"
+
     if fields is None:
-        f.fail("R00", where, "missing frontmatter (--- block at top of file)")
+        f.fail("R00", where(), "missing frontmatter (--- block at top of file)")
         return
     for problem in check_name(fields.get("name", ""), skill_md.parent.name):
-        f.fail("R01", where, problem)
+        f.fail("R01", where("name"), problem)
     desc = fields.get("description", "")
     if not desc.strip():
-        f.fail("R02", where, "description is empty")
+        f.fail("R02", where("description"), "description is empty")
         return
     if len(desc) > MAX_DESC:
-        f.fail("R02", where, f"description is {len(desc)} chars (max {MAX_DESC})")
+        f.fail("R02", where("description"), f"description is {len(desc)} chars (max {MAX_DESC})")
     if XML_TAG_RE.search(desc):
-        f.fail("R02", where, "description contains XML tags")
+        f.fail("R02", where("description"), "description contains XML tags")
     plain = INLINE_CODE_RE.sub("", desc)
     if FIRST_PERSON_CS_RE.search(plain) or NOT_THIRD_PERSON_RE.search(plain):
-        f.fail("R02", where, "description must be third person (found I/my/you/your/we/our)")
+        f.fail("R02", where("description"), "description must be third person (found I/my/you/your/we/our)")
     if not WHEN_RE.search(desc):
-        f.warn("W02", where, "description has no 'when' clause (Use when... / Manual-only: call it by name.)")
+        f.warn("W02", where("description"), "description has no 'when' clause (Use when... / Manual-only: call it by name.)")
     flag = fields.get("disable-model-invocation")
     if flag is not None and flag.strip().lower() not in ("true", "false"):
-        f.fail("R00", where, "disable-model-invocation must be true or false")
+        f.fail("R00", where("disable-model-invocation"), "disable-model-invocation must be true or false")
 
 
 def check_fences(rel, lines, f):
@@ -261,7 +269,7 @@ def check_references(skill_dir, rel_path, text_lines, is_skill_md, f):
             where = f"{rel_path}:{n}"
             if not is_skill_md and target.endswith(".md"):
                 f.fail("R04", where, f"reference names another .md ({target}); keep references one level deep")
-            if not (skill_dir / target).exists():
+            if not (skill_dir / target.replace("\\", "/")).exists():
                 f.fail("R08", where, f"referenced file not found: {target}")
 
 
@@ -315,8 +323,8 @@ def validate(skill_dir):
     skill_md = skill_dir / "SKILL.md"
     text = skill_md.read_text(encoding="utf-8")
     lines = text.splitlines()
-    fields, body_start = parse_frontmatter(lines)
-    check_frontmatter(fields, skill_md, f)
+    fields, field_lines, body_start = parse_frontmatter(lines)
+    check_frontmatter(fields, field_lines, skill_md, f)
 
     if len(lines) - body_start > MAX_BODY_LINES:
         f.fail("R03", "SKILL.md", f"body is {len(lines) - body_start} lines (max {MAX_BODY_LINES}); split into reference files")
@@ -342,7 +350,7 @@ def validate(skill_dir):
         check_references(skill_dir, rel, dlines, is_skill_md, f)
         emphasis = 0
         for n, line in prose_lines(dlines, inside):
-            if re.search(r"[A-Za-z0-9_.-]+\\[A-Za-z0-9_.-]+", line):
+            if BACKSLASH_PATH_RE.search(line) or BACKSLASH_SPAN_RE.search(dlines[n - 1]):
                 f.fail("R06", f"{rel}:{n}", "backslash path; use forward slashes")
             if DATED_RE.search(line):
                 f.fail("R11", f"{rel}:{n}", "time-sensitive phrase; move to an 'old patterns' note or drop")
