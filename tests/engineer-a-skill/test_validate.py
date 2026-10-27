@@ -6,6 +6,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "engineer-a-skill" / "scripts"))
+import run_evals  # noqa: E402
 import validate  # noqa: E402
 
 FM = '---\nname: probe\ndescription: "Probes things. Use when testing."\n---\n'
@@ -252,6 +253,65 @@ class LimitTests(SkillTestCase):
         skill = make_skill({"SKILL.md": skill_md})
         self.addCleanup_tmp(skill)
         self.assertIn(("FAIL", "R03"), rules(skill))
+
+
+class EvalsTests(SkillTestCase):
+    def test_eval_fixture_breaking_rules_is_skipped(self):
+        skill = make_skill({
+            "evals/files/bad/SKILL.md": "---\nname: Bad_Skill\ndescription: I help you.\n---\n"
+            "Run `scripts\\x.py` before 2024. <<FILL>>\n",
+        })
+        self.addCleanup_tmp(skill)
+        self.assertEqual(set(), rules(skill))
+
+    def test_secret_in_eval_fixture_still_fails(self):
+        skill = make_skill({"evals/files/x.md": 'password = "hunter2hunter2"\n'})
+        self.addCleanup_tmp(skill)
+        self.assertIn(("FAIL", "R10"), rules(skill))
+
+
+class WhenClauseTests(SkillTestCase):
+    def test_manual_only_call_by_name_counts_as_when(self):
+        fm = ('---\nname: probe\ndescription: "Probes things. Manual-only: call it by name."\n'
+              "disable-model-invocation: true\n---\n")
+        skill = make_skill({"SKILL.md": fm + "Body.\n"})
+        self.addCleanup_tmp(skill)
+        self.assertNotIn(("WARN", "W02"), rules(skill))
+
+
+class RunEvalsTests(SkillTestCase):
+    def test_last_json_skips_draft_and_nested_values(self):
+        text = 'draft {"results": []} then {"results": [{"pass": true, "x": {"y": 1}}]} done'
+        self.assertEqual({"results": [{"pass": True, "x": {"y": 1}}]}, run_evals.last_json(text))
+
+    def test_prepare_copies_skill_and_strips_fixture_prefix(self):
+        skill = make_skill({"evals/files/bad-skill/SKILL.md": "x\n"})
+        self.addCleanup_tmp(skill)
+        work = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, work, ignore_errors=True)
+        copy = run_evals.prepare(skill, {"files": ["evals/files/bad-skill/SKILL.md"]}, work)
+        self.assertTrue((copy / "SKILL.md").is_file())
+        self.assertTrue((work / "bad-skill" / "SKILL.md").is_file())
+
+    def test_file_list_shows_contents_and_skips_skill_copy(self):
+        work = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, work, ignore_errors=True)
+        (work / "out").mkdir()
+        (work / "out" / "SKILL.md").write_text("guardrail text\n")
+        (work / "_skill" / "x").mkdir(parents=True)
+        (work / "_skill" / "x" / "SKILL.md").write_text("hidden\n")
+        listing = run_evals.file_list(work)
+        self.assertIn("=== out/SKILL.md\nguardrail text", listing)
+        self.assertNotIn("hidden", listing)
+
+    def test_prepare_baseline_skips_skill_copy(self):
+        skill = make_skill({"evals/files/bad-skill/SKILL.md": "x\n"})
+        self.addCleanup_tmp(skill)
+        work = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, work, ignore_errors=True)
+        copy = run_evals.prepare(skill, {"files": ["evals/files/bad-skill/SKILL.md"]}, work, with_skill=False)
+        self.assertFalse(copy.exists())
+        self.assertTrue((work / "bad-skill" / "SKILL.md").is_file())
 
 
 if __name__ == "__main__":

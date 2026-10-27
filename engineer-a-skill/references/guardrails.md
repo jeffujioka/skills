@@ -32,7 +32,7 @@ Mark that step low freedom: exact command, exact order, confirm first.
 
 ## Factual or document output
 
-Trigger: the skill states facts, summarizes documents, or cites sources.
+Trigger: the skill states facts, or summarizes or cites any source text: documents, tickets, merge requests, comments, web pages, search results.
 
 ```text
 Use only the provided material. If it does not contain the answer, say "not found in the provided material". For long documents, extract word-for-word quotes first, then write only what the quotes support. Drop any claim you cannot back with a quote.
