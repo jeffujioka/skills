@@ -1,0 +1,71 @@
+[
+  {
+    "skills": ["obsidian-capture-troubleshooting"],
+    "query": "Record this fix with obsidian-capture-troubleshooting. The vault is the `evals/files/vault/` directory under the current directory; use its absolute path as the vault path. Problem just solved: in a fresh `git init` repo, `git commit -m x` failed with `Author identity unknown` and `*** Please tell me who you are.` Cause: neither user.name nor user.email was set. Fix: `git config user.name` and `git config user.email` set locally in that repo. Verification: `git config --get user.email` prints the address.",
+    "files": [
+      "evals/files/vault/.obsidian/app.json",
+      "evals/files/vault/Templates/Troubleshooting Note.md",
+      "evals/files/vault/Troubleshooting/Cargo install Fails With SSL Certificate Error Behind Proxy.md"
+    ],
+    "required_behavior": [
+      "Writes no file in the vault besides the new note"
+    ],
+    "expected_behavior": [
+      "Creates one new note directly under vault/Troubleshooting/ with a short problem-first filename",
+      "The H1 is the error text `Author identity unknown` as it appears on screen",
+      "Sections follow the template order: Symptom, Cause, Fix, Verification",
+      "`Seen with` carries a git version taken by running `git --version`, not recalled from memory, and a checked date",
+      "No `{{...}}` or `<...>` placeholder and no `<!-- -->` template comment is left in the note",
+      "Reports the note's path"
+    ]
+  },
+  {
+    "skills": ["obsidian-capture-troubleshooting"],
+    "query": "Record this fix with obsidian-capture-troubleshooting. The vault is the `evals/files/vault/` directory under the current directory; use its absolute path as the vault path. Problem just solved: `cargo install tealdeer` failed with `SSL certificate problem: unable to get local issuer certificate` behind the corporate proxy. Cause: the proxy CA is missing from cargo's trust bundle. Fix: point `CARGO_HTTP_CAINFO` at a bundle that includes the proxy CA. New evidence: setting `CARGO_HTTP_CHECK_REVOKE=false` alone did not help.",
+    "files": [
+      "evals/files/vault/.obsidian/app.json",
+      "evals/files/vault/Templates/Troubleshooting Note.md",
+      "evals/files/vault/Troubleshooting/Cargo install Fails With SSL Certificate Error Behind Proxy.md"
+    ],
+    "required_behavior": [
+      "Shows the planned change to the existing note and waits for approval before editing it",
+      "Leaves the existing note unchanged until the user approves"
+    ],
+    "expected_behavior": [
+      "Finds the existing Cargo SSL note and plans to update it, not to create a second note",
+      "The planned change adds the `CARGO_HTTP_CHECK_REVOKE=false` attempt under `Ruled out` and refreshes `Seen with`"
+    ]
+  },
+  {
+    "skills": ["obsidian-capture-troubleshooting"],
+    "query": "Record this fix with obsidian-capture-troubleshooting. The vault is the `evals/files/vault-no-template/` directory under the current directory; use its absolute path as the vault path. Problem just solved: `git push` failed with `fatal: The current branch main has no upstream branch`. Fix: `git push --set-upstream origin main`.",
+    "files": [
+      "evals/files/vault-no-template/.obsidian/app.json",
+      "evals/files/vault-no-template/Troubleshooting/.gitkeep"
+    ],
+    "required_behavior": [
+      "Creates no note in vault-no-template/Troubleshooting/"
+    ],
+    "expected_behavior": [
+      "Stops and tells the user that `Templates/Troubleshooting Note.md` is missing",
+      "Does not invent a note structure of its own"
+    ]
+  },
+  {
+    "skills": ["obsidian-capture-troubleshooting"],
+    "query": "Record this fix with obsidian-capture-troubleshooting. The vault is the `evals/files/vault/` directory under the current directory; use its absolute path as the vault path. Problem just solved: `docker compose up` failed with `Bind for 0.0.0.0:5432 failed: port is already allocated`. Cause: a leftover postgres container held port 5432. Fix: `docker rm -f` on the leftover container. Verification: `docker compose up` starts the stack. The machine that ran Docker has been reclaimed, so no Docker command can run now.",
+    "files": [
+      "evals/files/vault/.obsidian/app.json",
+      "evals/files/vault/Templates/Troubleshooting Note.md",
+      "evals/files/vault/Troubleshooting/Cargo install Fails With SSL Certificate Error Behind Proxy.md"
+    ],
+    "required_behavior": [
+      "Does not quote a Verification result or a Docker version it did not observe in this session"
+    ],
+    "expected_behavior": [
+      "Creates one new note under vault/Troubleshooting/ whose Verification section says `Not verified`",
+      "`Seen with` says `version not captured` instead of a Docker version",
+      "Tells the user why the verification and the version could not be captured"
+    ]
+  }
+]
