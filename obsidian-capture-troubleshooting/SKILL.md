@@ -18,7 +18,7 @@ Local, reversible actions proceed. Before an action that overwrites an existing 
 
 ## 1. Resolve the vault
 
-State file: `~/.local/state/skills/obsidian-capture-troubleshooting/vault-path` (one line, absolute path). The recall rule in `~/.claude/CLAUDE.md` reads the same file, so it must keep this path.
+State file: `~/.local/state/skills/obsidian-capture-troubleshooting/vault-path` (one line, absolute path). Keep this path: recall rules in files such as `~/.claude/CLAUDE.md` or `~/.agents/AGENTS.md` can depend on it.
 
 - File present and `<path>/.obsidian/` exists: use its path.
 - File missing, `<path>/.obsidian/` absent, or the user asked to change the vault: ask the user for the vault path, confirm `<path>/.obsidian/` exists, then `mkdir -p` the state directory and write the path.
