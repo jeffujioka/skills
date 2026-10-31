@@ -79,3 +79,8 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s obsidian-capture-troubleshooting
 	```
+
+- **dublagem** — Speak a text in a voice cloned from a reference audio through a local [VoiceStudio](https://github.com/debpalash/VoiceStudio) backend: picks the cleanest reference window, generates line by line, retries bad lines with other seeds (transcript and noise checks), joins into one WAV, then tunes with you. Never installs engines; creates a voice profile only after approval. Needs `ffmpeg`. Call with `@dublagem`; never auto-loads.
+	```sh
+	npx skills@latest add https://github.com/jeffujioka/skills.git -s dublagem
+	```
