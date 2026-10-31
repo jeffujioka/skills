@@ -1,0 +1,16 @@
+{
+  "engine": "voxcpm2",
+  "language": "Portuguese (Brazil)",
+  "instruct": "jovem paulistano empolgado, falando rápido e animado",
+  "seed": 42,
+  "retry_seeds": [7, 13, 99, 123, 2024],
+  "gap_seconds": 0.3,
+  "voice": {
+    "ref_audio": "ref.wav",
+    "ref_text": "transcript from ref.json"
+  },
+  "lines": [
+    "Aí, meu, bora que eu tenho que te contar uma parada.",
+    "Fechei o carro, mano: vai ser um Tesla, né, pô!"
+  ]
+}
