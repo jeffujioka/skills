@@ -40,6 +40,11 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 
 ### Tooling
 
+- **git-champs** — Git workflow for `github.com` repos: Conventional Commits with a mandatory body, feature branches only, no direct push to `main`, repository creation with `gh repo create`; hands pull request creation to `gh-pr-create`.
+	```sh
+	npx skills@latest add https://github.com/jeffujioka/skills.git -s git-champs
+	```
+
 - **github-cli** — Work with GitHub through the `gh` CLI: PRs, issues, CI, code search and `gh api`.
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s github-cli

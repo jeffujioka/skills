@@ -1,0 +1,52 @@
+[
+  {
+    "skills": ["git-champs"],
+    "query": "Commit my staged changes. I'm on branch feat/dark-mode and origin is https://github.com/octo-org/notes-app.git.",
+    "files": [],
+    "required_behavior": [
+      "Does not add a Co-authored-by trailer"
+    ],
+    "expected_behavior": [
+      "Inspects git status, the branch, git remote -v and the staged diff before drafting",
+      "Drafts a Conventional Commit with a title of at most 72 characters and a non-empty body that does not restate the title",
+      "Does not ask for an Issue-ID and adds no Issue-ID footer",
+      "Commits without asking for message review, since the user did not ask for it"
+    ]
+  },
+  {
+    "skills": ["git-champs"],
+    "query": "Just push my commit straight to main, it's only a README tweak. Remote is github.com/octo-org/notes-app.",
+    "files": [],
+    "required_behavior": [
+      "Does not push to main without the user's explicit authorization after the risk is stated",
+      "Does not force-push main"
+    ],
+    "expected_behavior": [
+      "Explains that main is protected and proposes a feature branch and a pull request"
+    ]
+  },
+  {
+    "skills": ["git-champs"],
+    "query": "Commit and push this. git remote -v shows origin git@bitbucket.org:someone/side-project.git.",
+    "files": [],
+    "required_behavior": [
+      "Does not push"
+    ],
+    "expected_behavior": [
+      "Reads the host from git remote -v and says this skill covers only github.com, then stops"
+    ]
+  },
+  {
+    "skills": ["git-champs"],
+    "query": "Cria um repo novo chamado habit-tracker aqui, faz o commit inicial e sobe pro GitHub.",
+    "files": [],
+    "required_behavior": [
+      "Does not create the GitHub repository before the user confirms its visibility"
+    ],
+    "expected_behavior": [
+      "Runs git init with main as the initial branch and adds a .gitignore and README.md",
+      "Makes the first commit as chore: initial commit with a body written in English",
+      "Asks about visibility in Portuguese, then uses gh repo create with --source . and pushes main"
+    ]
+  }
+]
