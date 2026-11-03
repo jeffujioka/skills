@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Prints what an MR description is built from: branch, target, commit messages
-# since the target, Jira key candidates, diff stat. Read-only; never fetches.
+# Prints what a PR description is built from: branch, target, commit messages
+# since the target, issue references (only when present), diff stat.
+# Read-only; never fetches.
 # usage: branch-context.sh [target-branch]
 set -euo pipefail
 
@@ -10,15 +11,8 @@ if [ -z "$branch" ]; then
   exit 1
 fi
 
-target=${1:-}
-if [ -z "$target" ]; then
-  ref=$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD || true)
-  target=${ref#origin/}
-fi
-if [ -z "$target" ]; then
-  echo "no target given and origin/HEAD unset: pass the target branch" >&2
-  exit 1
-fi
+here=$(cd "$(dirname "$0")" && pwd)
+target=$(bash "$here/resolve-base.sh" "${1:-}")
 
 base="origin/$target"
 if ! git rev-parse --verify --quiet "$base" >/dev/null; then
@@ -37,15 +31,13 @@ echo "target: $target"
 echo "commits ahead: $count"
 echo
 
-keys=$({ echo "$branch"; git log --no-merges --format=%B "$base..HEAD"; } \
-  | grep -oE '[A-Z][A-Z0-9]+-[0-9]+' | sort -u || true)
-if [ -n "$keys" ]; then
-  echo "jira key candidates (branch name and commit messages):"
-  echo "$keys" | sed 's/^/  /'
-else
-  echo "jira key candidates: none"
+refs=$({ echo "$branch"; git log --no-merges --format=%B "$base..HEAD"; } \
+  | grep -oE '(^|[[:space:](])#[0-9]+|[A-Z][A-Z0-9]+-[0-9]+' | sed -E 's/^[[:space:](]+//' | sort -u || true)
+if [ -n "$refs" ]; then
+  echo "issue references (branch name and commit messages):"
+  echo "$refs" | sed 's/^/  /'
+  echo
 fi
-echo
 
 echo "commit messages ($base..HEAD, oldest first):"
 git log --reverse --no-merges --format='--- %h%n%B' "$base..HEAD"

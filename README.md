@@ -40,7 +40,7 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 
 ### Tooling
 
-- **git-champs** — Git workflow for `github.com` repos: Conventional Commits with a mandatory body, feature branches only, no direct push to `main`; pushes and repository creation (`gh repo create`) run only after approval; hands pull request creation to `gh-pr-create`.
+- **git-champs** — Git workflow for `github.com` repos: Conventional Commits with a mandatory body, feature branches only, no direct push to `main`; pushes and repository creation (`gh repo create`) run only after approval; on the base branch with uncommitted work it branches and commits only the related hunks (`stage-hunks.sh`); hands pull request creation to `gh-pr-create`.
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s git-champs
 	```
@@ -50,7 +50,7 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s github-cli
 	```
 
-- **gh-pr-create** — Create a GitHub pull request with `gh` from the current branch: find the repo's PR template, fill it, show the draft, create only after approval. Uncommitted changes get a numbered choice: handle them yourself, stash and restore, commit and push (after approval), or continue without them.
+- **gh-pr-create** — Create a GitHub pull request with `gh` from the current branch: find the repo's PR template, fill it, show the draft, create only after approval. Uncommitted changes get a numbered choice: handle them yourself, stash and restore, commit and push (after approval), or continue without them. Nothing to PR (on the base branch or zero commits ahead) is detected before anything is stashed; the base branch is resolved, never guessed.
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s gh-pr-create
 	```
