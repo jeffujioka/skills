@@ -1,0 +1,10 @@
+diff --git a/style.css b/style.css
+index a050bfd..a95e61f 100644
+--- a/style.css
++++ b/style.css
+@@ -1 +1,5 @@
+ body { background: #fff; color: #222; }
++
++@media (prefers-color-scheme: dark) {
++  body { background: #111; color: #eee; }
++}

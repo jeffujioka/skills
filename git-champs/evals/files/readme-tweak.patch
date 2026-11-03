@@ -1,0 +1,9 @@
+diff --git a/README.md b/README.md
+index a35404e..61c849c 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,3 @@
+ # notes-app
+ 
+-A small notes app.
++A small notes app. Run `npm start`.

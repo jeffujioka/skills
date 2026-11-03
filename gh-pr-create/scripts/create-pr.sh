@@ -25,9 +25,11 @@ fi
 
 bash "$here/check-pushed.sh"
 
-if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
-  echo "uncommitted changes to tracked files are not in the PR. Commit first, then rerun." >&2
-  exit 1
+if [ "${ALLOW_DIRTY:-}" = 1 ]; then
+  echo "dirty-tree check skipped (ALLOW_DIRTY=1): local changes stay out of the PR"
+elif [ -n "$(git status --porcelain --untracked-files=no)" ]; then
+  echo "uncommitted changes to tracked files are not in the PR. Run check-clean.sh and let the user pick an option." >&2
+  exit 3
 fi
 
 branch=$(git branch --show-current)
