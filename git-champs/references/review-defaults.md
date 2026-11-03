@@ -3,38 +3,45 @@
 Defaults:
 
 - Commit messages: committed automatically; no review unless the user asks.
-- Pushes: automatic after pre-push checks; no review unless the user asks.
-- Pull request title and description: always shown for approval before create or update.
+- Pushes: the push summary is shown for approval before every push.
+- Repository creation: the `gh repo create` command, with owner and visibility, is shown for approval first.
+- Pull request title and description: shown for approval before create or update.
+
+Pushes, repository creation and pull requests are visible to others, so their approval is never skipped, even when the user asks for full automation.
 
 Rules:
 
 - User asks to review the commit message: draft it, show it, wait for approval or edits before `git commit`.
 - Draft the pull request title and description, show them, wait for approval or edits before `gh pr create` or `gh pr edit`.
-- Approval of one artifact never approves another. A reviewed commit message does not approve the pull request text, and an approved pull request does not approve a rewritten commit message the user asked to review.
-- Pull request automation needs explicit authorization. If the user automates only the pull request, keep any commit review they asked for, and the reverse.
-- Authorization ambiguous: stop and ask.
+- Approval of one artifact never approves another. An approved commit message does not approve the push, and an approved push does not approve the pull request text.
+- Approval ambiguous: stop and ask.
+
+## Push Summary
+
+Show this (explanations in the session language) and wait:
+
+```text
+Branch:  feature/add-login  ->  origin/feature/add-login
+Commits: 2
+  a1b2c3d feat(auth): add JWT token validation
+  e4f5g6h test(auth): add unit tests for token expiry
+Diff stat:
+  src/auth.ts  | +45 -3
+  test/auth.ts | +80
+
+Push? [y/N]
+```
 
 ## Examples
-
-Pull request automation:
-
-- `Open the PR without showing me the text`
-- `No need to ask me to review the PR description`
-- `Do everything automatically`
 
 Commit-message review:
 
 - `Show me the commit message before committing`
 - `Draft the commit message and let me review it first`
 
-Pull request review (matches the default):
+Commit without review (matches the default):
 
-- `Show me the PR description before creating it`
-- `Before updating the PR, send me the title and description`
+- `Commit it directly`
+- `If the commit message is good, just commit`
 
-Push review:
-
-- `Show me what will be pushed before pushing`
-- `Show me the push summary before pushing`
-
-Without wording like this, use the defaults: commit and push automatically, pull request review first.
+A request such as `Do everything automatically` or `Open the PR without showing me the text` still gets the push summary and the pull request draft; say why: both are visible to others.
