@@ -18,6 +18,10 @@ The harness started in the new Herdr location. Defaults to the current harness.
 A file summarising a session so a fresh session can continue the work.
 _Avoid_: Summary, context dump
 
+**Target remote**:
+The remote a push or review request goes to. Its host decides which skill applies.
+_Avoid_: Origin (when another remote is meant), upstream
+
 ### Skill engineering
 
 **Standard**:
