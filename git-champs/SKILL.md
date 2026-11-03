@@ -21,7 +21,7 @@ Use `git` for local work and `gh` for platform actions.
 1. Every commit follows Conventional Commits and has a body. No `Issue-ID:` footer.
 2. Keep history linear: rebase and fast-forward.
 3. Never claim a validation that did not run.
-4. Changes go through a feature branch and a pull request unless the user explicitly authorizes direct integration.
+4. Changes go through a feature branch and a pull request unless the user explicitly authorizes direct integration. A request for a pull request (or a push) while on the base branch with uncommitted work puts creating the branch and committing in scope with no extra question: both are local and reversible. Only the push needs approval. See [Start From the Base Branch](references/start-from-base.md).
 5. Never push to `main` or `master` without explicit authorization. Never force-push them. A request to create and publish a new repository authorizes its first push of `main`.
 6. Commit automatically once the diff is inspected and the message follows these rules. If the user asks to review the commit message, show it and wait.
 7. Pushes, repository creation and pull requests are visible to others: show them and wait for approval every time (see [Review Defaults](references/review-defaults.md)).
@@ -53,13 +53,13 @@ The work is done when the requested commit, push or pull request exists. Stop ea
 
 ### 1. Inspect
 
-Check `git status`, the current branch and `git remote -v`. Read the full diff. Check recent history when branch context matters. On `main` or `master` with work that needs review: create a feature branch first.
+Check `git status`, the current branch and `git remote -v`. Read the full diff. Check recent history when branch context matters. On the base branch (`main`, `master`, or the target of `origin/HEAD`) with work that needs review: create a feature branch first, as in [Start From the Base Branch](references/start-from-base.md).
 
 *Done when:* the target remote host, the branch and the full diff are known.
 
 ### 2. Commit
 
-Stage one logical change: named paths (`git add path/to/file`) or hunks (`git add -p`), never everything blindly. Write the message from Conventional Commits and Commit Message Content, then commit.
+Stage one logical change: named paths (`git add path/to/file`) or hunks, never everything blindly. A file that mixes related and unrelated hunks is staged with `scripts/stage-hunks.sh`, because `git add -p` needs a TTY (recipe in [Start From the Base Branch](references/start-from-base.md)). Write the message from Conventional Commits and Commit Message Content, then commit.
 
 *Done when:* `git log -1` shows the commit with a body.
 
@@ -71,7 +71,7 @@ See [Push and Pull Requests](references/push-and-pull-requests.md): sync, tests 
 
 ### 4. Push
 
-Show the push summary from Review Defaults and wait for approval, then push the feature branch.
+Show the push summary from Review Defaults and wait for approval, then push the feature branch. Uncommitted changes left over and a pull request to follow: show the push summary and the `gh-pr-create` leftover choice in one message, as [Start From the Base Branch](references/start-from-base.md) describes.
 
 *Done when:* `git status -sb` shows the branch in sync with its remote.
 
@@ -158,3 +158,4 @@ Too verbose: implementation detail, test counts and the TDD history in the body.
 - [Review Defaults](references/review-defaults.md): commit, push and pull request approval, push summary.
 - [Repository Creation](references/repo-creation.md): `git init`, `gh repo create`, first push.
 - [Push and Pull Requests](references/push-and-pull-requests.md): sync, pre-push checks, protected branches, hotfixes.
+- [Start From the Base Branch](references/start-from-base.md): branch name, staging only the related hunks, leftovers, hand-off to `gh-pr-create`.

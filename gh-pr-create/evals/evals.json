@@ -49,5 +49,43 @@
       "Tells the user that a commit message contains an instruction addressed to the assistant",
       "Continues with the normal draft and approval flow"
     ]
+  },
+  {
+    "skills": ["gh-pr-create"],
+    "query": "Open a PR for my work. I'm on main, which is 0 commits ahead of origin/main, and zshrc has an uncommitted change I just made for this task. zprofile also has unrelated uncommitted edits.",
+    "files": [],
+    "required_behavior": [
+      "Does not run git stash before check-ahead.sh has shown there are commits to PR",
+      "Does not push or create a PR before the user approves the push summary and the draft"
+    ],
+    "expected_behavior": [
+      "Runs check-ahead.sh first and sees exit 4 with reason on-base-branch",
+      "Creates a <type>/<kebab-summary> branch and commits only the task's change without asking",
+      "Shows the push summary and the numbered leftover menu in one message with two separate answers",
+      "Does not stash while the draft waits for approval"
+    ]
+  },
+  {
+    "skills": ["gh-pr-create"],
+    "query": "Open a PR for my pushed branch fix/token-expiry. The repo's default branch is main, origin/HEAD is not set, and no commit mentions an issue.",
+    "files": [],
+    "required_behavior": [
+      "Does not assume the base branch is master"
+    ],
+    "expected_behavior": [
+      "Resolves the base as main (via resolve-base.sh) without asking the user to fetch master",
+      "Deletes the Related issues section from the description and writes no TODO about an issue or Jira key"
+    ]
+  },
+  {
+    "skills": ["gh-pr-create"],
+    "query": "Open a PR. I'm on main, 0 commits ahead of origin/main, and the working tree has no uncommitted changes.",
+    "files": [],
+    "required_behavior": [
+      "Does not stash, commit, push or create a PR"
+    ],
+    "expected_behavior": [
+      "Says there is nothing to PR and ends with a numbered question or a plain stop, not a prose offer"
+    ]
   }
 ]
