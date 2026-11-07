@@ -1,0 +1,117 @@
+[
+  {
+    "skills": [
+      "handoff-hc"
+    ],
+    "query": "Handoff this conversation to omp in a new terminal through hc. I'm running claude with model claude-sonnet-5-5 at medium effort, inside hc terminal t13 (HC_TERMINAL_ID=t13, label herdr.space=sp123). The focus for the next session is: finish the README. omp models --json lists github-copilot/claude-sonnet-5.5 and github-copilot/claude-sonnet-5.5-1m, both with thinking low, medium, high, xhigh, max.",
+    "files": [],
+    "expected_behavior": [
+      "Reads the omp reference file and matches the model against the omp models list",
+      "Chooses --model github-copilot/claude-sonnet-5.5 and --thinking medium, without asking the user to pick",
+      "The hc run command, run or stated, has --bg, --outlive-parent, --no-notify and --label herdr.space=sp123",
+      "The first task is the last argument of that hc run command, and no herdr CLI command is used",
+      "The final message gives the name, label, harness, model and reasoning level"
+    ]
+  },
+  {
+    "skills": [
+      "handoff-hc"
+    ],
+    "query": "Handoff to codex through hc. I'm inside hc terminal t13 running claude.",
+    "files": [],
+    "required_behavior": [
+      "Starts no terminal with hc run"
+    ],
+    "expected_behavior": [
+      "Stops and says supported harnesses are opencode, claude, omp",
+      "Does not fall back to the current harness"
+    ]
+  },
+  {
+    "skills": [
+      "handoff-hc"
+    ],
+    "query": "Handoff to claude through hc. HC_TERMINAL_ID is not set in my shell.",
+    "files": [],
+    "required_behavior": [
+      "Runs no hc run and writes no handoff document"
+    ],
+    "expected_behavior": [
+      "Says it is not inside an hc terminal and stops"
+    ]
+  },
+  {
+    "skills": [
+      "handoff-hc"
+    ],
+    "query": "Handoff to opencode through hc using claude-sonnet-5-5. I'm inside hc terminal t13, running gpt-5 on provider openai. opencode models prints these Claude lines: github-copilot/claude-haiku-5.5, github-copilot/claude-sonnet-5, github-copilot/claude-sonnet-5.5, openrouter/~anthropic/claude-sonnet-latest, openrouter/anthropic/claude-sonnet-5, openrouter/anthropic/claude-sonnet-5.5.",
+    "files": [],
+    "expected_behavior": [
+      "Lists only the matching models github-copilot/claude-sonnet-5.5 and openrouter/anthropic/claude-sonnet-5.5 and asks the user to pick",
+      "Starts no terminal and runs no opencode seed before the user picks",
+      "Does not choose a provider on the user's behalf"
+    ]
+  },
+  {
+    "skills": [
+      "handoff-hc"
+    ],
+    "query": "Handoff to omp through hc, with sonnet at high effort. I'm inside hc terminal t13 (label herdr.space=sp123), running omp with github-copilot/claude-sonnet-4.6 at low. omp models --json lists claude-sonnet-4.6, claude-sonnet-5, claude-sonnet-5.5 and claude-sonnet-5.5-1m under github-copilot, all supporting low, medium, high, xhigh, max except 4.6 (low, medium, high).",
+    "files": [],
+    "expected_behavior": [
+      "Selects the newest version of the family, not the current model and not the -1m variant: --model github-copilot/claude-sonnet-5.5",
+      "Uses the effort the user named, not the current one: --thinking high",
+      "Does not ask the user to pick a model"
+    ]
+  },
+  {
+    "skills": [
+      "handoff-hc"
+    ],
+    "query": "Handoff to claude through hc with opus at max effort. I'm inside hc terminal t13 (label herdr.space=sp123) running omp. The focus for the next session is: finish the README.",
+    "files": [],
+    "expected_behavior": [
+      "Starts or plans to start claude with --model opus --effort max, passing the family name as is",
+      "Does not run a model-list command and does not match opus against a list",
+      "Passes the first task as the last argument of hc run"
+    ]
+  },
+  {
+    "skills": [
+      "handoff-hc"
+    ],
+    "query": "Handoff to opencode through hc with haiku at effort high. I'm inside hc terminal t13 (label herdr.space=sp123), running github-copilot/claude-sonnet-5.5 in omp. opencode models prints github-copilot/claude-haiku-4.5, github-copilot/claude-haiku-5.5, openrouter/anthropic/claude-haiku-4.5, openrouter/anthropic/claude-haiku-5.5. The opencode seed command with -m github-copilot/claude-haiku-5.5#high printed a line {\"type\":\"error\",\"message\":\"Variant unavailable for github-copilot/claude-haiku-5.5: high\"} and also printed a session ID.",
+    "files": [],
+    "required_behavior": [
+      "Does not open the session printed next to the error line"
+    ],
+    "expected_behavior": [
+      "Selects github-copilot/claude-haiku-5.5, newest haiku on the current model's provider, without asking for the model",
+      "Shows the error and asks the user to pick a variant, because the user named high"
+    ]
+  },
+  {
+    "skills": [
+      "handoff-hc"
+    ],
+    "query": "You already ran steps 1-6 of handoff-hc: the new terminal is handoff-docs, started on omp, and the handoff document is /tmp/handoff-docs.md. Do step 7 now. hc wait handoff-docs --output handoff-docs.md ended with reason timeout, and hc read handoff-docs --lines 40 shows the omp input box empty with no prompt text on screen.",
+    "files": [],
+    "expected_behavior": [
+      "Names hc send handoff-docs with the read-and-continue prompt as the command to run, or runs it",
+      "The hc send command has no --wait flag"
+    ]
+  },
+  {
+    "skills": [
+      "handoff-hc"
+    ],
+    "query": "You already ran steps 1-6 of handoff-hc: the new terminal is handoff-docs, started on claude, and the handoff document is /tmp/handoff-docs.md. Do step 7 now. hc wait handoff-docs --output handoff-docs.md ended with reason timeout, and hc read handoff-docs --lines 40 shows claude asking whether you trust the folder.",
+    "files": [],
+    "required_behavior": [
+      "Does not answer the trust question and does not send the prompt"
+    ],
+    "expected_behavior": [
+      "Tells the user to run hc attach on the new terminal"
+    ]
+  }
+]

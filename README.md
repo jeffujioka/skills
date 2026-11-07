@@ -60,6 +60,11 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s handoff-herdr
 	```
 
+- **handoff-hc** — Hand off the current conversation to a new terminal started through `hc` (herdr-core), placed in the caller's Herdr workspace: on the current harness by default, or on a named one (opencode, claude, omp), carrying the model and reasoning level over when the target supports them. Requires the `handoff` skill.
+	```sh
+	npx skills@latest add https://github.com/jeffujioka/skills.git -s handoff-hc
+	```
+
 - **hire** — Run a task on a subagent pinned to a chosen model and reasoning level, by rank (intern to cto) or raw `model#effort`.
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s hire
