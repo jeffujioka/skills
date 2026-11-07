@@ -3,10 +3,10 @@
     "skills": [
       "handoff-hc"
     ],
-    "query": "Handoff this conversation to omp in a new terminal through hc. I'm running claude with model claude-sonnet-5-5 at medium effort, inside hc terminal t13 (HC_TERMINAL_ID=t13, label herdr.space=sp123). The focus for the next session is: finish the README. omp models --json lists github-copilot/claude-sonnet-5.5 and github-copilot/claude-sonnet-5.5-1m, both with thinking low, medium, high, xhigh, max.",
+    "query": "Handoff this conversation to omp in a new terminal through hc. I'm running claude with model claude-sonnet-5-5 at medium effort, inside hc terminal t13 (HC_TERMINAL_ID=t13, label herdr.space=sp123). The focus for the next session is: finish the README. omp models --json lists github-copilot/claude-sonnet-5.5 and github-copilot/claude-sonnet-5.5-1m, both with thinking low, medium, high, xhigh, max. hc commands cannot run here: write each command you would run in your reply.",
     "files": [],
     "expected_behavior": [
-      "Reads the omp reference file and matches the model against the omp models list",
+      "Reads the omp reference file and matches claude-sonnet-5-5 against the model list given in the query",
       "Chooses --model github-copilot/claude-sonnet-5.5 and --thinking medium, without asking the user to pick",
       "The hc run command, run or stated, has --bg, --outlive-parent, --no-notify and --label herdr.space=sp123",
       "The first task is the last argument of that hc run command, and no herdr CLI command is used",
@@ -68,7 +68,7 @@
     "skills": [
       "handoff-hc"
     ],
-    "query": "Handoff to claude through hc with opus at max effort. I'm inside hc terminal t13 (label herdr.space=sp123) running omp. The focus for the next session is: finish the README.",
+    "query": "Handoff to claude through hc with opus at max effort. I'm inside hc terminal t13 (label herdr.space=sp123) running omp. The focus for the next session is: finish the README. hc commands cannot run here: write each command you would run in your reply.",
     "files": [],
     "expected_behavior": [
       "Starts or plans to start claude with --model opus --effort max, passing the family name as is",
