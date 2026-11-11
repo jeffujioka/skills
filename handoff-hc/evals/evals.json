@@ -8,7 +8,7 @@
     "expected_behavior": [
       "Reads the omp reference file and matches claude-sonnet-5-5 against the model list given in the query",
       "Chooses --model github-copilot/claude-sonnet-5.5 and --thinking medium, without asking the user to pick",
-      "The hc run command, run or stated, has --bg, --outlive-parent, --no-notify and --label herdr.space=sp123",
+      "The hc run command, run or stated, has --bg, --no-parent and --label herdr.space=sp123, and no --outlive-parent or --no-notify",
       "The first task is the last argument of that hc run command, and no herdr CLI command is used",
       "The final message gives the name, label, harness, model and reasoning level"
     ]
