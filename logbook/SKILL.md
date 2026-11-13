@@ -30,6 +30,8 @@ Update `progress.md` after each finished task, plan step or subagent return. App
 1. Update all three files.
 2. Request compaction: `bash scripts/compact.sh`. Compaction runs immediately and aborts the in-flight shell call with "Tool execution interrupted: shell". That interruption means it worked. Do not retry, and do not report the compaction as unconfirmed.
 3. In the next turn, confirm it: `bash scripts/compaction-status.sh`. Status `completed` means done.
+
+Both scripts drive OpenCode. On omp, ask the user to type `/compact`; the files are already current, so nothing else changes.
 4. Read the three files before any other action, then continue from `## Next`.
 
 ## Resume

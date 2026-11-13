@@ -7,7 +7,7 @@ Match the wanted model against the target harness's model list.
 3. A candidate matches when the wanted tokens appear in it as a contiguous run.
 4. If exactly one candidate equals the wanted tokens in full, it wins over the others.
 5. Several candidates left that differ only by provider: the one whose provider equals the current model's provider wins. None equal: pick-list.
-6. Several candidates left that differ only by a context suffix (`-1m`, `[1m]`): the one without the suffix wins, unless the user named the suffix.
+6. Several candidates left that differ only by a context suffix (`-1m`, `[1m]`): the one without the suffix wins, unless the user named the suffix or the wanted model is the current model carried over with it.
 
 ## Family names
 
