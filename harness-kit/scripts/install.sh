@@ -17,7 +17,7 @@ usage="usage: install.sh plan | install [--replace <path>]... | check | remove"
 # Harness "any" installs whenever a harness is found; source "settings" is the claude settings entry,
 # which check reports under claude-hook.
 artefacts=(
-  "agent-env|any|bin/agent-env|.local/bin/agent-env|755|prints the harness and session ids that logbook, captain-away and handoff-hc read|the consumer skills would run it as agent-env"
+  "agent-env|any|bin/agent-env|.local/bin/agent-env|755|prints the harness and session ids that logbook, captain-away and hc-handoff read|the consumer skills would run it as agent-env"
   "-|claude|settings|.claude/settings.json|-|gains one SessionStart entry that runs the claude hook; other entries stay|-"
   "claude-hook|claude|claude/session-start.sh|.claude/hooks/harness-kit-session-start.sh|755|sets AGENT_HARNESS=claude for the session's shell commands and names the logbook after compaction and shows a notice that it did|the harness-kit SessionStart entry would run it at every claude session start"
   "omp-extension|omp|omp/harness-kit.ts|.omp/agent/extensions/harness-kit.ts|644|sets AGENT_HARNESS=omp on commands that run agent-env or a skills script and adds the logbook reminder to the session after compaction and shows a notice|omp would load it as the harness-kit extension"

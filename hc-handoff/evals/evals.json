@@ -1,7 +1,7 @@
 [
   {
     "skills": [
-      "handoff-hc"
+      "hc-handoff"
     ],
     "query": "Handoff this conversation to omp in a new terminal through hc. I'm running claude with model claude-sonnet-5-5 at medium effort, inside hc terminal t13 (HC_TERMINAL_ID=t13, label herdr.space=sp123). The focus for the next session is: finish the README. omp models --json lists github-copilot/claude-sonnet-5.5 and github-copilot/claude-sonnet-5.5-1m, both with thinking low, medium, high, xhigh, max. hc commands cannot run here: write each command you would run in your reply.",
     "files": [],
@@ -15,7 +15,7 @@
   },
   {
     "skills": [
-      "handoff-hc"
+      "hc-handoff"
     ],
     "query": "Handoff to codex through hc. I'm inside hc terminal t13 running claude.",
     "files": [],
@@ -29,7 +29,7 @@
   },
   {
     "skills": [
-      "handoff-hc"
+      "hc-handoff"
     ],
     "query": "Handoff to claude through hc. HC_TERMINAL_ID is not set in my shell.",
     "files": [],
@@ -42,7 +42,7 @@
   },
   {
     "skills": [
-      "handoff-hc"
+      "hc-handoff"
     ],
     "query": "Handoff to opencode through hc using claude-sonnet-5-5. I'm inside hc terminal t13, running gpt-5 on provider openai. opencode models prints these Claude lines: github-copilot/claude-haiku-5.5, github-copilot/claude-sonnet-5, github-copilot/claude-sonnet-5.5, openrouter/~anthropic/claude-sonnet-latest, openrouter/anthropic/claude-sonnet-5, openrouter/anthropic/claude-sonnet-5.5.",
     "files": [],
@@ -54,7 +54,7 @@
   },
   {
     "skills": [
-      "handoff-hc"
+      "hc-handoff"
     ],
     "query": "Handoff to omp through hc, with sonnet at high effort. I'm inside hc terminal t13 (label herdr.space=sp123), running omp with github-copilot/claude-sonnet-4.6 at low. omp models --json lists claude-sonnet-4.6, claude-sonnet-5, claude-sonnet-5.5 and claude-sonnet-5.5-1m under github-copilot, all supporting low, medium, high, xhigh, max except 4.6 (low, medium, high).",
     "files": [],
@@ -66,7 +66,7 @@
   },
   {
     "skills": [
-      "handoff-hc"
+      "hc-handoff"
     ],
     "query": "Handoff to claude through hc with opus at max effort. I'm inside hc terminal t13 (label herdr.space=sp123) running omp. The focus for the next session is: finish the README. hc commands cannot run here: write each command you would run in your reply.",
     "files": [],
@@ -78,7 +78,7 @@
   },
   {
     "skills": [
-      "handoff-hc"
+      "hc-handoff"
     ],
     "query": "Handoff to opencode through hc with haiku at effort high. I'm inside hc terminal t13 (label herdr.space=sp123), running github-copilot/claude-sonnet-5.5 in omp. opencode models prints github-copilot/claude-haiku-4.5, github-copilot/claude-haiku-5.5, openrouter/anthropic/claude-haiku-4.5, openrouter/anthropic/claude-haiku-5.5. The opencode seed command with -m github-copilot/claude-haiku-5.5#high printed a line {\"type\":\"error\",\"message\":\"Variant unavailable for github-copilot/claude-haiku-5.5: high\"} and also printed a session ID.",
     "files": [],
@@ -92,9 +92,9 @@
   },
   {
     "skills": [
-      "handoff-hc"
+      "hc-handoff"
     ],
-    "query": "You already ran steps 1-6 of handoff-hc: the new terminal is handoff-docs, started on omp, and the handoff document is /tmp/handoff-docs.md. Do step 7 now. hc wait handoff-docs --output handoff-docs.md ended with reason timeout, and hc read handoff-docs --lines 40 shows the omp input box empty with no prompt text on screen.",
+    "query": "You already ran steps 1-6 of hc-handoff: the new terminal is handoff-docs, started on omp, and the handoff document is /tmp/handoff-docs.md. Do step 7 now. hc wait handoff-docs --output handoff-docs.md ended with reason timeout, and hc read handoff-docs --lines 40 shows the omp input box empty with no prompt text on screen.",
     "files": [],
     "expected_behavior": [
       "Names hc send handoff-docs with the read-and-continue prompt as the command to run, or runs it",
@@ -103,9 +103,9 @@
   },
   {
     "skills": [
-      "handoff-hc"
+      "hc-handoff"
     ],
-    "query": "You already ran steps 1-6 of handoff-hc: the new terminal is handoff-docs, started on claude, and the handoff document is /tmp/handoff-docs.md. Do step 7 now. hc wait handoff-docs --output handoff-docs.md ended with reason timeout, and hc read handoff-docs --lines 40 shows claude asking whether you trust the folder.",
+    "query": "You already ran steps 1-6 of hc-handoff: the new terminal is handoff-docs, started on claude, and the handoff document is /tmp/handoff-docs.md. Do step 7 now. hc wait handoff-docs --output handoff-docs.md ended with reason timeout, and hc read handoff-docs --lines 40 shows claude asking whether you trust the folder.",
     "files": [],
     "required_behavior": [
       "Does not answer the trust question and does not send the prompt"
@@ -116,7 +116,7 @@
   },
   {
     "skills": [
-      "handoff-hc"
+      "hc-handoff"
     ],
     "query": "Handoff this conversation through hc; continue the README work. I'm inside hc terminal t13 (HC_TERMINAL_ID=t13). My shell has CLAUDECODE=1 and PI_SESSION_ID=abc123 set, and agent-env prints AGENT_HARNESS=omp, AGENT_SESSION_ID=abc123, AGENT_ROOT_SESSION_ID=abc123. hc commands cannot run here: write each command you would run in your reply.",
     "files": [],
@@ -128,7 +128,7 @@
   },
   {
     "skills": [
-      "handoff-hc"
+      "hc-handoff"
     ],
     "query": "Handoff this conversation through hc; continue the README work. I'm inside hc terminal t13 (HC_TERMINAL_ID=t13). agent-env is not on my PATH and ~/.local/bin/agent-env does not exist. hc commands cannot run here: write each command you would run in your reply.",
     "files": [],
@@ -141,7 +141,7 @@
   },
   {
     "skills": [
-      "handoff-hc"
+      "hc-handoff"
     ],
     "query": "Handoff to omp through hc, in a new pane on my left. I'm inside hc terminal t50 (label herdr.space=sp123), running omp with github-copilot/claude-sonnet-5.5-1m. You already did steps 1-4: the handoff document is /tmp/handoff-docs.md (use that path as given; it exists, do not check it or ask) and the model is settled. Do steps 5-6. You cannot run commands here: write each command you would run in your answer. Assume these outputs when you run them, and show every command including the split: `bash <skill dir>/scripts/herdr-app.sh ls` would print {\"spaces\":[{\"id\":\"bs/sp123\",\"tabs\":[{\"id\":\"bs/tb1\",\"terminals\":[{\"terminal\":\"bs/t50\",\"pane\":\"bs/p50\"},{\"terminal\":\"bs/t51\",\"pane\":\"bs/p51\"}]}]}]}, and `do pane.split` would print {\"pane\":\"bs/p77\",\"terminal\":\"bs/t77\"}.",
     "files": [],
@@ -155,14 +155,14 @@
   },
   {
     "skills": [
-      "handoff-hc"
+      "hc-handoff"
     ],
-    "query": "Handoff to omp through hc, in a new pane on my right. I'm inside hc terminal t50. The handoff document is /tmp/handoff-docs.md and the model is settled; do step 5 up to the placement. You cannot run commands here: write each command you would run in your answer. `bash <skill dir>/scripts/herdr-app.sh ls` exits 3 and prints: herdr-app.sh: herdr-app is not on PATH and /home/dev/.config/handoff-hc/herdr-app-host does not exist. Ask the user for the ssh destination of the machine that shows the Herdr window, write it on one line into that file, then run this again.",
+    "query": "Handoff to omp through hc, in a new pane on my right. I'm inside hc terminal t50. The handoff document is /tmp/handoff-docs.md and the model is settled; do step 5 up to the placement. You cannot run commands here: write each command you would run in your answer. `bash <skill dir>/scripts/herdr-app.sh ls` exits 3 and prints: herdr-app.sh: herdr-app is not on PATH and /home/dev/.config/hc-handoff/herdr-app-host does not exist. Ask the user for the ssh destination of the machine that shows the Herdr window, write it on one line into that file, then run this again.",
     "files": [],
     "expected_behavior": [
       "Asks the user, once, for the ssh destination of the machine that shows the Herdr window",
       "Does not invent a destination and does not fall back to a tab before asking",
-      "Says it will write the answer on one line into ~/.config/handoff-hc/herdr-app-host and run herdr-app.sh ls again"
+      "Says it will write the answer on one line into ~/.config/hc-handoff/herdr-app-host and run herdr-app.sh ls again"
     ]
   }
 ]

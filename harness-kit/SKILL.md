@@ -1,11 +1,11 @@
 ---
 name: harness-kit
-description: Use when installing, checking or removing harness-kit, the agent environment that logbook, captain-away and handoff-hc need on claude, omp and opencode, or when a skill stops with "agent-env not found".
+description: Use when installing, checking or removing harness-kit, the agent environment that logbook, captain-away and hc-handoff need on claude, omp and opencode, or when a skill stops with "agent-env not found".
 ---
 
 # harness-kit
 
-harness-kit gives every shell command an agent runs the variable `AGENT_HARNESS`, and installs `agent-env`, which prints the harness, the session id and the root session id. logbook, captain-away and handoff-hc read them from `agent-env`.
+harness-kit gives every shell command an agent runs the variable `AGENT_HARNESS`, and installs `agent-env`, which prints the harness, the session id and the root session id. logbook, captain-away and hc-handoff read them from `agent-env`.
 
 `<skill dir>` is the absolute path of this skill's folder. The scripts need `bash`; `install.sh` also needs `jq` when claude is found, and `agent-env` needs `sqlite3` on opencode. Check them with `command -v jq sqlite3`. `install.sh` edits `~/.claude/settings.json` through `scripts/claude-settings.sh`, which keeps every other key.
 

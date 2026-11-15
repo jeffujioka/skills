@@ -55,12 +55,12 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s gh-pr-create
 	```
 
-- **handoff-hc** — Hand off the current conversation to a new terminal started through `hc` (herdr-core), placed in the caller's Herdr workspace: on the current harness by default, or on a named one (opencode, claude, omp), carrying the model and reasoning level over when the target supports them. Requires the `handoff` skill and harness-kit.
+- **hc-handoff** — Hand off the current conversation to a new terminal started through `hc` (herdr-core), placed in the caller's Herdr workspace: on the current harness by default, or on a named one (opencode, claude, omp), carrying the model and reasoning level over when the target supports them. Requires the `handoff` skill and harness-kit.
 	```sh
-	npx skills@latest add https://github.com/jeffujioka/skills.git -s handoff-hc
+	npx skills@latest add https://github.com/jeffujioka/skills.git -s hc-handoff
 	```
 
-- **harness-kit** — Installs the agent environment that logbook, captain-away and handoff-hc need: a claude `SessionStart` hook, an omp extension and an opencode plugin that set `AGENT_HARNESS` in the agent's shell commands, and `agent-env`, which prints the harness, session id and root session id. Lists every file it would write, asks once, installs only for the harnesses found; also checks and removes what it installed.
+- **harness-kit** — Installs the agent environment that logbook, captain-away and hc-handoff need: a claude `SessionStart` hook, an omp extension and an opencode plugin that set `AGENT_HARNESS` in the agent's shell commands, and `agent-env`, which prints the harness, session id and root session id. Lists every file it would write, asks once, installs only for the harnesses found; also checks and removes what it installed.
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s harness-kit
 	```
@@ -78,6 +78,11 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 - **logbook** — Keeps a session's progress, decisions and blocked actions on disk so context compaction loses no state. Needs harness-kit.
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s logbook
+	```
+
+- **debrief** — Distil the current session into a terse, LLM-readable summary saved to `.agents/debriefs/`, so a later session keeps decisions and failed attempts. Manual-only: call it by name.
+	```sh
+	npx skills@latest add https://github.com/jeffujioka/skills.git -s debrief
 	```
 
 - **engineer-a-skill** — Create, edit or audit an agent skill against authoring rules, 5.5 model notes and guardrails: batched intake, scaffold, evals first, write, then validate with a script (frontmatter, size, one-level references, embedded-command limits, secrets) and run the evals headless on claude or omp (the user picks), 10 runs per scenario on one model, graded by a judge. Edit mode asks about an unclear request first, then offers to keep, adjust or revert. Audit mode changes nothing, reports numbered findings, then asks whether to apply them (all or some), adjust a fix, ask a question or challenge a finding. Manual-only: call it by name; never auto-loads.

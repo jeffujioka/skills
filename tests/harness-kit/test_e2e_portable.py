@@ -10,7 +10,7 @@ from pathlib import Path
 
 from harness_home import REPO, env_for, install_skill, make_home
 
-SKILLS = ("logbook", "captain-away", "handoff-hc", "harness-kit")
+SKILLS = ("logbook", "captain-away", "hc-handoff", "harness-kit")
 COST = re.compile(r"^[0-9]+\.[0-9]{2}( \(estimate\))?$")
 
 

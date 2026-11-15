@@ -52,7 +52,7 @@ class InstallTest(unittest.TestCase):
             result.stdout.splitlines(),
             [
                 "harness-kit 0.1.1 would write:",
-                "~/.local/bin/agent-env: prints the harness and session ids that logbook, captain-away and handoff-hc read",
+                "~/.local/bin/agent-env: prints the harness and session ids that logbook, captain-away and hc-handoff read",
                 "~/.claude/settings.json: gains one SessionStart entry that runs the claude hook; other entries stay",
                 "~/.claude/hooks/harness-kit-session-start.sh: sets AGENT_HARNESS=claude for the session's shell commands and names the logbook after compaction and shows a notice that it did",
                 "~/.omp/agent/extensions/harness-kit.ts: sets AGENT_HARNESS=omp on commands that run agent-env or a skills script and adds the logbook reminder to the session after compaction and shows a notice",
