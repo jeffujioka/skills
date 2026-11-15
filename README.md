@@ -80,6 +80,11 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s engineer-a-skill
 	```
 
+- **engineer-an-agents** — Engineer a lean `AGENTS.md` (or `CLAUDE.md`) for a repo. Audits an existing file with three questions: remove what the model can work out, remove what does not apply to every prompt, move important task-specific rules into linked reference files (`docs/agents/`), and flag reusable procedures as skill candidates. With no file, drafts one from the repo's own manifests, configs, CI and git history. Edits only the context file and `docs/agents/`; keeps a backup in `/tmp`; commits nothing. Manual-only: call it by name; never auto-loads.
+	```sh
+	npx skills@latest add https://github.com/jeffujioka/skills.git -s engineer-an-agents
+	```
+
 - **obsidian-capture-troubleshooting** — Capture a solved problem as a note in an Obsidian vault's `Troubleshooting/` folder (symptom, cause, fix, verification). User-invoked only; stores the vault path in `~/.local/state/skills/obsidian-capture-troubleshooting/vault-path`.
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s obsidian-capture-troubleshooting
