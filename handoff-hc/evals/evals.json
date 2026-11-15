@@ -138,5 +138,31 @@
     "expected_behavior": [
       "Stops with the agent-env not found sentence"
     ]
+  },
+  {
+    "skills": [
+      "handoff-hc"
+    ],
+    "query": "Handoff to omp through hc, in a new pane on my left. I'm inside hc terminal t50 (label herdr.space=sp123), running omp with github-copilot/claude-sonnet-5.5-1m. You already did steps 1-4: the handoff document is /tmp/handoff-docs.md (use that path as given; it exists, do not check it or ask) and the model is settled. Do steps 5-6. You cannot run commands here: write each command you would run in your answer. Assume these outputs when you run them, and show every command including the split: `bash <skill dir>/scripts/herdr-app.sh ls` would print {\"spaces\":[{\"id\":\"bs/sp123\",\"tabs\":[{\"id\":\"bs/tb1\",\"terminals\":[{\"terminal\":\"bs/t50\",\"pane\":\"bs/p50\"},{\"terminal\":\"bs/t51\",\"pane\":\"bs/p51\"}]}]}]}, and `do pane.split` would print {\"pane\":\"bs/p77\",\"terminal\":\"bs/t77\"}.",
+    "files": [],
+    "expected_behavior": [
+      "Takes the caller's pane bs/p50 from the ls output, from the terminal whose id ends with /t50, and does not treat $HC_TERMINAL_ID as a pane id",
+      "Gives, in scripts/herdr-app.sh do pane.split, pane bs/p50, direction right and an argv whose last item is the prompt \"Read /tmp/handoff-docs.md and continue from it.\"",
+      "Gives, in scripts/herdr-app.sh do pane.swap, pane bs/p77 and target bs/p50, not a direction",
+      "Does not start the session with hc run, and does not run bare herdr-app",
+      "Uses the address t77 (no machine prefix) for later hc commands"
+    ]
+  },
+  {
+    "skills": [
+      "handoff-hc"
+    ],
+    "query": "Handoff to omp through hc, in a new pane on my right. I'm inside hc terminal t50. The handoff document is /tmp/handoff-docs.md and the model is settled; do step 5 up to the placement. You cannot run commands here: write each command you would run in your answer. `bash <skill dir>/scripts/herdr-app.sh ls` exits 3 and prints: herdr-app.sh: herdr-app is not on PATH and /home/dev/.config/handoff-hc/herdr-app-host does not exist. Ask the user for the ssh destination of the machine that shows the Herdr window, write it on one line into that file, then run this again.",
+    "files": [],
+    "expected_behavior": [
+      "Asks the user, once, for the ssh destination of the machine that shows the Herdr window",
+      "Does not invent a destination and does not fall back to a tab before asking",
+      "Says it will write the answer on one line into ~/.config/handoff-hc/herdr-app-host and run herdr-app.sh ls again"
+    ]
   }
 ]
