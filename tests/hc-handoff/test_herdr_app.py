@@ -1,4 +1,4 @@
-"""handoff-hc's herdr-app.sh reaches herdr-app here or over ssh, and keeps its arguments intact."""
+"""hc-handoff's herdr-app.sh reaches herdr-app here or over ssh, and keeps its arguments intact."""
 
 import json
 import os
@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-SCRIPT = Path(__file__).resolve().parents[2] / "handoff-hc" / "scripts" / "herdr-app.sh"
+SCRIPT = Path(__file__).resolve().parents[2] / "hc-handoff" / "scripts" / "herdr-app.sh"
 
 # Records its arguments as JSON lines in $RECORD.
 RECORDER = """#!/usr/bin/env bash
@@ -58,7 +58,7 @@ class HerdrAppTest(unittest.TestCase):
         return [json.loads(line) for line in self.record.read_text().splitlines()]
 
     def write_host(self, line):
-        config = self.home / ".config" / "handoff-hc"
+        config = self.home / ".config" / "hc-handoff"
         config.mkdir(parents=True)
         (config / "herdr-app-host").write_text(line + "\n")
 
@@ -98,7 +98,7 @@ class HerdrAppTest(unittest.TestCase):
         result = self.run_script("ls")
         self.assertEqual(result.returncode, 3)
         self.assertIn("ssh destination", result.stderr)
-        self.assertIn(str(self.home / ".config/handoff-hc/herdr-app-host"), result.stderr)
+        self.assertIn(str(self.home / ".config/hc-handoff/herdr-app-host"), result.stderr)
         self.assertEqual(self.recorded(), [])
 
 

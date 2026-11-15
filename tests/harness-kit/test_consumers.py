@@ -27,14 +27,14 @@ class ConsumersTest(unittest.TestCase):
                 self.assertEqual(result.stderr, SENTENCE + "\n")
                 self.assertFalse((home / ".local" / "state" / "agents").exists())
 
-        text = (REPO / "handoff-hc" / "SKILL.md").read_text()
+        text = (REPO / "hc-handoff" / "SKILL.md").read_text()
         step2 = re.search(r"^2\. .*$", text, re.MULTILINE).group(0)
         self.assertIn(SENTENCE, step2)
         for stale in ("OPENCODE=1", "CLAUDECODE=1", ".foreground.name"):
             self.assertNotIn(stale, step2)
 
     def test_handoff_stops_when_agent_env_fails(self):
-        text = (REPO / "handoff-hc" / "SKILL.md").read_text()
+        text = (REPO / "hc-handoff" / "SKILL.md").read_text()
         step2 = re.search(r"^2\. .*$", text, re.MULTILINE).group(0)
         stops = text.split("## Stops", 1)[1].split("\n## ", 1)[0]
         self.assertIn("If `agent-env` exits non-zero, stop and show its stderr", step2)

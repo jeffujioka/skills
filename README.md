@@ -55,12 +55,12 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s gh-pr-create
 	```
 
-- **handoff-hc** — Hand off the current conversation to a new terminal started through `hc` (herdr-core), placed in the caller's Herdr workspace: on the current harness by default, or on a named one (opencode, claude, omp), carrying the model and reasoning level over when the target supports them. Requires the `handoff` skill and harness-kit.
+- **hc-handoff** — Hand off the current conversation to a new terminal started through `hc` (herdr-core), placed in the caller's Herdr workspace: on the current harness by default, or on a named one (opencode, claude, omp), carrying the model and reasoning level over when the target supports them. Requires the `handoff` skill and harness-kit.
 	```sh
-	npx skills@latest add https://github.com/jeffujioka/skills.git -s handoff-hc
+	npx skills@latest add https://github.com/jeffujioka/skills.git -s hc-handoff
 	```
 
-- **harness-kit** — Installs the agent environment that logbook, captain-away and handoff-hc need: a claude `SessionStart` hook, an omp extension and an opencode plugin that set `AGENT_HARNESS` in the agent's shell commands, and `agent-env`, which prints the harness, session id and root session id. Lists every file it would write, asks once, installs only for the harnesses found; also checks and removes what it installed.
+- **harness-kit** — Installs the agent environment that logbook, captain-away and hc-handoff need: a claude `SessionStart` hook, an omp extension and an opencode plugin that set `AGENT_HARNESS` in the agent's shell commands, and `agent-env`, which prints the harness, session id and root session id. Lists every file it would write, asks once, installs only for the harnesses found; also checks and removes what it installed.
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s harness-kit
 	```

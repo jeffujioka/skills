@@ -29,7 +29,7 @@ The top-level session a subagent descends from. A top-level session is its own r
 _Avoid_: Parent session (when the top level is meant), main session
 
 **Consumer skill**:
-A skill that reads the harness and session through harness-kit's `agent-env`: logbook, captain-away and handoff-hc.
+A skill that reads the harness and session through harness-kit's `agent-env`: logbook, captain-away and hc-handoff.
 
 **Logbook folder**:
 The folder holding one root session's `progress.md`, `decisions.md` and `needs-you.md`, keyed by the project folder and the root session.
