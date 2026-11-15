@@ -15,7 +15,7 @@ LOGBOOK=$(bash "<skill dir>/scripts/path.sh")
 
 `<skill dir>` is the absolute path of this skill's folder. Its `/skills/logbook/scripts/` part is what makes omp treat the command as a skills script. Run the command from the project folder, since the logbook is keyed by the folder it runs in.
 
-The script creates the folder and prints its path. It needs harness-kit's `agent-env`, on PATH or at `~/.local/bin/agent-env`, and may name an older logbook of this project on stderr.
+The script creates the folder and prints its path. It needs harness-kit's `agent-env`, on PATH or at `~/.local/bin/agent-env`, and may name an older logbook of this project on stderr. `scripts/require-agent-env.sh` finds `agent-env` for it, and for captain-away's `cost.sh`. When the script exits non-zero, show its stderr to the user word for word and create no logbook anywhere else: a second folder splits the session's state.
 
 | File | Content | Written by |
 |---|---|---|
@@ -30,6 +30,10 @@ Update `progress.md` after each finished task, plan step or subagent return. App
 ## Resume
 
 A context that opens with a summary, the line "Context was compacted. Read …", or a user saying the session was compacted or resumed: read the three files first, then continue from `## Next`. When they disagree with the summary, the files win.
+
+## Compaction requests
+
+The logbook never compacts. Asked to compact: bring `progress.md` up to date (or offer to, when the folder is not set up), then tell the user to run the harness's own `/compact`. Per harness detail is in the references above.
 
 ## Subagents
 

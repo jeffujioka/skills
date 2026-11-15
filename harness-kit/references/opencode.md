@@ -1,6 +1,6 @@
 # opencode reference (opencode 2.3.0)
 
-Verified by the spike `tests/harness-kit/spikes/spike_compaction.py` and by `tests/harness-kit/test_e2e_reminder.py`, which run `opencode run --standalone` in a temporary HOME (spec D17).
+Verified by the skills repo's spike `tests/harness-kit/spikes/spike_compaction.py` and by `tests/harness-kit/test_e2e_reminder.py`, which run `opencode run --standalone` in a temporary HOME, so nothing touches the real opencode config or database.
 
 ## Plugin
 

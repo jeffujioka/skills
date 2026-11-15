@@ -51,7 +51,7 @@ class InstallTest(unittest.TestCase):
         self.assertEqual(
             result.stdout.splitlines(),
             [
-                "harness-kit 0.1.0 would write:",
+                "harness-kit 0.1.1 would write:",
                 "~/.local/bin/agent-env: prints the harness and session ids that logbook, captain-away and handoff-hc read",
                 "~/.claude/settings.json: gains one SessionStart entry that runs the claude hook; other entries stay",
                 "~/.claude/hooks/harness-kit-session-start.sh: sets AGENT_HARNESS=claude for the session's shell commands and names the logbook after compaction and shows a notice that it did",
@@ -68,7 +68,7 @@ class InstallTest(unittest.TestCase):
             (home / ".claude" / "hooks" / "harness-kit-session-start.sh", True),
             (home / ".omp" / "agent" / "extensions" / "harness-kit.ts", False),
         ):
-            self.assertIn("harness-kit 0.1.0", path.read_text(), path)
+            self.assertIn("harness-kit 0.1.1", path.read_text(), path)
             self.assertNotIn("@VERSION@", path.read_text(), path)
             if executable:
                 self.assertEqual(path.stat().st_mode & 0o777, 0o755, path)
@@ -95,7 +95,7 @@ class InstallTest(unittest.TestCase):
         result = self.run_install("install", "--replace", "~/.local/bin/agent-env")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("replaced foreign ~/.local/bin/agent-env", result.stdout.splitlines())
-        self.assertIn("harness-kit 0.1.0", agent_env.read_text())
+        self.assertIn("harness-kit 0.1.1", agent_env.read_text())
 
     def test_path_warning(self):
         self.make()
@@ -190,10 +190,10 @@ class InstallTest(unittest.TestCase):
         result = self.run_install("install")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn(
-            "replaced ~/.omp/agent/extensions/harness-kit.ts (0.0.1 -> 0.1.0)",
+            "replaced ~/.omp/agent/extensions/harness-kit.ts (0.0.1 -> 0.1.1)",
             result.stdout.splitlines(),
         )
-        self.assertEqual(extension.read_text(), source.replace("@VERSION@", "0.1.0"))
+        self.assertEqual(extension.read_text(), source.replace("@VERSION@", "0.1.1"))
 
     def test_check_reports_missing_agent_env(self):
         home = self.make(harnesses=("claude", "omp", "opencode"), without=())
@@ -205,10 +205,10 @@ class InstallTest(unittest.TestCase):
             result.stdout.splitlines(),
             [
                 "agent-env: missing (~/.local/bin/agent-env)",
-                "claude-hook: installed 0.1.0 (~/.claude/hooks/harness-kit-session-start.sh)",
-                "omp-extension: installed 0.1.0 (~/.omp/agent/extensions/harness-kit.ts)",
-                "opencode-plugin: installed 0.1.0 (~/.config/opencode/plugins/harness-kit/index.ts)",
-                "opencode-tui: installed 0.1.0 (~/.config/opencode/plugins/harness-kit/tui.ts)",
+                "claude-hook: installed 0.1.1 (~/.claude/hooks/harness-kit-session-start.sh)",
+                "omp-extension: installed 0.1.1 (~/.omp/agent/extensions/harness-kit.ts)",
+                "opencode-plugin: installed 0.1.1 (~/.config/opencode/plugins/harness-kit/index.ts)",
+                "opencode-tui: installed 0.1.1 (~/.config/opencode/plugins/harness-kit/tui.ts)",
                 "Run the harness-kit skill's install to repair.",
             ],
         )
@@ -375,11 +375,11 @@ class InstallTest(unittest.TestCase):
         self.assertEqual(
             result.stdout.splitlines(),
             [
-                "harness-kit 0.1.0 would write:",
+                "harness-kit 0.1.1 would write:",
                 "~/.local/bin/agent-env: unchanged",
                 "~/.claude/settings.json: unchanged",
                 "~/.claude/hooks/harness-kit-session-start.sh: unchanged",
-                "~/.omp/agent/extensions/harness-kit.ts: replaced (0.0.1 -> 0.1.0); sets AGENT_HARNESS=omp "
+                "~/.omp/agent/extensions/harness-kit.ts: replaced (0.0.1 -> 0.1.1); sets AGENT_HARNESS=omp "
                 "on commands that run agent-env or a skills script and adds the logbook reminder to the session after compaction and shows a notice",
                 "opencode not found: nothing is written for it",
             ],

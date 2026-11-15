@@ -7,6 +7,10 @@ description: Use when installing, checking or removing harness-kit, the agent en
 
 harness-kit gives every shell command an agent runs the variable `AGENT_HARNESS`, and installs `agent-env`, which prints the harness, the session id and the root session id. logbook, captain-away and handoff-hc read them from `agent-env`.
 
+`<skill dir>` is the absolute path of this skill's folder. The scripts need `bash`; `install.sh` also needs `jq` when claude is found, and `agent-env` needs `sqlite3` on opencode. Check them with `command -v jq sqlite3`. `install.sh` edits `~/.claude/settings.json` through `scripts/claude-settings.sh`, which keeps every other key.
+
+Local, reversible actions (run `plan` or `check`) proceed. Before an action that is destructive, hard to reverse, or visible to others (install, replace, remove), show it and wait for the developer's approval. When blocked, never use a destructive shortcut: no bypassing checks, no discarding files you did not create.
+
 ## Artefacts
 
 Install writes these, only for the harnesses found on `PATH`:
@@ -23,10 +27,10 @@ Each installed file carries a `harness-kit <version>` marker line. A target with
 
 ## Install
 
-1. Run `bash "<skill dir>/scripts/install.sh" plan`. It writes nothing. Show its output whole.
-2. Ask one question: install or not, and, for each file the plan lists as foreign, whether to replace it.
-3. On yes, run `bash "<skill dir>/scripts/install.sh" install`, adding `--replace <path>` for each foreign file the developer confirmed, with the path as the plan printed it. On no, run nothing more and write nothing.
-4. Tell the developer to start a new session: the hooks apply only to sessions started after the install.
+1. Run `bash "<skill dir>/scripts/install.sh" plan`. It writes nothing. Show its output whole. Done when the plan is shown.
+2. Ask one question: install or not, and, for each file the plan lists as foreign, whether to replace it. Done when the developer answers.
+3. On yes, run `bash "<skill dir>/scripts/install.sh" install`, adding `--replace <path>` for each foreign file the developer confirmed, with the path as the plan printed it. On no, run nothing more and write nothing. Done when install exits 0, or the developer said no.
+4. Tell the developer to start a new session: the hooks apply only to sessions started after the install. Done when said.
 
 ## Check
 
@@ -34,7 +38,9 @@ Run `bash "<skill dir>/scripts/install.sh" check`. It reports each artefact as i
 
 ## Remove
 
-Run `bash "<skill dir>/scripts/install.sh" remove`. It deletes only the files harness-kit installed and its `SessionStart` entry; foreign files and the other settings stay.
+1. Run `bash "<skill dir>/scripts/install.sh" check` and show its output: remove deletes the artefacts it reports as installed, older or newer. Done when the output is shown.
+2. Ask one question: remove them or not. Done when the developer answers.
+3. On yes, run `bash "<skill dir>/scripts/install.sh" remove`. It deletes only the files harness-kit installed and its `SessionStart` entry; foreign files and the other settings stay. On no, run nothing more. Done when remove exits 0, or the developer said no.
 
 ## Harness notes
 

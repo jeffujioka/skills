@@ -1,6 +1,6 @@
 # claude reference (claude 2.1.325)
 
-Verified by `tests/harness-kit/test_e2e_install.py` and `tests/harness-kit/test_e2e_reminder.py`, which run `claude -p` in a temporary HOME (spec D17).
+Verified by the skills repo's `tests/harness-kit/test_e2e_install.py` and `tests/harness-kit/test_e2e_reminder.py`, which run `claude -p` in a temporary HOME, so nothing touches the real `~/.claude`.
 
 ## Settings entry
 
