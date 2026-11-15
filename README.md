@@ -55,9 +55,14 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s gh-pr-create
 	```
 
-- **handoff-hc** — Hand off the current conversation to a new terminal started through `hc` (herdr-core), placed in the caller's Herdr workspace: on the current harness by default, or on a named one (opencode, claude, omp), carrying the model and reasoning level over when the target supports them. Requires the `handoff` skill.
+- **handoff-hc** — Hand off the current conversation to a new terminal started through `hc` (herdr-core), placed in the caller's Herdr workspace: on the current harness by default, or on a named one (opencode, claude, omp), carrying the model and reasoning level over when the target supports them. Requires the `handoff` skill and harness-kit.
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s handoff-hc
+	```
+
+- **harness-kit** — Installs the agent environment that logbook, captain-away and handoff-hc need: a claude `SessionStart` hook, an omp extension and an opencode plugin that set `AGENT_HARNESS` in the agent's shell commands, and `agent-env`, which prints the harness, session id and root session id. Lists every file it would write, asks once, installs only for the harnesses found; also checks and removes what it installed.
+	```sh
+	npx skills@latest add https://github.com/jeffujioka/skills.git -s harness-kit
 	```
 
 - **hire** — Run a task on a subagent pinned to a chosen model and reasoning level, by rank (intern to cto) or raw `model#effort`.
@@ -65,12 +70,12 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s hire
 	```
 
-- **captain-away** — Unattended runs: the agent decides every open question itself, never pushes, merges, deletes or writes to Jira/Confluence, caps spend, and leaves a report for when you return.
+- **captain-away** — Unattended runs: the agent decides every open question itself, never pushes, merges, deletes or writes to Jira/Confluence, caps spend, and leaves a report for when you return. Needs harness-kit.
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s captain-away
 	```
 
-- **logbook** — Keeps a session's progress, decisions and blocked actions on disk so context compaction loses no state; also compacts on request.
+- **logbook** — Keeps a session's progress, decisions and blocked actions on disk so context compaction loses no state. Needs harness-kit.
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s logbook
 	```

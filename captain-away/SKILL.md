@@ -1,6 +1,6 @@
 ---
 name: captain-away
-description: "Use when the user signals nobody will answer for a while, in any language: 'to saindo', 'vou dirigir', 'tchau e bom trabalho', 'I need to leave', going to lunch or dinner, picking up the kids, 'you have full autonomy', or invokes captain-away by hand. Only when the message means no reply is coming."
+description: "Use when the user signals nobody will answer for a while, in any language: 'to saindo', 'vou dirigir', 'tchau e bom trabalho', saying they need to leave, going to lunch or dinner, picking up the kids, granting full autonomy, or invokes captain-away by hand. Only when the message means no reply is coming."
 ---
 
 # captain-away
@@ -37,10 +37,12 @@ Start every subagent prompt with: the Hard limits list above, "decide, never ask
 After each major step, read the run's cost in dollars, subagents included (default cap 300):
 
 ```bash
-bash scripts/cost.sh
+bash "<skill dir>/scripts/cost.sh"
 ```
 
-The path is relative to this skill's directory.
+`<skill dir>` is the absolute path of this skill's folder. Its `/skills/captain-away/scripts/` part is what makes omp treat the command as a skills script.
+
+It prints the amount with two decimals; on claude the amount ends in `(estimate)`, since claude's figure may leave out subagents. The script needs harness-kit's `agent-env` and the logbook skill beside this one.
 
 At 300 or more (or the cap the user named), stop starting new work and go to Finish.
 

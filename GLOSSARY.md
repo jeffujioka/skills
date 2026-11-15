@@ -22,6 +22,21 @@ _Avoid_: Summary, context dump
 The remote a push or review request goes to. Its host decides which skill applies.
 _Avoid_: Origin (when another remote is meant), upstream
 
+### Harness kit
+
+**Root session**:
+The top-level session a subagent descends from. A top-level session is its own root.
+_Avoid_: Parent session (when the top level is meant), main session
+
+**Consumer skill**:
+A skill that reads the harness and session through harness-kit's `agent-env`: logbook, captain-away and handoff-hc.
+
+**Logbook folder**:
+The folder holding one root session's `progress.md`, `decisions.md` and `needs-you.md`, keyed by the project folder and the root session.
+
+**Skills script**:
+A shell command whose text contains `agent-env` or a path segment `/skills/<name>/scripts/`. On omp only these get `AGENT_HARNESS`.
+
 ### Skill engineering
 
 **Standard**:

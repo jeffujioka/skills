@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
-# Print the logbook folder for this session and create it.
-# Session id: OpenCode's OPENCODE_SESSION_ID, else omp's PI_SESSION_ID, else the start minute.
+# Print the logbook folder of this session's root and create it.
 set -euo pipefail
-dir=~/.local/state/opencode/projects/$(pwd | tr '/ ' '--')/${OPENCODE_SESSION_ID:-${PI_SESSION_ID:-$(date +%Y%m%d-%H%M)}}
+source "$(dirname "${BASH_SOURCE[0]}")/require-agent-env.sh"
+dir=$("$AGENT_ENV" logbook-dir)
 mkdir -p "$dir"
+old=$HOME/.local/state/opencode/projects/$(basename "$(dirname "$dir")")
+if [ ! -e "$dir/progress.md" ] && [ -d "$old" ]; then
+  newest=$(ls -td "$old"/*/ 2>/dev/null | head -n 1 || true)
+  if [ -n "$newest" ]; then
+    echo "Older logbook for this project: ${newest%/}; copy its files here to continue it." >&2
+  fi
+fi
 echo "$dir"

@@ -1,0 +1,168 @@
+#!/usr/bin/env bash
+# harness-kit @VERSION@
+# Print the harness session contract: AGENT_HARNESS, AGENT_SESSION_ID, AGENT_ROOT_SESSION_ID;
+# `agent-env logbook-dir` prints the session's logbook folder;
+# `agent-env compact-reminder` prints the post-compaction reminder when the logbook holds progress.md;
+# `agent-env root-source` prints where the root session's cost lives (internal to captain-away's cost.sh).
+set -euo pipefail
+
+die() {
+  printf 'agent-env: %s\n' "$1" >&2
+  exit 1
+}
+
+session_variable() {
+  case "$1" in
+    claude) echo CLAUDE_CODE_SESSION_ID ;;
+    omp) echo PI_SESSION_ID ;;
+    opencode) echo OPENCODE_SESSION_ID ;;
+    *) die "unknown AGENT_HARNESS=$1 (claude, omp, opencode)" ;;
+  esac
+}
+
+harness() {
+  if [[ -n "${AGENT_HARNESS:-}" ]]; then
+    session_variable "$AGENT_HARNESS" >/dev/null
+    echo "$AGENT_HARNESS"
+    return
+  fi
+  local found=() names=()
+  [[ -n "${CLAUDE_CODE_SESSION_ID:-}" ]] && found+=(claude) && names+=(CLAUDE_CODE_SESSION_ID)
+  [[ -n "${PI_SESSION_ID:-}" ]] && found+=(omp) && names+=(PI_SESSION_ID)
+  [[ -n "${OPENCODE_SESSION_ID:-}" ]] && found+=(opencode) && names+=(OPENCODE_SESSION_ID)
+  case "${#found[@]}" in
+    1) echo "${found[0]}" ;;
+    0) die "AGENT_HARNESS is unset and no harness session variable is set (CLAUDE_CODE_SESSION_ID, PI_SESSION_ID, OPENCODE_SESSION_ID)" ;;
+    *) die "AGENT_HARNESS is unset and several harness session variables are set: ${names[*]}" ;;
+  esac
+}
+
+session_id() {
+  local variable
+  variable=$(session_variable "$1")
+  [[ -n "${!variable:-}" ]] || die "$variable is not set (AGENT_HARNESS=$1)"
+  echo "${!variable}"
+}
+
+omp_root_file() {
+  local file=$1 pattern='^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{3}Z_.+$' folder
+  folder=$(dirname "$file")
+  if [[ "$(basename "$file" .jsonl)" =~ $pattern ]]; then
+    echo "$file"
+  elif [[ "$(basename "$folder")" =~ $pattern ]]; then
+    echo "$folder.jsonl"
+  else
+    die "PI_SESSION_FILE $file has no <ts>_<root id> name"
+  fi
+}
+
+omp_root() {
+  local file
+  if [[ -z "${PI_SESSION_FILE:-}" ]]; then
+    echo "$1"
+    return
+  fi
+  file=$(omp_root_file "$PI_SESSION_FILE") || exit 1
+  file=$(basename "$file" .jsonl)
+  echo "${file#*_}"
+}
+
+opencode_query() {
+  local db=$1 sql=$2 output
+  output=$(sqlite3 -readonly -cmd '.timeout 5000' "$db" "$sql" 2>&1) || die "sqlite3 $db: ${output//$'\n'/ }"
+  echo "$output"
+}
+
+opencode_db() {
+  echo "$HOME/.local/share/opencode/opencode.db"
+}
+
+# The session tree of $1, from one read: the root first, then its descendants sorted by id.
+opencode_tree() {
+  local db id=${1//\'/\'\'} tables tree
+  db=$(opencode_db)
+  [[ -f "$db" ]] || die "$db not found"
+  tables=$(opencode_query "$db" "select 1 from sqlite_master where type = 'table' and name = 'session_v2'") || exit 1
+  [[ -n "$tables" ]] || die "table session_v2 not found in $db"
+  tree=$(opencode_query "$db" "with recursive chain(id, parent_id) as (
+      select id, parent_id from session_v2 where id = '$id'
+      union all
+      select s.id, s.parent_id from session_v2 s join chain c on s.id = c.parent_id),
+    root(id) as (select id from chain where parent_id is null or parent_id = '' limit 1),
+    tree(id) as (
+      select id from root
+      union all
+      select s.id from session_v2 s join tree t on s.parent_id = t.id)
+    select id from tree order by id <> (select id from root), id") || exit 1
+  [[ -n "$tree" ]] || die "session $1 not found in session_v2 of $db"
+  echo "$tree"
+}
+
+root_session_id() {
+  local tree
+  case "$1" in
+    claude) echo "$2" ;;
+    omp) omp_root "$2" ;;
+    opencode)
+      tree=$(opencode_tree "$2") || exit 1
+      echo "${tree%%$'\n'*}"
+      ;;
+  esac
+}
+
+root_source() {
+  local transcripts root tree
+  case "$1" in
+    claude)
+      transcripts=("$HOME"/.claude/projects/*/"$2".jsonl)
+      [[ -f "${transcripts[0]}" ]] || die "no transcript $HOME/.claude/projects/*/$2.jsonl"
+      ((${#transcripts[@]} == 1)) || die "several transcripts for session $2: ${transcripts[*]}"
+      printf 'TRANSCRIPT=%s\n' "${transcripts[0]}"
+      ;;
+    omp)
+      [[ -n "${PI_SESSION_FILE:-}" ]] || die "PI_SESSION_FILE is not set (AGENT_HARNESS=omp)"
+      root=$(omp_root_file "$PI_SESSION_FILE") || exit 1
+      [[ -f "$root" ]] || die "$root not found"
+      printf 'JSONL=%s\n' "$root"
+      if [[ -d "${root%.jsonl}" ]]; then
+        find "${root%.jsonl}" -type f -name '*.jsonl' | LC_ALL=C sort | sed 's/^/JSONL=/'
+      fi
+      ;;
+    opencode)
+      tree=$(opencode_tree "$2") || exit 1
+      printf 'DB=%s\n' "$(opencode_db)"
+      printf '%s\n' "$tree" | sed 's/^/SESSION=/'
+      ;;
+  esac
+}
+
+main() {
+  local harness session root dir
+  case "${1-}" in
+    '' | logbook-dir | compact-reminder | root-source) ;;
+    *) printf 'agent-env: unknown command %s\n' "$1" >&2; exit 2 ;;
+  esac
+  harness=$(harness)
+  session=$(session_id "$harness")
+  if [[ "${1-}" == root-source ]]; then
+    root_source "$harness" "$session"
+    return
+  fi
+  root=$(root_session_id "$harness" "$session")
+  dir=$(printf '%s/.local/state/agents/logbooks/%s/%s' "$HOME" "$(pwd | tr '/ ' '--')" "$root")
+  case "${1-}" in
+    logbook-dir)
+      printf '%s\n' "$dir"
+      return
+      ;;
+    compact-reminder)
+      if [[ -f "$dir/progress.md" ]]; then
+        printf 'Context was compacted. Read `%s/progress.md`, `decisions.md`, `needs-you.md` before anything else; continue from `## Next`.\n' "$dir"
+      fi
+      return
+      ;;
+  esac
+  printf 'AGENT_HARNESS=%s\nAGENT_SESSION_ID=%s\nAGENT_ROOT_SESSION_ID=%s\n' "$harness" "$session" "$root"
+}
+
+main "$@"
