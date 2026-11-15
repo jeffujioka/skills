@@ -1,19 +1,21 @@
 ---
 name: logbook
-description: "Use when the user asks to compact or compress the session, when a long or multi-step session needs its progress, decisions and next steps kept outside the context window, when the context was just compacted, or when another skill requires a logbook. Not for Obsidian notes, AGENTS.md or tool memory."
+description: "Use when a long or multi-step session needs its progress, decisions and next steps kept outside the context window, when the context was just compacted, or when another skill requires a logbook. Not for Obsidian notes, AGENTS.md or tool memory."
 ---
 
 # logbook
 
-State lives on disk, so a compaction can lose conversation detail without losing the work. Opencode auto-compacts at the `compaction.buffer` set in `~/.config/opencode/opencode.jsonc` (250k on 1M-context models); this skill keeps the files current so that moment is safe.
+State lives on disk, so a compaction can lose conversation detail without losing the work. Each harness compacts on its own; after it does, harness-kit's hook names these files to the agent. This skill keeps the files current so that moment is safe. Per harness: [claude](references/claude.md), [omp](references/omp.md), [opencode](references/opencode.md).
 
 ## Folder
 
 ```bash
-LOGBOOK=$(bash scripts/path.sh)
+LOGBOOK=$(bash "<skill dir>/scripts/path.sh")
 ```
 
-The script creates the folder and prints its path. Script paths are relative to this skill's directory.
+`<skill dir>` is the absolute path of this skill's folder. Its `/skills/logbook/scripts/` part is what makes omp treat the command as a skills script. Run the command from the project folder, since the logbook is keyed by the folder it runs in.
+
+The script creates the folder and prints its path. It needs harness-kit's `agent-env`, on PATH or at `~/.local/bin/agent-env`, and may name an older logbook of this project on stderr. `scripts/require-agent-env.sh` finds `agent-env` for it, and for captain-away's `cost.sh`. When the script exits non-zero, show its stderr to the user word for word and create no logbook anywhere else: a second folder splits the session's state.
 
 | File | Content | Written by |
 |---|---|---|
@@ -25,18 +27,13 @@ The script creates the folder and prints its path. Script paths are relative to 
 
 Update `progress.md` after each finished task, plan step or subagent return. Append to `decisions.md` at the moment of deciding. The agent that finishes a step updates the files before it starts the next one.
 
-## Compact on request
-
-1. Update all three files.
-2. Request compaction: `bash scripts/compact.sh`. Compaction runs immediately and aborts the in-flight shell call with "Tool execution interrupted: shell". That interruption means it worked. Do not retry, and do not report the compaction as unconfirmed.
-3. In the next turn, confirm it: `bash scripts/compaction-status.sh`. Status `completed` means done.
-
-Both scripts drive OpenCode. On omp, ask the user to type `/compact`; the files are already current, so nothing else changes.
-4. Read the three files before any other action, then continue from `## Next`.
-
 ## Resume
 
-A context that opens with a summary, an interrupted `compact` call, or a user saying the session was compacted or resumed: read the three files first. When they disagree with the summary, the files win.
+A context that opens with a summary, the line "Context was compacted. Read …", or a user saying the session was compacted or resumed: read the three files first, then continue from `## Next`. When they disagree with the summary, the files win.
+
+## Compaction requests
+
+The logbook never compacts. Asked to compact: bring `progress.md` up to date (or offer to, when the folder is not set up), then tell the user to run the harness's own `/compact`. Per harness detail is in the references above.
 
 ## Subagents
 

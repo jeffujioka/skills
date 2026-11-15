@@ -19,6 +19,8 @@ Run steps 1-8 without pausing. Stop early only for these:
 
 - Not inside an hc terminal (step 1).
 - The user named an unsupported harness (step 2).
+- `agent-env` not found while the target is the current harness (step 2).
+- `agent-env` exits non-zero (step 2). Show its stderr.
 - The model or reasoning level needs a pick from the user (step 3). Show the list and wait.
 - The `handoff` skill cannot be loaded or read (step 4). Ask the user to run `/handoff` and wait for the path.
 
@@ -35,7 +37,7 @@ Copy this checklist and tick each step:
 ```
 
 1. **Resolve the calling terminal.** Read `$HC_TERMINAL_ID`. If it is empty, tell the user you are not inside an hc terminal and stop. Run `hc get $HC_TERMINAL_ID --json` and read `.labels["herdr.space"]` (may be absent). Done when `<terminal>` is known.
-2. **Resolve the target harness.** If the user names one (`opencode`, `claude`, `omp`), use it. If they name any other harness, stop and say: supported are opencode, claude, omp. If they name none, the target is the current harness: `OPENCODE=1` is opencode, `CLAUDECODE=1` is claude, otherwise read `.foreground.name` of `hc get $HC_TERMINAL_ID --json`. Read `references/<target>.md` now. Done when the target is one of the three and its file is read.
+2. **Resolve the target harness.** If the user names one (`opencode`, `claude`, `omp`), use it. If they name any other harness, stop and say: supported are opencode, claude, omp. If they name none, the target is the current harness: run `agent-env`, or `~/.local/bin/agent-env` when `agent-env` is not on `PATH`, and take the value of its `AGENT_HARNESS=` line. When neither exists, stop and say the quoted text word for word, without the quotes, with no question and no command list: "agent-env not found: harness-kit is not installed. Ask your agent to run the harness-kit skill, then start a new session." If `agent-env` exits non-zero, stop and show its stderr; never guess the harness. Read `references/<target>.md` now. Done when the target is one of the three and its file is read.
 3. **Resolve model and reasoning.** Never guess a value: omit a flag whose value is unknown and say so in the report.
    - **Wanted model**: the model the user named (a full name, a family name `opus`/`sonnet`/`haiku`, or a family with a version), else the current model. The current model comes from your own system prompt, with every suffix it has: a current `claude-opus-5.5-1m` stays `-1m` (dropping it once moved the new session to a 200k window, which compacted three times).
    - **Wanted reasoning**: the level the user named (`low`, `medium`, `high`, `xhigh`, `max`; they may call it effort or thinking), else the current level from the session config or system prompt.

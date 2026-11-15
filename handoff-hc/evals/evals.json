@@ -113,5 +113,30 @@
     "expected_behavior": [
       "Tells the user to run hc attach on the new terminal"
     ]
+  },
+  {
+    "skills": [
+      "handoff-hc"
+    ],
+    "query": "Handoff this conversation through hc; continue the README work. I'm inside hc terminal t13 (HC_TERMINAL_ID=t13). My shell has CLAUDECODE=1 and PI_SESSION_ID=abc123 set, and agent-env prints AGENT_HARNESS=omp, AGENT_SESSION_ID=abc123, AGENT_ROOT_SESSION_ID=abc123. hc commands cannot run here: write each command you would run in your reply.",
+    "files": [],
+    "expected_behavior": [
+      "Names omp as the current harness and the target",
+      "The hc run command starts omp, not claude",
+      "Does not take the harness from CLAUDECODE=1"
+    ]
+  },
+  {
+    "skills": [
+      "handoff-hc"
+    ],
+    "query": "Handoff this conversation through hc; continue the README work. I'm inside hc terminal t13 (HC_TERMINAL_ID=t13). agent-env is not on my PATH and ~/.local/bin/agent-env does not exist. hc commands cannot run here: write each command you would run in your reply.",
+    "files": [],
+    "required_behavior": [
+      "Starts no terminal with hc run and writes no handoff document"
+    ],
+    "expected_behavior": [
+      "Stops with the agent-env not found sentence"
+    ]
   }
 ]
