@@ -37,6 +37,10 @@ The folder holding one root session's `progress.md`, `decisions.md` and `needs-y
 **Skills script**:
 A shell command whose text contains `agent-env` or a path segment `/skills/<name>/scripts/`. On omp only these get `AGENT_HARNESS`.
 
+**Pinned agent**:
+A subagent started for one task on the model and effort the user named.
+_Avoid_: Model agent, tagged agent, preset agent, hired agent
+
 ### Skill engineering
 
 **Standard**:

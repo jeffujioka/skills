@@ -24,7 +24,7 @@ Each rule is checked by `scripts/validate.py` unless marked "manual". FAIL block
 
 | Id | Level | Rule |
 |---|---|---|
-| R00 | FAIL | Frontmatter block present. `disable-model-invocation`, if set, is `true` or `false`. |
+| R00 | FAIL | Frontmatter block present. `disable-model-invocation`, if set, is `true` or `false`. A value containing `: ` is quoted. |
 | R01 | FAIL | `name`: lowercase letters, digits, hyphens; max 64; no "claude" or "anthropic"; equals the directory name. |
 | R02 | FAIL | `description`: non-empty, max 1024, no XML tags, third person (no I/my/you/your/we/our). Says what the skill does and when. |
 | W02 | WARN | Description has no "when" clause. Auto skill: trigger terms. Manual-only skill: end with "Manual-only: call it by name." |

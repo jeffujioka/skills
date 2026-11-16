@@ -138,6 +138,16 @@ class FrontmatterLineTests(SkillTestCase):
         self.assertIn(("R02", "SKILL.md:3"), findings)
         self.assertIn(("W02", "SKILL.md:3"), findings)
 
+    def test_unquoted_value_with_colon_space_fails(self):
+        skill = make_skill({"SKILL.md": "---\nname: probe\ndescription: Probes things. Manual-only: call it by name.\n---\nBody.\n"})
+        self.addCleanup_tmp(skill)
+        self.assertIn(("FAIL", "R00"), rules(skill))
+
+    def test_quoted_value_with_colon_space_passes(self):
+        skill = make_skill({"SKILL.md": '---\nname: probe\ndescription: "Probes things. Manual-only: call it by name."\n---\nBody.\n'})
+        self.addCleanup_tmp(skill)
+        self.assertNotIn(("FAIL", "R00"), rules(skill))
+
 
 class FalsePositiveTests(SkillTestCase):
     def test_number_with_unit_not_dated(self):

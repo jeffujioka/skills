@@ -318,6 +318,18 @@ def check_unreferenced(skill_dir, skill_text, f):
                 f.warn("W05", str(path.relative_to(skill_dir)), "file is not mentioned in SKILL.md")
 
 
+def unquoted_colon_fields(lines):
+    """Yield (key, line_no) for frontmatter values that are plain YAML scalars containing ': '."""
+    if not lines or lines[0].strip() != "---":
+        return
+    for i in range(1, len(lines)):
+        if lines[i].strip() == "---":
+            return
+        m = re.match(r"^([A-Za-z0-9_-]+):\s*(.*)$", lines[i])
+        if m and m.group(2)[:1] not in ('"', "'", "|", ">") and ": " in m.group(2):
+            yield m.group(1), i + 1
+
+
 def validate(skill_dir):
     f = Findings()
     skill_md = skill_dir / "SKILL.md"
@@ -325,6 +337,8 @@ def validate(skill_dir):
     lines = text.splitlines()
     fields, field_lines, body_start = parse_frontmatter(lines)
     check_frontmatter(fields, field_lines, skill_md, f)
+    for key, line_no in unquoted_colon_fields(lines):
+        f.fail("R00", f"SKILL.md:{line_no}", f"`{key}` value has an unquoted ': ', which YAML parsers reject; quote the value")
 
     if len(lines) - body_start > MAX_BODY_LINES:
         f.fail("R03", "SKILL.md", f"body is {len(lines) - body_start} lines (max {MAX_BODY_LINES}); split into reference files")
