@@ -1,0 +1,13 @@
+{
+  "name": "billing-api",
+  "version": "1.4.0",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc -p .",
+    "codegen": "node tools/codegen.js",
+    "migrate": "node tools/migrate.js",
+    "seed": "node tools/seed.js",
+    "lint": "eslint src"
+  },
+  "prettier": { "tabWidth": 2 }
+}

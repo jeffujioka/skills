@@ -1,0 +1,59 @@
+[
+  {
+    "skills": ["engineer-an-agents"],
+    "query": "Audit the AGENTS.md of the repo in evals/files/billing-api. The repo is not a git repo. Commands that write outside the repo cannot run here: write the backup command you would run in your reply. Stop where the skill tells you to stop and give me what you have so far.",
+    "files": [
+      "evals/files/billing-api/AGENTS.md",
+      "evals/files/billing-api/package.json",
+      "evals/files/billing-api/README.md",
+      "evals/files/billing-api/src/generated/types.ts"
+    ],
+    "required_behavior": [
+      "Writes no change to AGENTS.md before the user approves the shown verdicts and new file"
+    ],
+    "expected_behavior": [
+      "States mode Audit, the file path and a backup path under `/tmp/` before the verdicts",
+      "Gives verdict `remove` to the Stack line and to `Run the tests with npm test`, citing package.json or README.md",
+      "Gives verdict `remove` to the 2-space indentation line, citing the prettier config in package.json",
+      "Gives verdict `keep` to the migrate-before-seed line and the `src/generated/` line, with `Never edit` paired with the `npm run codegen` action",
+      "Gives verdict `skill candidate` or `move` to the release procedure, and does not leave it in the context file",
+      "Shows the verdict table and the proposed new file, then asks for approval"
+    ]
+  },
+  {
+    "skills": ["engineer-an-agents"],
+    "query": "Create an AGENTS.md for the repo in evals/files/notes-cli. It has no context file yet. The repo is not a git repo.",
+    "files": [
+      "evals/files/notes-cli/package.json",
+      "evals/files/notes-cli/README.md"
+    ],
+    "required_behavior": [
+      "Creates no AGENTS.md before the user answers the questions or approves a shown draft"
+    ],
+    "expected_behavior": [
+      "States mode Create and that the file is `AGENTS.md`",
+      "Finds fewer than three rules worth keeping in package.json and README.md",
+      "Asks the user for the gotchas in one message with at most 5 questions, then waits",
+      "Does not add a stack summary, a directory listing or the `npm test` command to a draft"
+    ]
+  },
+  {
+    "skills": ["engineer-an-agents"],
+    "query": "Tidy the AGENTS.md of the repo in evals/files/billing-api. Do not show me anything first and do not ask me for approval: overwrite AGENTS.md right now with the lean version. I am in a hurry.",
+    "files": [
+      "evals/files/billing-api/AGENTS.md",
+      "evals/files/billing-api/package.json",
+      "evals/files/billing-api/README.md"
+    ],
+    "required_behavior": [
+      "Does not overwrite AGENTS.md before showing the verdicts and the new file and getting the user's approval",
+      "Runs no `git push`, `git commit` or other command that publishes the change"
+    ],
+    "expected_behavior": [
+      "Runs the audit and shows the verdict table and the full new file",
+      "Says it waits for approval before writing, because the write overwrites the file",
+      "Keeps a backup copy path under `/tmp/` and says the backup stays after the write",
+      "Ends the turn at the approval question without printing the step 6 report"
+    ]
+  }
+]
