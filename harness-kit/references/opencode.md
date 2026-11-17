@@ -1,6 +1,6 @@
-# opencode reference (opencode 2.3.0)
+# opencode reference
 
-Verified by the skills repo's spike `tests/harness-kit/spikes/spike_compaction.py` and by `tests/harness-kit/test_e2e_reminder.py`, which run `opencode run --standalone` in a temporary HOME, so nothing touches the real opencode config or database.
+Verified with: opencode 2.3.0, run as `opencode run --standalone` in a temporary HOME, so nothing touches the real opencode config or database.
 
 ## Plugin
 
@@ -42,9 +42,9 @@ Subscribe with `ctx.event.subscribe({ types: ["session.compaction.ended"] })`, a
 ## Notice for the user: a toast in the TUI part
 
 - A toast is a small box that opencode draws in a corner of the terminal UI for a few seconds. It is not stored and the model never sees it.
-- The server part has no toast call in opencode 2.3.0. The toast comes from the TUI part, `tui.ts`, with the same `{ id, setup(context) }` shape: `context.data.on("session.compaction.ended", handler)` and `context.ui.toast.show({ message, variant: "info" })`. The `data.session.get(sessionID)` result gives the folder; without it the handler uses `context.location` or `context.data.location.default()`.
+- The server part has no toast call. The toast comes from the TUI part, `tui.ts`, with the same `{ id, setup(context) }` shape: `context.data.on("session.compaction.ended", handler)` and `context.ui.toast.show({ message, variant: "info" })`. The `data.session.get(sessionID)` result gives the folder; without it the handler uses `context.location` or `context.data.location.default()`.
 - The TUI part runs `agent-env compact-reminder` itself, as the server part does, and shows `harness-kit: logbook reminder sent to the model (<logbook folder>)` only when it prints a reminder.
-- Headless `opencode run` loads no TUI part, so `tests/harness-kit/opencode-tui.test.ts` covers it with a fake context. It was also seen in a real TUI in a temporary HOME under tmux: after `/compact`, a toast with that text appeared in the top right corner.
+- Headless `opencode run` loads no TUI part. A real TUI in a temporary HOME under tmux showed the toast in the top right corner after `/compact`.
 
 ## Where the reminder shows up
 
