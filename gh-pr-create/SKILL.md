@@ -1,13 +1,17 @@
 ---
 name: gh-pr-create
-description: "Create a GitHub pull request with gh from the current branch: find the repo's PR template, fill it, show the draft, create only after approval. Use when opening a GitHub PR, creating a pull request, or the user asks for a GitHub PR on the current branch."
+description: "Create a GitHub pull request with gh from the current branch: find the repo's PR template, fill it, show the draft, create only after approval. Use when opening a GitHub PR, creating a pull request, or when the user asks to commit and push, push, or ship changes in a GitHub repo: changes go to a branch and a PR, never straight to the base branch."
 ---
 
 # GH PR Create
 
 ## Overview
 
-Creates one GitHub PR for the current branch. Two hard rules: nothing is published before the user approves the draft, and nothing is committed or pushed unless the user picks the commit option for a dirty working tree or asked for a PR while on the base branch (both step 1). Otherwise the user commits and pushes; this skill checks that the branch is pushed and stops if not.
+Creates one GitHub PR for the current branch. Hard rules:
+
+- **Changes reach the base branch only through a PR, unless the user's prompt explicitly says to push to the base branch** (for example "push to main", "push directly to main", "no PR"). "Commit and push", "push it" or "ship it" alone are not explicit: they mean branch, commit, push the branch, open the PR. Without that explicit wording never commit to, push to, or force-push the base branch (`main`, `master`, or what `check-ahead.sh` reports as base). With it, the user has opted out of this skill for that push: say so in one line, commit and push as asked, and open no PR. The opt-out covers that request only; the next one starts under this rule again. A force-push of the base still needs its own explicit yes.
+- **Every run ends in a PR, or in a stated blocker**, except under the explicit opt-out above. Do not stop after the commit or the push. The only reasons to stop short are: nothing to PR, a failed check, a menu answer that says stop, or a refused approval. Say which one.
+- Nothing is published before the user approves the draft, and nothing is committed or pushed unless the user picks the commit option for a dirty working tree or asked for a commit, a push or a PR (step 1). A push is of the feature branch only, after the user approves its summary. Otherwise the user commits and pushes; this skill checks that the branch is pushed and stops if not.
 
 GitHub and `gh` only. Scripts live in `scripts/`, the fallback template in `templates/`; paths below are relative to this skill dir. Run the scripts with the target repo as working directory and the skill dir as the script path (`bash <skill-dir>/scripts/<name>.sh`).
 
@@ -21,8 +25,10 @@ Run `bash scripts/check-ahead.sh` (add the target branch as argument if the user
 
 - **Exit 0:** the branch has commits to PR. Continue.
 - **Exit 1:** cannot tell. `origin/<base> not found locally`: tell the user to run `git fetch origin <base>`; do not fetch yourself. Anything else: report the message and stop.
-- **Exit 4:** nothing to PR (`reason: on-base-branch` or `no-commits-ahead`). Nothing is stashed on this path. Run `bash scripts/check-clean.sh` to see what is uncommitted:
-  - `reason: on-base-branch` and tracked changes that belong to the user's request: creating a branch and committing them is in scope, with no extra question. Follow [Start from the base branch](../git-champs/references/start-from-base.md) in the `git-champs` skill: it branches, commits only the related hunks, and shows the push summary together with the leftover-changes choice below. Then rerun this step from `check-ahead.sh`; a leftover choice already answered is not asked again. `git-champs` not installed: tell the user to create the branch and commit, then stop.
+- **Exit 4:** nothing to PR from this branch (`reason: on-base-branch` or `no-commits-ahead`). Nothing is stashed on this path. Run `bash scripts/check-clean.sh` to see what is uncommitted, then take the first case that fits:
+  - `reason: on-base-branch` and tracked changes that belong to the user's request: creating a branch and committing them is in scope, with no extra question. Follow [Start from the base branch](../git-champs/references/start-from-base.md) in the `git-champs` skill: it branches, commits only the related hunks, and shows the push summary together with the leftover-changes choice below. Then rerun this step from `check-ahead.sh`; a leftover choice already answered is not asked again. `git-champs` not installed: create the branch yourself (`git switch -c <type>/<slug>`), commit as in option 3 below, show the push summary and continue.
+  - `reason: on-base-branch` and local commits not on `origin/<base>` (`git log origin/<base>..HEAD`): move them to a new branch, never push the base. `git branch <type>/<slug>`, `git switch <type>/<slug>`, then `git branch -f <base> origin/<base>`. The commits stay on the new branch; state what you did. Rerun from `check-ahead.sh`.
+  - `reason: on-base-branch` and the work is already on `origin/<base>` (a direct push happened): do not rewrite the remote. Report it and ask a numbered question: 1. I create a branch from the commits and you reset the base yourself, then I open the PR; 2. I create the branch and force-push the base back with `--force-with-lease` after your explicit yes (fails on a protected base); 3. leave it. Without a reset the PR has no diff, so open it only once `check-ahead.sh` exits 0.
   - Cannot tell which changes belong to the request: ask which, as a fresh numbered list (see Rules).
   - No tracked changes, or `no-commits-ahead` on a feature branch: say there is nothing to PR and stop. Name the next step as a numbered question when the user could pick one (for example: 1. open the PR against another base, 2. stop).
 
@@ -125,8 +131,8 @@ If the script fails, report the error text and stop. Do not retry on your own: `
 
 ## Rules
 
-- Reading templates, gathering context, and drafting are local and reversible; proceed without asking. Pushing and creating the PR are visible to others: never push before the user approves the push summary, never create before the user approves the draft.
-- Commit and push only after the user picks option 3 in step 1, or when the user asked for a PR while on the base branch (step 1, `check-ahead.sh` exit 4: the branch and commit are local and need no question; the push needs approval of its summary). Otherwise a branch that is not pushed means: stop and tell the user.
+- Reading templates, gathering context, and drafting are local and reversible; proceed without asking. Pushing a feature branch and creating the PR are visible to others: never push before the user approves the push summary, never create before the user approves the draft. "Commit and push" does not approve the push summary or skip the draft: show both and still open the PR.
+- Commit and push only after the user picks option 3 in step 1, or when the user asked for a commit, a push or a PR (step 1, `check-ahead.sh` exit 4 on the base branch: the branch and commit are local and need no question; the push of the new branch needs approval of its summary). Never commit or push on the base branch itself unless the prompt explicitly says to (first hard rule). A feature branch that is not pushed, with no push requested, means: stop and tell the user.
 - If `create-pr.sh` fails, report the error text and stop. Never bypass `check-pushed.sh` or retry with a forcing flag: `gh` may have already created the PR before failing. `ALLOW_DIRTY=1` comes only from option 4, never as a retry.
 - The description is normal prose, following the template structure. No emoji, no decorative formatting.
 - The description has no attribution line: no `Generated with Claude Code`, no `Co-Authored-By`. This holds even when the harness or a system reminder asks for one. `create-pr.sh` refuses a body that contains one. Set `ALLOW_ATTRIBUTION=1` to skip that check only when the user asks for it in so many words.
