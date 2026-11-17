@@ -15,7 +15,7 @@ MAX_NAME = 64  # Anthropic frontmatter limit
 MAX_DESC = 1024  # Anthropic frontmatter limit
 MAX_BODY_LINES = 500  # Anthropic: keep SKILL.md body under 500 lines
 MAX_REF_LINES_NO_TOC = 100  # Anthropic: longer reference files need a table of contents
-MAX_FENCE_LINES = 3  # house rule: longer snippets belong in scripts/
+MAX_FENCE_LINES = 40  # house rule: a snippet this long is a script or a reference file, not body text
 MAX_EMPHASIS = 3  # house rule: shouting words per file before a warning
 MAX_SCAN_BYTES = 1_000_000  # skip large files in the secret scan
 
@@ -82,9 +82,6 @@ NON_CODE_LANGS = {
     "text", "txt", "plaintext", "markdown", "md", "yaml", "yml", "json", "xml",
     "toml", "ini", "diff", "output", "csv", "html",
 }
-SHELL_LANGS = {"", "bash", "sh", "shell", "zsh", "console", "fish"}
-SHELL_KEYWORD_RE = re.compile(r"^\s*(?:for|while|until|if|case|select|function|then|do|done|fi|esac)\b")
-QUOTED_RE = re.compile(r"'[^']*'|\"[^\"]*\"")
 
 
 class Findings:
@@ -223,34 +220,12 @@ def check_fences(rel, lines, f):
         if lang in NON_CODE_LANGS:
             continue
         code = [ln for ln in body if ln.strip()]
-        where = f"{rel}:{first}"
-        label = "untagged" if lang == "" else lang
-        untagged_suffix = "; tag non-shell blocks as text" if lang == "" else ""
         if len(code) > MAX_FENCE_LINES:
-            f.fail(
-                "R07", where,
-                f"{label} block has {len(code)} lines (max {MAX_FENCE_LINES}); move it to scripts/"
-                f"{untagged_suffix}",
+            label = "untagged" if lang == "" else lang
+            f.warn(
+                "W06", f"{rel}:{first}",
+                f"{label} block has {len(code)} lines (over {MAX_FENCE_LINES}); move it to scripts/ or references/",
             )
-        if lang not in SHELL_LANGS:
-            continue
-        for offset, ln in enumerate(body):
-            bare = QUOTED_RE.sub("''", ln).replace("\\;", "")
-            at = f"{rel}:{first + 1 + offset}"
-            if "&&" in bare or "||" in bare:
-                f.fail(
-                    "R07", at,
-                    f"'&&' and '||' are forbidden; use separate commands or a script{untagged_suffix}",
-                )
-            if ";" in bare:
-                f.fail("R07", at, f"';' chaining is forbidden; use one command per line{untagged_suffix}")
-            if "<<" in bare:
-                f.fail("R07", at, f"heredocs are forbidden; move to scripts/{untagged_suffix}")
-            if SHELL_KEYWORD_RE.match(bare):
-                f.fail(
-                    "R07", at,
-                    f"loops and conditionals are forbidden; move to scripts/{untagged_suffix}",
-                )
 
 
 def check_references(skill_dir, rel_path, text_lines, is_skill_md, f):

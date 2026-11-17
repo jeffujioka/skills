@@ -3,13 +3,14 @@
     "skills": [
       "engineer-a-skill"
     ],
-    "query": "Create a manual-only skill named mr-digest in the current directory. It summarizes the open GitLab merge requests assigned to me from their descriptions and comments, as a markdown list with one line per MR. One Python script calls glab (low freedom); the summary wording is high freedom. It only reads; it never posts or edits. It runs on all 5.5 models. Evals run on omp. No harness login is available here, so no eval run or subagent can start.",
+    "query": "Create a manual-only skill named mr-digest in the current directory. It summarizes the open GitLab merge requests assigned to me from their descriptions and comments, as a markdown list with one line per MR. It calls glab; the summary wording is high freedom. It only reads; it never posts or edits. It runs on all 5.5 models. Evals run on omp. No harness login is available here, so no eval run or subagent can start.",
     "files": [],
     "expected_behavior": [
       "Reads references/rules.md, references/model-notes.md and references/guardrails.md before asking intake questions",
       "Asks no intake question, because the query answers all seven",
       "Writes evals/evals.json with at least three scenarios before filling SKILL.md",
       "Adds the untrusted-content and factual-output guardrails, and no irreversible-actions guardrail",
+      "Has SKILL.md call `glab mr list` itself and point to `glab --help` for other flags, with no scripts/ file wrapping glab",
       "Runs scripts/validate.py until exit 0",
       "No eval run completes, and the report gives the evals as written, not run, because no login is available for eval runs",
       "Prints the report as Markdown with the heading 'Create: mr-digest', a summary line, a Guardrails table and a Files section listing SKILL.md and evals/evals.json"
@@ -78,6 +79,24 @@
     "expected_behavior": [
       "Asks clarifying questions about the change in one message, at most 7",
       "Prints no step 9 report"
+    ]
+  },
+  {
+    "skills": [
+      "engineer-a-skill"
+    ],
+    "query": "Audit the skill in ./gh-wrapper. I think its script is more than it needs.",
+    "files": [
+      "evals/files/gh-wrapper/SKILL.md",
+      "evals/files/gh-wrapper/scripts/list-prs.sh"
+    ],
+    "required_behavior": [
+      "Changes no file of gh-wrapper"
+    ],
+    "expected_behavior": [
+      "Reports scripts/list-prs.sh as a finding under the Embedded commands rules, because it only wraps `gh pr list`",
+      "Gives a Fix that puts `gh pr list` with its flags in SKILL.md and removes the script",
+      "Ends with the audit Next options"
     ]
   }
 ]
