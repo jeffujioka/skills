@@ -65,7 +65,7 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s harness-kit
 	```
 
-- **hire** — Run a task on a subagent pinned to a chosen model and reasoning level, by rank (intern to cto) or raw `model#effort`.
+- **hire** — Run a task on a subagent pinned to a chosen model and reasoning level, by rank (intern to yoda) or raw `model#effort`. Manual-only: call it by name.
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s hire
 	```
