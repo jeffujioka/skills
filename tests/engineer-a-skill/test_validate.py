@@ -40,39 +40,26 @@ class SkillTestCase(unittest.TestCase):
 
 
 class FenceTests(SkillTestCase):
-    def test_untagged_fence_with_loop_fails(self):
-        skill = make_skill({
-            "SKILL.md": FM + "Body.\n\n```\nfor f in *; do rm \"$f\"; done\n```\n",
-        })
-        self.addCleanup_tmp(skill)
-        self.assertIn(("FAIL", "R07"), rules(skill))
-
-    def test_untagged_fence_message_mentions_tagging_as_text(self):
-        skill = make_skill({
-            "SKILL.md": FM + "Body.\n\n```\nfor f in *; do rm \"$f\"; done\n```\n",
-        })
-        self.addCleanup_tmp(skill)
-        findings = validate.validate(skill)
-        messages = [item[3] for item in findings.items if item[1] == "R07"]
-        self.assertTrue(
-            any("tag non-shell blocks as text" in m for m in messages),
-            messages,
-        )
-
-    def test_untagged_fence_over_3_lines_fails(self):
-        skill = make_skill({
-            "SKILL.md": FM + "Body.\n\n```\na\nb\nc\nd\n```\n",
-        })
-        self.addCleanup_tmp(skill)
-        self.assertIn(("FAIL", "R07"), rules(skill))
-
-    def test_text_fence_exempt(self):
-        skill = make_skill({
-            "SKILL.md": FM + "Body.\n\n```text\na\nb\nc\nd\ne\n```\n",
-        })
+    def test_shell_with_loop_heredoc_and_chaining_passes(self):
+        body = "```bash\nfor f in *; do rm \"$f\"; done\ncat <<EOF\nx\nEOF\na && b; c || d\n```\n"
+        skill = make_skill({"SKILL.md": FM + "Body.\n\n" + body})
         self.addCleanup_tmp(skill)
         ids = {rule_id for _, rule_id in rules(skill)}
         self.assertNotIn("R07", ids)
+        self.assertNotIn("W06", ids)
+
+    def test_code_block_over_40_lines_warns(self):
+        lines = "\n".join(f"echo {n}" for n in range(41))
+        skill = make_skill({"SKILL.md": FM + f"Body.\n\n```bash\n{lines}\n```\n"})
+        self.addCleanup_tmp(skill)
+        self.assertIn(("WARN", "W06"), rules(skill))
+
+    def test_text_fence_exempt(self):
+        lines = "\n".join(str(n) for n in range(60))
+        skill = make_skill({"SKILL.md": FM + f"Body.\n\n```text\n{lines}\n```\n"})
+        self.addCleanup_tmp(skill)
+        ids = {rule_id for _, rule_id in rules(skill)}
+        self.assertNotIn("W06", ids)
 
 
 class NestingTests(SkillTestCase):
