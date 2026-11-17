@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Prints the base (target) branch name for PRs from this repo. Read-only; never fetches.
+# Prints the base branch name for PRs from this repo. Read-only; never fetches.
 # Order: the argument, origin/HEAD, the default branch gh reports, the only one of
 # origin/main and origin/master that exists. Never defaults blindly.
-# usage: resolve-base.sh [target-branch]   (run from inside the repo)
+# usage: resolve-base.sh [base-branch]   (run from inside the repo)
 set -euo pipefail
 
 if [ -n "${1:-}" ]; then
@@ -35,5 +35,5 @@ if [ "${#found[@]}" -eq 1 ]; then
   exit 0
 fi
 
-echo "cannot tell the default branch (origin/HEAD unset, gh found none): pass the target branch" >&2
+echo "cannot tell the default branch (origin/HEAD unset, gh found none): pass the base branch" >&2
 exit 1

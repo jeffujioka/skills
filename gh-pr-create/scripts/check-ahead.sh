@@ -4,7 +4,7 @@
 # Exit 4: nothing to PR (reason: on-base-branch or no-commits-ahead).
 # Exit 1: cannot tell (detached HEAD, base unresolved, origin/<base> missing).
 # 4 differs from check-pushed.sh's 2 and check-clean.sh's 3 so the results never mix up.
-# usage: check-ahead.sh [target-branch]   (run from inside the repo)
+# usage: check-ahead.sh [base-branch]   (run from inside the repo)
 set -euo pipefail
 
 here=$(cd "$(dirname "$0")" && pwd)
