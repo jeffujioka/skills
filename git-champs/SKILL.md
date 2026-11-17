@@ -1,13 +1,16 @@
 ---
 name: git-champs
-description: "Git workflow for repositories on github.com: inspection, Conventional Commits, branches, rebases, pushes, repository creation and the hand-off to pull request creation. Use when committing, branching, rebasing, pushing, creating a repository (git init, gh repo create) or preparing a pull request for a repo whose target remote is github.com."
+description: "Git workflow for repositories on github.com: inspection, Conventional Commits, branches, rebases, pushes, repository creation and the hand-off to pull request creation. Use when committing, branching, rebasing, pushing, creating a repository (git init, gh repo create) or preparing a pull request for a repo whose remote is github.com."
 ---
 
 # Git Champs
 
 ## Scope
 
-Applies only when the target remote is `github.com`, the remote a push or pull request goes to. Read the host from `git remote -v`, never from the repo name. Target remote on another host: say this skill does not cover it and stop.
+Applies only when the remote a push or pull request goes to is `github.com`.
+
+- Read the host from `git remote -v`, never from the repo name.
+- Remote on another host: say this skill does not cover it and stop.
 
 No remote yet:
 
@@ -22,7 +25,7 @@ Use `git` for local work and `gh` for platform actions.
 2. Keep history linear: rebase and fast-forward.
 3. Never claim a validation that did not run.
 4. Changes go through a feature branch and a pull request unless the user explicitly authorizes direct integration. A request for a pull request (or a push) while on the base branch with uncommitted work puts creating the branch and committing in scope with no extra question: both are local and reversible. Only the push needs approval. See [Start From the Base Branch](references/start-from-base.md).
-5. Never push to `main` or `master` without explicit authorization. Never force-push them. A request to create and publish a new repository authorizes its first push of `main`.
+5. Push `main` or `master` only with explicit authorization; force-push them never. A request to create and publish a new repository authorizes its first push of `main`.
 6. Commit automatically once the diff is inspected and the message follows these rules. If the user asks to review the commit message, show it and wait.
 7. Pushes, repository creation and pull requests are visible to others: show them and wait for approval every time (see [Review Defaults](references/review-defaults.md)).
 8. No `Co-authored-by` trailer for any AI tool; trailers name human co-authors only.
@@ -53,13 +56,18 @@ The work is done when the requested commit, push or pull request exists. Stop ea
 
 ### 1. Inspect
 
-Check `git status`, the current branch and `git remote -v`. Read the full diff. Check recent history when branch context matters. On the base branch (`main`, `master`, or the target of `origin/HEAD`) with work that needs review: create a feature branch first, as in [Start From the Base Branch](references/start-from-base.md).
+Check `git status`, the current branch and `git remote -v`. Read the full diff. Check recent history when branch context matters. On the base branch (`main`, `master`, or the branch `origin/HEAD` points to) with work that needs review: create a feature branch first, as in [Start From the Base Branch](references/start-from-base.md).
 
-*Done when:* the target remote host, the branch and the full diff are known.
+*Done when:* the remote host, the branch and the full diff are known.
 
 ### 2. Commit
 
-Stage one logical change: named paths (`git add path/to/file`) or hunks, never everything blindly. A file that mixes related and unrelated hunks is staged with `scripts/stage-hunks.sh`, because `git add -p` needs a TTY (recipe in [Start From the Base Branch](references/start-from-base.md)). Write the message from Conventional Commits and Commit Message Content, then commit.
+Stage one logical change.
+
+- Stage named paths (`git add path/to/file`) or hunks. Never stage everything blindly.
+- Stage a file that mixes related and unrelated hunks with `bash <skill-dir>/scripts/stage-hunks.sh`, because `git add -p` needs a TTY (recipe in [Start From the Base Branch](references/start-from-base.md)).
+- `<skill-dir>` is the directory that holds this SKILL.md. Run the script with the repo as working directory.
+- Write the message from Conventional Commits and Commit Message Content, then commit.
 
 *Done when:* `git log -1` shows the commit with a body.
 
