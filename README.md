@@ -95,7 +95,7 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s engineer-an-agents
 	```
 
-- **obsidian-capture-troubleshooting** — Capture a solved problem as a note in an Obsidian vault's `Troubleshooting/` folder (symptom, cause, fix, verification). User-invoked only; stores the vault path in `~/.local/state/skills/obsidian-capture-troubleshooting/vault-path`.
+- **obsidian-capture-troubleshooting** — Capture a solved problem as a note in an Obsidian vault's `Troubleshooting/` folder (symptom, cause, fix, verification). User-invoked only; stores the vault path in `~/.local/state/skills/obsidian-capture-troubleshooting/vault-path`. Needs the `obsidian-markdown` skill.
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s obsidian-capture-troubleshooting
 	```

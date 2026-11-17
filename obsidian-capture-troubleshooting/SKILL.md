@@ -35,7 +35,11 @@ Done when the `obsidian-markdown` skill is loaded.
 
 Grep `<vault>/Troubleshooting/` for the error text and the tool name. A note matches when it holds the same error text, or the same tool with the same cause.
 
-- Match: show the user the note and the planned changes, then wait for approval. With several matches, show the closest and ask which to update. After approval, update the note in place: keep its filename, refresh `Seen with`, extend `Ruled out`. If the user declines, stop and report; write nothing.
+- Match (low freedom: exact order, confirm first):
+  1. Show the user the note and the planned changes.
+  2. Wait for approval. With several matches, show the closest and ask which to update.
+  3. After approval, update the note in place: keep its filename, refresh `Seen with`, extend `Ruled out`.
+  4. If the user declines, stop and report. Write nothing.
 - No match: create a new note.
 
 Done when you hold either an approved matching note path or the decision to create a new note.
@@ -44,7 +48,11 @@ Done when you hold either an approved matching note path or the decision to crea
 
 Read `<vault>/Templates/Troubleshooting Note.md` and follow its structure and section order. Stop and tell the user if the template is missing. Run `mkdir -p <vault>/Troubleshooting` if the folder is missing.
 
-- Filename: short, problem-first title (`Brew force-bottle Error and Bottle Relocation (Custom Prefix).md`), flat in `Troubleshooting/`. If `<vault>/Troubleshooting/<filename>` already exists, treat it as a match: show it and wait for approval, as in step 3.
+- Filename: short, problem-first title (`Brew force-bottle Error and Bottle Relocation (Custom Prefix).md`), flat in `Troubleshooting/`.
+- Overwrite (low freedom: exact order, confirm first): if `<vault>/Troubleshooting/<filename>` already exists, treat it as a match.
+  1. Show the existing note and the planned changes.
+  2. Wait for approval, as in step 3.
+  3. Write only after approval.
 - H1: the error text or symptom as it appears on screen.
 - Frontmatter: `created` is today's date from `date +%F`; `tags` are `subject/vault/troubleshooting` plus `subject/<domain>/<tool>` tags reused from existing notes, such as `subject/rust/cargo` (grep before inventing one); `related` links the other notes the step 3 grep found that did not match, and stays `[]` when there are none; leave `source`, `area` and `project` as the template has them.
 - `Seen with`: `<tool> <version> (checked <date>)`, with the date from `date +%F`.
@@ -63,5 +71,6 @@ All of these hold:
 - `Seen with` carries a version captured by running the tool's `--version` (or equivalent) in this session. If it cannot run here, write `version not captured` and report why.
 - The `Verification` command was run in this session, and its real result is quoted. If it cannot run here, write `Not verified` in the section and report why.
 - Every claim comes from this session's evidence; whatever was not observed is omitted.
+- Back each claim with command output or a message quoted from this session. Drop any claim you cannot back.
 
 Report the note's path to the user.
