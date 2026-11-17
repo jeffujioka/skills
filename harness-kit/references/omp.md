@@ -1,6 +1,6 @@
-# omp reference (omp 18.20.0)
+# omp reference
 
-Verified by the skills repo's spike `tests/harness-kit/spikes/spike_compaction.py` and by `tests/harness-kit/test_e2e_reminder.py`, which run `omp -p` in a temporary HOME, so nothing touches the real `~/.omp`.
+Verified with: omp 18.20.0, run as `omp -p` in a temporary HOME, so nothing touches the real `~/.omp`.
 
 ## Extension
 
