@@ -19,7 +19,7 @@ Install writes these, only for the harnesses found on `PATH`:
 |---|---|---|
 | `~/.local/bin/agent-env` | any | prints `AGENT_HARNESS`, `AGENT_SESSION_ID` and `AGENT_ROOT_SESSION_ID` |
 | a `SessionStart` entry in `~/.claude/settings.json`, running `~/.claude/hooks/harness-kit-session-start.sh` | claude | sets `AGENT_HARNESS=claude` for the session's shell commands and names the logbook after compaction and shows a notice that it did |
-| `~/.omp/agent/extensions/harness-kit.ts` | omp | sets `AGENT_HARNESS=omp` on commands that run `agent-env` or a skills script and adds the logbook reminder to the session after compaction and shows a notice |
+| `~/.omp/agent/extensions/harness-kit.ts` | omp | sets `AGENT_HARNESS=omp` on commands that run `agent-env` or a skills script, adds the logbook reminder to the session after compaction and shows a notice, and asks GitHub Copilot for 1h prompt-cache entries on Claude models in the main session |
 | `~/.config/opencode/plugins/harness-kit/index.ts` | opencode | sets `AGENT_HARNESS=opencode` for the session's shell commands and adds the logbook reminder as a session instruction after compaction |
 | `~/.config/opencode/plugins/harness-kit/tui.ts` | opencode | shows a toast that the reminder was added |
 
@@ -41,6 +41,17 @@ Run `bash "<skill dir>/scripts/install.sh" check`. It reports each artefact as i
 1. Run `bash "<skill dir>/scripts/install.sh" check` and show its output: remove deletes the artefacts it reports as installed, older or newer. Done when the output is shown.
 2. Ask one question: remove them or not. Done when the developer answers.
 3. On yes, run `bash "<skill dir>/scripts/install.sh" remove`. It deletes only the files harness-kit installed and its `SessionStart` entry; foreign files and the other settings stay. On no, run nothing more. Done when remove exits 0, or the developer said no.
+
+## Copilot 1h cache (omp)
+
+The omp extension changes the cache lifetime of the main session on GitHub Copilot Claude models from 5 minutes to 1 hour. omp sends 5-minute entries there because its model catalog marks those models as not supporting the 1h entry; Copilot accepts it.
+
+- A 1h cache write costs 1.6 times a 5-minute write. A read costs the same either way, so a session that pauses 5 to 60 minutes pays less overall.
+- Subagents keep 5-minute entries: they rarely pause.
+- Opt out for one run with `HARNESS_KIT_COPILOT_CACHE=5m omp`. Opt out for good by exporting it in the shell profile.
+- After Copilot answers 400 or 422 to a request that carried a 1h entry, the extension stops sending it for the rest of the session and shows a notice.
+- When the plan lists the omp extension, tell the developer about this change in one sentence before asking install or not.
+- Details and the measurement: [references/omp.md](references/omp.md).
 
 ## Harness notes
 
