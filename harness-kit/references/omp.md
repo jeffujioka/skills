@@ -1,6 +1,6 @@
 # omp reference
 
-Verified with: omp 18.20.0, run as `omp -p` in a temporary HOME, so nothing touches the real `~/.omp`.
+Verified with: omp 18.20.0 for the reminder, omp 18.22.2 for the 1h cache. Both run as `omp -p` in a temporary HOME, so nothing touches the real `~/.omp`.
 
 ## Extension
 
@@ -49,3 +49,21 @@ In the session jsonl, after the `"type":"compaction"` entry (written by `method:
 ## Check by hand
 
 In a session whose logbook folder holds `progress.md`, let a compaction run, for example with the threshold above. In the session jsonl, after the `"type":"compaction"` entry, a `"type":"custom_message"` entry with `customType` `harness-kit-reminder` holds the reminder.
+
+## 1h cache for Copilot Claude
+
+The extension hooks `before_provider_request` and `after_provider_response`.
+
+- `before_provider_request` receives `{ payload }` and `ctx` with `ctx.model` (`provider`, `id`) and `ctx.agent.kind` (`"main"` or `"sub"`). The handler returns the payload itself.
+- It applies when `ctx.agent.kind` is `"main"`, `ctx.model.provider` is `github-copilot`, `ctx.model.id` starts with `claude`, and `HARNESS_KIT_COPILOT_CACHE` is not `5m`.
+- It sets `ttl: "1h"` on every `cache_control: {type: "ephemeral"}` marker in the payload.
+- The extension is also loaded into each subagent session, so the `ctx.agent.kind` check is what keeps subagents on 5-minute entries.
+- Cache warming replays the real request through the same hook. The change is deterministic, so the replay stays byte-identical and still hits the cache.
+
+Why omp sends 5-minute entries: its model catalog marks every Copilot Claude model `supportsLongCacheRetention: false`, so `providers.cacheRetention: long` falls back to 5 minutes there.
+
+Measured on `github-copilot/claude-haiku-5.5-1m` with a 38k-token unique prompt and the extension loaded through `-e`: the usage block reports `"cttl":{"ephemeral1h":38597}`. A separate probe sent a 53k-token prompt twice 6 min 56 s apart: the second request read all 53331 tokens from the cache. Not measured: Sonnet and Opus on Copilot.
+
+Refusal fallback: after a 400 or 422 to a request that carried 1h entries, the extension sends no more 1h entries in that session and calls `ctx.ui.notify` with a warning. Covered by a unit test only; Copilot never refused a 1h entry in the probes.
+
+Cost ratio from Anthropic's price list: a 1h write is 2 times the input price, a 5-minute write 1.25 times (1.6 times as much); a read is the same for both.

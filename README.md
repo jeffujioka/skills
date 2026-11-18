@@ -60,7 +60,7 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s hc-handoff
 	```
 
-- **harness-kit** — Installs the agent environment that logbook, captain-away and hc-handoff need: a claude `SessionStart` hook, an omp extension and an opencode plugin that set `AGENT_HARNESS` in the agent's shell commands, and `agent-env`, which prints the harness, session id and root session id. Lists every file it would write, asks once, installs only for the harnesses found; also checks and removes what it installed.
+- **harness-kit** — Installs the agent environment that logbook, captain-away and hc-handoff need: a claude `SessionStart` hook, an omp extension and an opencode plugin that set `AGENT_HARNESS` in the agent's shell commands, and `agent-env`, which prints the harness, session id and root session id. The omp extension also asks GitHub Copilot for 1h prompt-cache entries on Claude models in the main session (opt out with `HARNESS_KIT_COPILOT_CACHE=5m`). Lists every file it would write, asks once, installs only for the harnesses found; also checks and removes what it installed.
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s harness-kit
 	```

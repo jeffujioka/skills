@@ -11,6 +11,12 @@ from harness_home import REPO, env_for, make_home
 INSTALL = REPO / "harness-kit" / "scripts" / "install.sh"
 HOOK_COMMAND = 'bash "$HOME/.claude/hooks/harness-kit-session-start.sh"'
 ENTRY = {"hooks": [{"type": "command", "command": HOOK_COMMAND}]}
+OMP_EXPLANATION = (
+    "sets AGENT_HARNESS=omp on commands that run agent-env or a skills script, "
+    "adds the logbook reminder to the session after compaction and shows a notice, "
+    "and asks GitHub Copilot for 1h prompt-cache entries on Claude models in the main session "
+    "(a cache write costs more, a read after a pause costs less; HARNESS_KIT_COPILOT_CACHE=5m opts out)"
+)
 JQ_MISSING = (
     "harness-kit: jq not found; it is needed to edit ~/.claude/settings.json. "
     "Install jq, then run harness-kit again."
@@ -51,11 +57,11 @@ class InstallTest(unittest.TestCase):
         self.assertEqual(
             result.stdout.splitlines(),
             [
-                "harness-kit 0.1.1 would write:",
+                "harness-kit 0.2.0 would write:",
                 "~/.local/bin/agent-env: prints the harness and session ids that logbook, captain-away and hc-handoff read",
                 "~/.claude/settings.json: gains one SessionStart entry that runs the claude hook; other entries stay",
                 "~/.claude/hooks/harness-kit-session-start.sh: sets AGENT_HARNESS=claude for the session's shell commands and names the logbook after compaction and shows a notice that it did",
-                "~/.omp/agent/extensions/harness-kit.ts: sets AGENT_HARNESS=omp on commands that run agent-env or a skills script and adds the logbook reminder to the session after compaction and shows a notice",
+                "~/.omp/agent/extensions/harness-kit.ts: " + OMP_EXPLANATION,
                 "opencode not found: nothing is written for it",
             ],
         )
@@ -68,7 +74,7 @@ class InstallTest(unittest.TestCase):
             (home / ".claude" / "hooks" / "harness-kit-session-start.sh", True),
             (home / ".omp" / "agent" / "extensions" / "harness-kit.ts", False),
         ):
-            self.assertIn("harness-kit 0.1.1", path.read_text(), path)
+            self.assertIn("harness-kit 0.2.0", path.read_text(), path)
             self.assertNotIn("@VERSION@", path.read_text(), path)
             if executable:
                 self.assertEqual(path.stat().st_mode & 0o777, 0o755, path)
@@ -95,7 +101,7 @@ class InstallTest(unittest.TestCase):
         result = self.run_install("install", "--replace", "~/.local/bin/agent-env")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("replaced foreign ~/.local/bin/agent-env", result.stdout.splitlines())
-        self.assertIn("harness-kit 0.1.1", agent_env.read_text())
+        self.assertIn("harness-kit 0.2.0", agent_env.read_text())
 
     def test_path_warning(self):
         self.make()
@@ -190,10 +196,10 @@ class InstallTest(unittest.TestCase):
         result = self.run_install("install")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn(
-            "replaced ~/.omp/agent/extensions/harness-kit.ts (0.0.1 -> 0.1.1)",
+            "replaced ~/.omp/agent/extensions/harness-kit.ts (0.0.1 -> 0.2.0)",
             result.stdout.splitlines(),
         )
-        self.assertEqual(extension.read_text(), source.replace("@VERSION@", "0.1.1"))
+        self.assertEqual(extension.read_text(), source.replace("@VERSION@", "0.2.0"))
 
     def test_check_reports_missing_agent_env(self):
         home = self.make(harnesses=("claude", "omp", "opencode"), without=())
@@ -205,10 +211,10 @@ class InstallTest(unittest.TestCase):
             result.stdout.splitlines(),
             [
                 "agent-env: missing (~/.local/bin/agent-env)",
-                "claude-hook: installed 0.1.1 (~/.claude/hooks/harness-kit-session-start.sh)",
-                "omp-extension: installed 0.1.1 (~/.omp/agent/extensions/harness-kit.ts)",
-                "opencode-plugin: installed 0.1.1 (~/.config/opencode/plugins/harness-kit/index.ts)",
-                "opencode-tui: installed 0.1.1 (~/.config/opencode/plugins/harness-kit/tui.ts)",
+                "claude-hook: installed 0.2.0 (~/.claude/hooks/harness-kit-session-start.sh)",
+                "omp-extension: installed 0.2.0 (~/.omp/agent/extensions/harness-kit.ts)",
+                "opencode-plugin: installed 0.2.0 (~/.config/opencode/plugins/harness-kit/index.ts)",
+                "opencode-tui: installed 0.2.0 (~/.config/opencode/plugins/harness-kit/tui.ts)",
                 "Run the harness-kit skill's install to repair.",
             ],
         )
@@ -344,24 +350,24 @@ class InstallTest(unittest.TestCase):
         self.assertEqual(self.run_install("install").returncode, 0)
         source = (REPO / "harness-kit" / "omp" / "harness-kit.ts").read_text()
         extension = home / ".omp" / "agent" / "extensions" / "harness-kit.ts"
-        extension.write_text(source.replace("@VERSION@", "0.2.0"))
+        extension.write_text(source.replace("@VERSION@", "0.3.0"))
         newer = extension.read_bytes()
         result = self.run_install("plan")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn(
-            "~/.omp/agent/extensions/harness-kit.ts: newer (harness-kit 0.2.0), kept",
+            "~/.omp/agent/extensions/harness-kit.ts: newer (harness-kit 0.3.0), kept",
             result.stdout.splitlines(),
         )
         result = self.run_install("install")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn(
-            "kept newer ~/.omp/agent/extensions/harness-kit.ts (0.2.0)", result.stdout.splitlines()
+            "kept newer ~/.omp/agent/extensions/harness-kit.ts (0.3.0)", result.stdout.splitlines()
         )
         self.assertEqual(extension.read_bytes(), newer)
         result = self.run_install("check")
         self.assertEqual(result.returncode, 1, result.stderr)
         lines = result.stdout.splitlines()
-        self.assertIn("omp-extension: newer 0.2.0 (~/.omp/agent/extensions/harness-kit.ts)", lines)
+        self.assertIn("omp-extension: newer 0.3.0 (~/.omp/agent/extensions/harness-kit.ts)", lines)
         self.assertNotIn("Run the harness-kit skill's install to repair.", lines)
 
     def test_plan_shows_unchanged_and_replaced(self):
@@ -375,12 +381,11 @@ class InstallTest(unittest.TestCase):
         self.assertEqual(
             result.stdout.splitlines(),
             [
-                "harness-kit 0.1.1 would write:",
+                "harness-kit 0.2.0 would write:",
                 "~/.local/bin/agent-env: unchanged",
                 "~/.claude/settings.json: unchanged",
                 "~/.claude/hooks/harness-kit-session-start.sh: unchanged",
-                "~/.omp/agent/extensions/harness-kit.ts: replaced (0.0.1 -> 0.1.1); sets AGENT_HARNESS=omp "
-                "on commands that run agent-env or a skills script and adds the logbook reminder to the session after compaction and shows a notice",
+                "~/.omp/agent/extensions/harness-kit.ts: replaced (0.0.1 -> 0.2.0); " + OMP_EXPLANATION,
                 "opencode not found: nothing is written for it",
             ],
         )
