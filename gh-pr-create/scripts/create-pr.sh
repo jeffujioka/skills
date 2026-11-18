@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Creates the GitHub PR for the current branch with gh, using an approved
-# description file. Stops unless the branch is pushed. Never pushes.
+# Creates the GitHub PR for the current branch with gh, using a description
+# file. Stops unless the branch is pushed. Never pushes.
 # usage: create-pr.sh <title> <description-file> [base-branch]
 set -euo pipefail
 
@@ -28,7 +28,7 @@ bash "$here/check-pushed.sh"
 if [ "${ALLOW_DIRTY:-}" = 1 ]; then
   echo "dirty-tree check skipped (ALLOW_DIRTY=1): local changes stay out of the PR"
 elif [ -n "$(git status --porcelain --untracked-files=no)" ]; then
-  echo "uncommitted changes to tracked files are not in the PR. Run check-clean.sh and let the user pick an option." >&2
+  echo "uncommitted changes to tracked files are not in the PR. Commit the related ones; set ALLOW_DIRTY=1 only for unrelated ones." >&2
   exit 3
 fi
 

@@ -50,7 +50,7 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s github-cli
 	```
 
-- **gh-pr-create** — Create a GitHub pull request with `gh` from the current branch: find the repo's PR template, fill it, show the draft, create only after approval. Uncommitted changes get a numbered choice: handle them yourself, stash and restore, commit and push (after approval), or continue without them. Nothing to PR (on the base branch or zero commits ahead) is detected before anything is stashed; the base branch is resolved, never guessed.
+- **gh-pr-create** — Create a GitHub pull request with `gh` from the current branch with no approval step: commits the related uncommitted changes (via `git-champs`), pushes the feature branch, fills the repo's PR template and creates the PR; it overrides `git-champs` on approvals. Unrelated uncommitted files stay out of the PR with a warning in the final reply. Gaps become `TODO:` lines. Nothing to PR (on the base branch or zero commits ahead) is detected first; the base branch is resolved, never guessed; the base branch is never pushed.
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s gh-pr-create
 	```

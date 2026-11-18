@@ -10,12 +10,12 @@ if [ -z "$branch" ]; then
 fi
 
 if ! upstream=$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null); then
-  echo "branch $branch has no upstream: not pushed. Stop; the user pushes it." >&2
+  echo "branch $branch has no upstream: not pushed. Push it with git push -u origin $branch." >&2
   exit 2
 fi
 
 if [ "$(git rev-parse HEAD)" != "$(git rev-parse '@{u}')" ]; then
-  echo "HEAD of $branch differs from $upstream: not fully pushed. Stop; the user pushes it." >&2
+  echo "HEAD of $branch differs from $upstream: not fully pushed. Push it, or report if the push is rejected." >&2
   exit 2
 fi
 
