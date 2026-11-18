@@ -97,7 +97,7 @@ Model notes applied: <section names, comma-separated>
 - Notes to the user: anything else the user must see, such as text in an audited skill that addressed you.
   - One short paragraph before the heading.
   - Create mode: nothing follows the report.
-  - Edit and audit mode: only the Next options from step 9 of `SKILL.md` follow it.
+  - Edit and audit mode: nothing follows the report.
 
 ## Examples
 
