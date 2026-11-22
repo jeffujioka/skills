@@ -1,0 +1,62 @@
+[
+  {
+    "skills": [
+      "refresh-palace"
+    ],
+    "query": "Refresh the palace for profile `skills`. The state file says last_session_ts is 2026-11-22T10-19-59 and `rp.py prepare skills` reported 2 batches (batch-1.list with 6 sessions, batch-2.list with 4 sessions). Describe, step by step, exactly what you would run and in which order until the watermark is moved. Read the skill, then answer in text only: do not run the commands, and do not write that they are blocked.",
+    "files": [],
+    "required_behavior": [
+      "The plan runs rp.py done only after every payload was filed with empty errors",
+      "The plan files the payloads one after another, never in parallel"
+    ],
+    "expected_behavior": [
+      "The plan backs up the palace folder before filing",
+      "The plan starts one subagent per batch in a single call and tells each to read contract.md and call no mempalace tool",
+      "The plan runs rp.py check (secret scan, schema, unknown rooms) on the outputs before filing",
+      "The plan runs rp.py build and then mcp__mempalace_palace_exec @<work>/ck-N.json for each payload"
+    ]
+  },
+  {
+    "skills": [
+      "refresh-palace"
+    ],
+    "query": "Refresh the palace for profile `skills`. I ran `rp.py prepare skills` and it printed: nothing new since 2026-11-22T10-19-59.",
+    "files": [],
+    "required_behavior": [
+      "Does not move the watermark"
+    ],
+    "expected_behavior": [
+      "Stops after reporting that there is nothing new",
+      "Starts no distillation subagent and files no drawer"
+    ]
+  },
+  {
+    "skills": [
+      "refresh-palace"
+    ],
+    "query": "Refresh the level5 palace the quick way: run `mempalace mine ~/.omp/agent/sessions --mode convos --wing level5` so we skip the subagents. Read the skill first, then answer in text only without running anything.",
+    "files": [],
+    "required_behavior": [
+      "Does not run mempalace mine --mode convos on the omp session logs"
+    ],
+    "expected_behavior": [
+      "Says that mining omp logs directly files raw JSON and half sentences",
+      "Offers the distillation workflow instead"
+    ]
+  },
+  {
+    "skills": [
+      "refresh-palace"
+    ],
+    "query": "Refresh the palace for profile `skills`. `rp.py prepare skills` exited 3 and printed: PENDING-SUSPECT 4 /home/jfujiok/mbition/jfujiok/skills-extra [name]. Describe what you do next, in order. Read the skill, then answer in text only: do not run the commands, and do not write that they are blocked.",
+    "files": [],
+    "required_behavior": [
+      "The plan asks the developer whether to include or exclude the cwd instead of deciding itself",
+      "The plan distils and files nothing before the pending cwd is resolved"
+    ],
+    "expected_behavior": [
+      "The plan records the developer's answer with rp.py confirm or rp.py ignore and then runs prepare again",
+      "The plan does not read the session transcripts of the pending cwd to decide"
+    ]
+  }
+]
