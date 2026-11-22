@@ -1,6 +1,6 @@
 ---
 name: refresh-palace
-description: "Catches a project's memory palace wing up with new omp sessions of its checkout and worktrees. Scripts pick and audit the sessions; subagents distil short drawers (decisions, causes and fixes, preferences); the skill files them. Works for any repo through a profile. Manual-only: call it by name with the profile name."
+description: "Catches a project's memory palace wing up with new omp sessions of its checkout and worktrees. Distils short drawers (decisions, causes and fixes, preferences) with subagents and files them; scripts/rp.py is a reference toolbox for the mechanical parts. Works for any repo through a profile. Manual-only: call it by name with the profile name."
 disable-model-invocation: true
 ---
 
@@ -10,113 +10,115 @@ A palace wing holds short notes distilled from the omp sessions of one project.
 It does not update itself. This skill adds the sessions newer than the last refresh.
 Call it as `refresh-palace <profile>`. Ask for the profile name if none is given.
 
-Never run `mempalace mine --mode convos` on omp logs. It files raw JSON and half sentences.
+You own the outcome. `scripts/rp.py` is a reference for the mechanical parts: use it as written, adapt it, or do a step by hand when the situation calls for it. Its output explains what it found; it does not make the decisions below. The rules in "Rules that do not bend" are the exception.
 
-Everything deterministic is in one script, `scripts/rp.py`. It prints counts, paths and cwds, never transcript text. Do not read transcripts yourself except for the spot-check in step 4.
+## Rules that do not bend
+
+- **Never run `mempalace mine --mode convos` on omp logs.** It files raw JSON and half sentences.
+- **No secret reaches the palace.** Tokens, keys, passwords and URLs with credentials are scanned for before filing, in every drawer. A hit is removed or reworded, never filed. `rp.py check` and `build` do this with a pattern list; if you file without the script, scan the drawers yourself.
+- **Back up the palace before the first write of the day.** A refresh writes through `checkpoint` calls into one shared index. A half-failed call can corrupt it, and deleting drawers is not an undo. Copy the folder: `cp -a ~/.config/mempalace/palace ~/.config/mempalace/palace.bak-$(date +%F)`. Skip when that folder exists.
+- **A new room is the developer's decision.** Show the room and a sample drawer; never add one on your own.
+- **A cwd you cannot tie to the project is the developer's decision.** Ask once; the answer is saved in the profile.
+- **File one payload at a time.** Concurrent writers corrupt the index.
+- **Move the watermark last,** only after every payload was filed with empty `errors`, and never past a session that was not mined (a pending cwd, a running session).
+- **Do not commit anything, and add no tests or docs,** unless the developer asks.
 
 ## Terms
 
-- Skill dir: the directory of this `SKILL.md`. Resolve it to an absolute path first. `RP` below means `python3 <skill-dir>/scripts/rp.py`.
-- Profile: `~/.config/mempalace/refresh/<name>.json`: wing, project roots, worktree globs, git remote, known docs, extra rooms, and the cwds you confirmed or ignored. Run `RP show <name>`.
-- Work dir: `$TMPDIR/refresh-<name>` (`/tmp` if `TMPDIR` is unset). The script prints it.
-- Watermark: `last_session_ts` in `~/.config/mempalace/refresh/<name>.state.json`. Sessions at or before it are done. No state file: every session is new.
+- Skill dir: the directory of this `SKILL.md`. `RP` below means `python3 <skill-dir>/scripts/rp.py`; run it with no arguments for the command list.
+- Profile: `~/.config/mempalace/refresh/<name>.json`: wing, project roots, worktree globs, git remote, known docs, extra rooms, and the cwds you confirmed or ignored. `RP show <name>` prints it.
+- Work dir: `$TMPDIR/refresh-<name>` (`/tmp` if `TMPDIR` is unset).
+- Watermark: `last_session_ts` in `~/.config/mempalace/refresh/<name>.state.json`. Sessions starting at or before it are done. No state file: every session is new.
+- Rooms: the fixed ones (`tooling`, `architecture`, `workflow`, `testing`, `security`, `config`, `process`) plus the ones the profile adds.
 
 ## Needs
 
 - `python3`, `git`, `mempalace` (check: `mempalace --version`).
 - The bash command `mcp__mempalace_palace_exec` (omp). Run `mcp__mempalace_palace_exec --help` for its flags.
 
-## Checklist
+## The work, in order
 
-Copy into the todo tool. Tick each step.
+Track the steps in the todo tool. Stop when step 2 finds nothing new, when a failure is outside this skill (name the failing command), or when filing reports errors you cannot fix. After step 7, stop.
 
-```text
-- [ ] 1 Check      - [ ] 2 Prepare    - [ ] 3 Distil
-- [ ] 4 Review     - [ ] 5 File       - [ ] 6 Watermark
-- [ ] 7 Report
-```
+### 0. New project
 
-Stop only when:
+No profile for the name? Create one before step 1.
 
-- Step 2 prints `nothing new`.
-- A step fails and the fix is outside this skill. Name the failing command.
-- Step 5 reports errors you cannot fix.
+1. Ask the developer for the wing name and the checkout path or paths. The palace rejects `/` in a wing name.
+2. Ask what the project's sessions mostly do, and propose 2 or 3 subject rooms that fit (for a dotfiles or tooling vault: `agent-harness`, `dev-env`, `terminal`; for a code project the fixed rooms are enough). The developer approves them.
+3. `RP init <name> --wing <wing> --root <path> [--glob '<worktree glob>'] [--description '<one line>'] [--room <room>]...`. It prints git worktrees and `known_docs` candidates; add the ones the developer accepts (`--known-docs`, or edit the profile). Names are lowercase slugs.
 
-When step 7 is done, stop. Do not add tests, docs or extra review rounds. Do not commit anything.
+### 1. Check
 
-## 0. New project
+Run `mempalace status`; the profile's wing should be listed unless this is the first run. Make the backup (rule above).
 
-No profile for the name? Create one, then continue at step 1:
+### 2. Find the new sessions
 
-1. Ask the developer for the wing name and the checkout path or paths.
-2. Run `RP init <name> --wing <wing> --root <path> [--glob '<worktree glob>'] [--description '<one line>']`.
-3. Show the developer its `known_docs candidates` and git worktree lines. Add the ones they accept with `--known-docs` on a fresh `init`, or by editing the profile.
+Goal: a transcript set that covers every new session of this project, and nothing else.
 
-Profile names are lowercase slugs (`skills`, `champ-skills`). The wing may differ, e.g. `jfujiok-skills`. The palace rejects `/` in a wing name.
+`RP audit <name>` lists the sessions newer than the watermark by cwd:
 
-## 1. Check
+- `member`: under a root, or a cwd you confirmed.
+- `PENDING-NEW`: a worktree glob matched a cwd not seen before.
+- `PENDING-SUSPECT`: not matched, but git (worktree list, common dir, remote) or the directory name ties it to the project, e.g. a sibling `<root>-sdd`.
+- `PENDING-MISMATCH`: matched, but the checkout's git remote differs from the profile's.
+- `weak signal`: information only.
 
-1. Run `mempalace status`.
-2. Run `cp -a ~/.config/mempalace/palace ~/.config/mempalace/palace.bak-$(date +%F)`. Skip if that folder exists.
+Resolve every pending cwd before you run `prepare`: put each to the developer, include it (`RP confirm <name> <cwd>...`) or exclude it (`RP ignore <name> <cwd>...`), and wait for the answer. Do not read its transcripts to decide, and do not distil or file anything meanwhile. (`prepare` would only defer the sessions at or after a pending cwd, so running it early wastes the run.) Then audit again.
 
-Done when: status lists the profile's wing, or this is its first run, and the backup folder exists.
+Then `RP prepare <name>` writes plain transcripts, `batch-N.list` (about 400 KB each), `known-docs.txt`, `run.json` and `contract.md` into the work dir. What it does:
 
-## 2. Prepare
+- Skips the session touched in the last 30 minutes (this one) and defers every session at or after a pending or running one, so the watermark cannot skip it.
+- Keeps skill invocations (`> /skill:name request`), a time marker before each user turn, and short `[tool error]` and `[command]` excerpts: the plain user/assistant text alone loses what the developer asked and the exact failure.
+- Refuses to delete unfiled drafts (`out-*.jsonl`) unless `--force`.
+- First run: takes every session. `--since YYYY-MM-DDTHH-MM-SS` starts later.
 
-Run `RP prepare <name>`.
+Done when you have the transcripts and batches, or `nothing new`: say so and stop.
 
-- It audits every session newer than the watermark by cwd. It exits 3 and lists the cwds that need a decision:
-  - `PENDING-NEW`: a worktree glob matched a cwd not seen before.
-  - `PENDING-SUSPECT`: not matched, but git (worktree list, common dir, remote) or the directory name ties it to the project. Typical: a sibling dir like `<root>-sdd`.
-  - `PENDING-MISMATCH`: matched, but the checkout's git remote differs from the profile's.
-  - `weak signal` lines are information only.
-- Put each pending cwd to the developer: include it (`RP confirm <name> <cwd>...`) or exclude it (`RP ignore <name> <cwd>...`). The answer is saved in the profile, so each cwd is asked once. Then run `prepare` again.
-- It skips sessions touched in the last 30 minutes: that is the running session.
-- It writes plain transcripts, `batch-N.list` (about 400 KB each), `run.json` and `contract.md` in the work dir, and deletes the previous run's files.
-- No state file and a first run? It takes every session. Pass `--since YYYY-MM-DDTHH-MM-SS` to start later.
+### 3. Distil
 
-Done when: it lists the batches, or prints `nothing new` and you stop.
+Goal: one `out-N.jsonl` per batch, each drawer one durable fact the transcript supports.
 
-## 3. Distil
+Start one `task` subagent per batch, all in one `tasks[]` call. Tell each: read `<work>/contract.md`, distil the sessions in `<work>/batch-N.list`, write `<work>/out-N.jsonl`, call no mempalace tool. Wait for all of them.
 
-1. Start one `task` subagent per batch, all in one `tasks[]` call.
-2. Tell each: read `<work>/contract.md`, distil the sessions in `<work>/batch-N.list`, write `<work>/out-N.jsonl`, and call no mempalace tool.
-3. Wait for all of them.
+The contract is the quality bar. If a batch is unusual (a research-heavy project, no preferences), adjust the contract text in the work dir for that run rather than fighting it in the review.
 
-Done when: every `out-N.jsonl` exists.
+### 4. Review
 
-## 4. Review
+Goal: every drawer is true, durable, safe and in the right room before it goes in.
 
-1. Run `RP check <name>`. It validates every drawer's schema, scans for secrets, lists rooms not yet known, and writes a spot-check sample.
-2. Secret hits: run `RP check <name> --drop-flagged` to delete them.
-3. Schema errors: fix the file or delete the line.
-4. `NEW ROOM` lines: for each, ask the developer to approve it (`RP rooms <name> add <room>`) or fold it into another room (`RP rooms <name> map <old> <new>`; add the target first if it is new). Approved rooms are saved in the profile.
-5. Read `<work>/sample.txt`: each line is a drawer and the transcript that should support it. Open the 5 to 10 it lists, not the rest. Fix or delete a drawer the transcript does not support.
-6. Run `RP check <name>` again.
+`RP check <name>` reports schema problems, secret hits, rooms not yet known, drawers whose backticked tokens do not appear in their cited transcript, and writes `sample.txt`. Act on it:
 
-Done when: `check` exits 0 and no spot-checked drawer is unsupported.
+- Secret hit: remove or reword the drawer (`--drop-flagged` deletes it).
+- Schema problem: fix the line.
+- Unknown room: ask the developer to approve it (`RP rooms <name> add <room>`) or fold it (`RP rooms <name> map <old> <new>`).
+- Ungrounded tokens, medium or low confidence, and a wrong `session` id are the usual signs of a bad drawer. Open each listed transcript. Check, for every drawer in `sample.txt`: the cited session is the one that states the fact, the wording is the transcript's, and the kind fits (a `decision` needs the developer's own answer).
+- Look at the room spread. If one room holds most drawers, the contract steered wrongly; re-room by subject.
 
-## 5. File
+Done when you would stand behind every drawer. Run `check` again after fixes.
 
-Filing is one sequential step. Concurrent writers corrupt the index.
+### 5. File
 
-1. Run `RP build <name>`. It writes `<work>/ck-N.json`. It exits 4 while an unknown room remains.
-2. For each payload run `mcp__mempalace_palace_exec @<work>/ck-N.json`.
-3. Read the result. `errors` must be empty. `duplicates` are fine: the palace skips them.
-4. Run `mempalace status` and compare the drawer count.
-5. Search once for a fact you filed (below).
+`RP build <name>` writes `<work>/ck-N.json` and holds drawers with a secret hit or an unapproved room (`HELD` lines). For each payload, one after another:
 
-Done when: every payload returned empty `errors`, the count grew, and the search finds the fact.
+1. `mcp__mempalace_palace_exec @<work>/ck-N.json`.
+2. Read the result. `errors` must be empty. `duplicates` are fine: the palace skips them.
 
-## 6. Watermark
+Then `mempalace status` (the count grew) and one search for a fact you filed (below).
 
-Run `RP done <name>` only after step 5 is done.
+Done when every payload returned empty `errors` and the search finds the fact.
 
-Done when: it prints `watermark -> <timestamp>`.
+### 6. Watermark
 
-## 7. Report
+`RP done <name>` prints `watermark -> <timestamp>` and renames `out-N.jsonl` to `filed-N.jsonl`. Run it only after step 5 is done.
 
-Print: drawers added per room, and each drawer you doubt, with its title. Name each cwd confirmed, ignored or room approved in this run.
+### 7. Report
+
+Print: drawers added per room, each drawer you doubt (with its title), each cwd confirmed or ignored and each room approved in this run, and anything you adapted from the script.
+
+## Fixing filed drawers
+
+A drawer that is wrong or in the wrong room: delete it (`mcp__mempalace_palace_exec --action delete_drawer --drawer-id <id>`; ids from `mcp__mempalace_palace_query -j '{"target":"drawers","wing":"<wing>","limit":50}'`) and file the corrected one through `build`. `update_drawer` per drawer also works; there is no bulk rename.
 
 ## Searching the palace
 
@@ -132,5 +134,4 @@ Without `max_distance` the palace returns its top results even when unrelated.
 
 - Sessions of other harnesses (OpenCode on the Mac, Claude Code) and subagent sessions.
 - Worktrees that never had an omp session.
-- Moving drawers already filed into another room: `mcp__mempalace_palace_exec` `update_drawer` per drawer; no bulk rename.
 - The knowledge graph, tunnels and diary: plain search does not need them.

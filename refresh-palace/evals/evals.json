@@ -48,7 +48,7 @@
     "skills": [
       "refresh-palace"
     ],
-    "query": "Refresh the palace for profile `skills`. `rp.py prepare skills` exited 3 and printed: PENDING-SUSPECT 4 /home/jfujiok/mbition/jfujiok/skills-extra [name]. Describe what you do next, in order. Read the skill, then answer in text only: do not run the commands, and do not write that they are blocked.",
+    "query": "Refresh the palace for profile `skills`. `rp.py audit skills` printed: PENDING-SUSPECT 4 /home/jfujiok/mbition/jfujiok/skills-extra [name]. Describe what you do next, in order. Read the skill, then answer in text only: do not run the commands, and do not write that they are blocked.",
     "files": [],
     "required_behavior": [
       "The plan asks the developer whether to include or exclude the cwd instead of deciding itself",
