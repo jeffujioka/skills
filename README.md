@@ -104,3 +104,8 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s dublagem
 	```
+
+- **refresh-palace** — Manual-only: catches a project's memory-palace wing up with new omp sessions of its checkout and worktrees, for any repo through a profile. A reference script (`rp.py`) helps pick and audit sessions by cwd (flagging unconfirmed worktrees, sibling dirs and remote mismatches) and check drawers; the skill states the goals and the rules that do not bend (secret scan, backup, approved rooms). Subagents distil short drawers (decisions, causes and fixes, preferences); the skill files them and moves a watermark. Call with `/skill:refresh-palace <profile>`; never auto-loads. Needs `python3`, `git` and `mempalace`.
+	```sh
+	npx skills@latest add https://github.com/jeffujioka/skills.git -s refresh-palace
+	```
