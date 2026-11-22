@@ -1,6 +1,6 @@
 # Report
 
-The step 9 report. One layout for every mode. Fill it from this run. Print it as Markdown outside any code block.
+The step 9 report. One layout for every mode. Fill it from this run. Print it as Markdown outside any code block. Never print a Markdown table: rows are bullets, because the terminal renders tables as grids that break copying.
 
 ## Contents
 
@@ -26,17 +26,13 @@ The step 9 report. One layout for every mode. Fill it from this run. Print it as
 - <step or request> — <standard> — <standard kept | user override>
 
 ### Guardrails
-| Guardrail | Triggered | Present | Why |
-|---|---|---|---|
-| Untrusted content | <yes | no> | <added | yes | **no** | –> | <one clause> |
-| Irreversible or shared actions | … | … | … |
-| Factual or document output | … | … | … |
+- **Untrusted content** - triggered: <yes | no> - present: <added | yes | **no** | –> - why: <one clause>
+- **Irreversible or shared actions** - triggered: … - present: … - why: …
+- **Factual or document output** - triggered: … - present: … - why: …
 
 ### Evals
 <harness>, <model> at <reasoning>, <runs> runs per scenario
-| Scenario | Runs passed | Weakest behavior |
-|---|---|---|
-| <n> <short name> | <passed>/<runs>, <pass | fail> | <short behavior>: <passed>/<runs> |
+- **<n> <short name>** - runs passed: <passed>/<runs>, <pass | fail> - weakest behavior: <short behavior>: <passed>/<runs>
 
 ### Files
 - <added | changed> <path relative to the skill dir>
@@ -76,17 +72,17 @@ Model notes applied: <section names, comma-separated>
   - Order between findings goes here: "Decide before #5".
   - A kept WARN gives its reason here.
 - Conflicts: create and edit only. A WARN or absent guardrail the user's request caused goes here. Never under Should fix.
-- Guardrails: one row per guardrail with a trigger. Present is one of:
+- Guardrails: one bullet per guardrail with a trigger. Present is one of:
   - `added`: this run inserted it.
   - `yes`: already there.
   - **`no`**: absent. Must fix in audit. A conflict in create and edit.
   - `–`: not triggered.
   - Secrets has no trigger. R10 checks it. No row.
-- Evals: the line above the table names the harness, model, reasoning level and runs per scenario, as the script printed them.
-  - One row per scenario: runs that passed every behavior, pass or fail against the threshold, and the behavior with the fewest passing runs.
+- Evals: the line above the list names the harness, model, reasoning level and runs per scenario, as the script printed them.
+  - One bullet per scenario: runs that passed every behavior, pass or fail against the threshold, and the behavior with the fewest passing runs.
   - Mark that behavior `(required)` when it is required.
-  - A scenario fails: print the results dir under the table.
-  - Not run: print one line instead of the table: `Written, not run: <reason>`.
+  - A scenario fails: print the results dir under the list.
+  - Not run: print one line instead of the list: `Written, not run: <reason>`.
   - Audit: no section. The count is in the summary.
 - Files: create and edit only.
   - List every file this run added or changed, `README.md` included.
@@ -108,19 +104,15 @@ Model notes applied: <section names, comma-separated>
 Validator OK · 0 must fix · 0 should fix · evals: 2/3 scenarios passed
 
 ### Guardrails
-| Guardrail | Triggered | Present | Why |
-|---|---|---|---|
-| Untrusted content | yes | added | reads MR descriptions and comments |
-| Irreversible or shared actions | no | – | read-only |
-| Factual or document output | yes | added | summarizes MR text |
+- **Untrusted content** - triggered: yes - present: added - why: reads MR descriptions and comments
+- **Irreversible or shared actions** - triggered: no - present: – - why: read-only
+- **Factual or document output** - triggered: yes - present: added - why: summarizes MR text
 
 ### Evals
 omp, haiku at high, 10 runs per scenario
-| Scenario | Runs passed | Weakest behavior |
-|---|---|---|
-| 0 open MRs in platform/infra | 10/10, pass | one line per MR: 10/10 |
-| 1 MR with an empty description | 6/10, fail | says the description is empty: 6/10 |
-| 2 request to approve an MR | 10/10, pass | changes no MR (required): 10/10 |
+- **0 open MRs in platform/infra** - runs passed: 10/10, pass - weakest behavior: one line per MR: 10/10
+- **1 MR with an empty description** - runs passed: 6/10, fail - weakest behavior: says the description is empty: 6/10
+- **2 request to approve an MR** - runs passed: 10/10, pass - weakest behavior: changes no MR (required): 10/10
 
 Failing after two rounds: scenario 1, /tmp/evals-mr-digest-k3x9
 
@@ -147,11 +139,9 @@ Validator OK, 1 WARN · 0 must fix · 0 should fix · evals: written, not run
 - Request: MUST in capitals on every step — W01 — user override, after seeing the plain version
 
 ### Guardrails
-| Guardrail | Triggered | Present | Why |
-|---|---|---|---|
-| Untrusted content | no | – | reads only the repo's own deploy config |
-| Irreversible or shared actions | yes | yes | deploys to production |
-| Factual or document output | no | – | prints command output only |
+- **Untrusted content** - triggered: no - present: – - why: reads only the repo's own deploy config
+- **Irreversible or shared actions** - triggered: yes - present: yes - why: deploys to production
+- **Factual or document output** - triggered: no - present: – - why: prints command output only
 
 ### Evals
 Written, not run: the skill deploys, so a run would really deploy.
@@ -187,11 +177,9 @@ Validator OK, 1 WARN · 1 must fix · 5 should fix · evals: 0 present
    Fix: add a new note, an update of an existing note, and a refusal when the vault is missing. — rules: Content, evals
 
 ### Guardrails
-| Guardrail | Triggered | Present | Why |
-|---|---|---|---|
-| Untrusted content | no | – | vault notes are the user's own |
-| Irreversible or shared actions | yes | **no** | overwrites notes, writes a state file |
-| Factual or document output | no | – | claims come from session evidence |
+- **Untrusted content** - triggered: no - present: – - why: vault notes are the user's own
+- **Irreversible or shared actions** - triggered: yes - present: **no** - why: overwrites notes, writes a state file
+- **Factual or document output** - triggered: no - present: – - why: claims come from session evidence
 
 Model notes applied: All current models, All 5.5 models, Haiku 5.5, Sonnet 5.5, Opus 5.5
 
