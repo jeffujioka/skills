@@ -1,0 +1,14 @@
+{
+  "name": "skills",
+  "private": true,
+  "description": "Tooling for the skills repo: Biome, rumdl, ShellCheck and shfmt",
+  "scripts": {
+    "check": "biome check . && rumdl check . && git ls-files -z '*.sh' harness-kit/bin/agent-env | grep -zv /evals/files/ | xargs -0 shellcheck && git ls-files -z '*.sh' harness-kit/bin/agent-env | grep -zv /evals/files/ | xargs -0 shfmt -d",
+    "fix": "biome check --write . && git ls-files -z '*.sh' harness-kit/bin/agent-env | grep -zv /evals/files/ | xargs -0 shfmt -w",
+    "format": "biome format --write . && git ls-files -z '*.sh' harness-kit/bin/agent-env | grep -zv /evals/files/ | xargs -0 shfmt -w",
+    "lint": "biome lint . && rumdl check . && git ls-files -z '*.sh' harness-kit/bin/agent-env | grep -zv /evals/files/ | xargs -0 shellcheck"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.6.9"
+  }
+}

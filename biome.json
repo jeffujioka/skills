@@ -1,0 +1,22 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.6.9/schema.json",
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": {
+    "includes": [
+      "**/*.md",
+      "**/*.json",
+      "**/*.ts",
+      "!!**/evals/files",
+      "!!**/node_modules",
+      "!!obsidian-sessions"
+    ]
+  },
+  "formatter": { "indentStyle": "space", "indentWidth": 2, "lineWidth": 100 },
+  "javascript": { "formatter": { "quoteStyle": "single" } },
+  "linter": { "rules": { "preset": "recommended" } },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "markdown": {
+    "parser": { "frontmatter": true },
+    "formatter": { "enabled": true, "indentStyle": "space", "proseWrap": "preserve" }
+  }
+}
