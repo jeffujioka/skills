@@ -9,6 +9,7 @@ set -euo pipefail
 kit=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 version=$(<"$kit/VERSION")
 harnesses=(claude omp opencode)
+# shellcheck disable=SC2016  # $HOME must stay literal: the hook expands it when it runs
 hook_command='bash "$HOME/.claude/hooks/harness-kit-session-start.sh"'
 usage="usage: install.sh plan | install [--replace <path>]... | check | remove"
 
@@ -60,6 +61,7 @@ repair=false
 [[ $mode == plan ]] && echo "harness-kit $version would write:"
 for row in "${artefacts[@]}"; do
   IFS='|' read -r name harness source target file_mode explanation foreign_use <<<"$row"
+  # shellcheck disable=SC2088  # shown is display text: the tilde stays literal
   shown="~/$target"
   path="$HOME/$target"
   # A file target is absent, foreign (no marker), current, older or newer than $version.
@@ -175,6 +177,7 @@ elif [[ $mode == plan ]]; then
     [[ " ${found[*]} " == *" $harness "* ]] || echo "$harness not found: nothing is written for it"
   done
   if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+    # shellcheck disable=SC2088,SC2016  # the message shows the path and the export line as text to copy, unexpanded
     echo '~/.local/bin is not on PATH; add this line to your shell profile: export PATH="$HOME/.local/bin:$PATH"'
   fi
 fi

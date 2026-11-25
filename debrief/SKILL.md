@@ -56,25 +56,32 @@ related: [<prior debrief filenames this session continues, if any>]
 # <Terse descriptive title>
 
 ## Summary
+
 2-3 lines max. What happened. Caveman.
 
 ## Decisions
+
 - <choice> → reason: <why> → rejected: <alternative considered, if any>
 
 ## Attempts & Failures
+
 - tried <X> → failed: <error msg, version, config specifics> → cause: <root cause, if known>
 - tried <Y> → worked: <what made it work> (include when it contrasts with a failure)
 
 ## Discoveries
+
 - <finding as leading word + one-line consequence, e.g. "pnpm hoisting — breaks patch-package, must use .npmrc shamefully-hoist">
 
 ## Unresolved
+
 - <what remains open> → next: <concrete resumption step, if obvious>
 
 ## Files Changed
+
 - path/to/file — <what changed, terse>
 
 ## References
+
 - <URL> — <one-word why it mattered>
 ```
 

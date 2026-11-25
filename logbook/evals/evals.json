@@ -2,22 +2,36 @@
   {
     "skills": ["logbook"],
     "query": "Context was compacted. Read `resume/progress.md`, `decisions.md`, `needs-you.md` before anything else; continue from `## Next`. Summary of the earlier conversation: we were renaming parse_args to parse_options and had not touched cli.py yet. Shell commands cannot run here: say what you would read and do, in order.",
-    "files": ["evals/files/resume/progress.md", "evals/files/resume/decisions.md", "evals/files/resume/needs-you.md"],
+    "files": [
+      "evals/files/resume/progress.md",
+      "evals/files/resume/decisions.md",
+      "evals/files/resume/needs-you.md"
+    ],
     "required_behavior": ["Changes no file before reading the three logbook files"],
-    "expected_behavior": ["Reads progress.md, decisions.md and needs-you.md first", "Names the tests/test_cli.py rename from ## Next as the next action", "Trusts the files over the summary: treats cli.py as already done"]
+    "expected_behavior": [
+      "Reads progress.md, decisions.md and needs-you.md first",
+      "Names the tests/test_cli.py rename from ## Next as the next action",
+      "Trusts the files over the summary: treats cli.py as already done"
+    ]
   },
   {
     "skills": ["logbook"],
     "query": "Start a logbook for this multi-step migration. I ran `bash <skill dir>/scripts/path.sh` from the project folder and it exited 1 with stderr: agent-env not found: harness-kit is not installed. Ask your agent to run the harness-kit skill, then start a new session.",
     "files": [],
     "required_behavior": ["Creates no logbook folder or file in another place as a workaround"],
-    "expected_behavior": ["Reports that harness-kit is not installed", "Points to the harness-kit skill and a new session"]
+    "expected_behavior": [
+      "Reports that harness-kit is not installed",
+      "Points to the harness-kit skill and a new session"
+    ]
   },
   {
     "skills": ["logbook"],
     "query": "Compact this session now with the logbook. Shell commands cannot run here: write each command you would run in your reply.",
     "files": [],
     "required_behavior": ["Runs or writes no compact.sh or compaction-status.sh command"],
-    "expected_behavior": ["Says the logbook does not compact and points to the harness's own /compact", "Offers to bring progress.md up to date first"]
+    "expected_behavior": [
+      "Says the logbook does not compact and points to the harness's own /compact",
+      "Offers to bring progress.md up to date first"
+    ]
   }
 ]

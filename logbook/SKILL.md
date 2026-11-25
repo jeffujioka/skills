@@ -28,11 +28,11 @@ On a non-zero exit:
 - Show its stderr to the user word for word.
 - Create no logbook anywhere else. A second folder splits the session's state.
 
-| File | Content | Written by |
-|---|---|---|
-| `progress.md` | `## Report` (empty until the end), `## Done`, `## In progress`, `## Next` | parent, rewritten whole |
-| `decisions.md` | one line each: time, decision, why, alternative rejected | anyone, append |
-| `needs-you.md` | skipped or blocked action, why, the exact command or step for the user | anyone, append |
+| File           | Content                                                                   | Written by              |
+| -------------- | ------------------------------------------------------------------------- | ----------------------- |
+| `progress.md`  | `## Report` (empty until the end), `## Done`, `## In progress`, `## Next` | parent, rewritten whole |
+| `decisions.md` | one line each: time, decision, why, alternative rejected                  | anyone, append          |
+| `needs-you.md` | skipped or blocked action, why, the exact command or step for the user    | anyone, append          |
 
 ## Cadence
 

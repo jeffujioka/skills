@@ -23,10 +23,7 @@
   {
     "skills": ["engineer-an-agents"],
     "query": "Create an AGENTS.md for the repo in evals/files/notes-cli. It has no context file yet. The repo is not a git repo.",
-    "files": [
-      "evals/files/notes-cli/package.json",
-      "evals/files/notes-cli/README.md"
-    ],
+    "files": ["evals/files/notes-cli/package.json", "evals/files/notes-cli/README.md"],
     "required_behavior": [
       "Creates no AGENTS.md before the user answers the questions or approves a shown draft"
     ],

@@ -12,7 +12,7 @@
 3. Rebase conflicts: resolve, stage, `git rebase --continue`. User wants to stop: `git rebase --abort`, never an extra commit mid-rebase.
 4. Confirm the branch is not `main` or `master`. On one: create a feature branch first, unless the user authorized direct integration.
 
-*Done when:* checks pass or are reported as skipped, the branch is up to date with its base, and it is a feature branch.
+_Done when:_ checks pass or are reported as skipped, the branch is up to date with its base, and it is a feature branch.
 
 ## Push
 

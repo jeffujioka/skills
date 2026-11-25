@@ -21,19 +21,19 @@ A first word that is not a rank is read as a model. A missing model or effort is
 
 ## Ranks
 
-| rank | model#effort |
-| --- | --- |
-| `intern` | `haiku#low` |
-| `junior` | `haiku#medium` |
-| `mid` | `haiku#high` |
-| `senior` | `sonnet#medium` |
-| `lead` | `sonnet#high` |
-| `staff`, `principal` | `opus#medium` |
-| `head` | `opus#high` |
-| `vp` | `opus#xhigh` |
-| `cso` | `opus#max` |
-| `cto` | `fable#medium` |
-| `yoda` | `fable#max` |
+| rank                 | model#effort    |
+| -------------------- | --------------- |
+| `intern`             | `haiku#low`     |
+| `junior`             | `haiku#medium`  |
+| `mid`                | `haiku#high`    |
+| `senior`             | `sonnet#medium` |
+| `lead`               | `sonnet#high`   |
+| `staff`, `principal` | `opus#medium`   |
+| `head`               | `opus#high`     |
+| `vp`                 | `opus#xhigh`    |
+| `cso`                | `opus#max`      |
+| `cto`                | `fable#medium`  |
+| `yoda`               | `fable#max`     |
 
 ## Steps
 

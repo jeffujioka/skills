@@ -15,13 +15,13 @@ Local, reversible actions (run `plan` or `check`) proceed. Before an action that
 
 Install writes these, only for the harnesses found on `PATH`:
 
-| Artefact | Harness | What it does |
-|---|---|---|
-| `~/.local/bin/agent-env` | any | prints `AGENT_HARNESS`, `AGENT_SESSION_ID` and `AGENT_ROOT_SESSION_ID` |
-| a `SessionStart` entry in `~/.claude/settings.json`, running `~/.claude/hooks/harness-kit-session-start.sh` | claude | sets `AGENT_HARNESS=claude` for the session's shell commands and names the logbook after compaction and shows a notice that it did |
-| `~/.omp/agent/extensions/harness-kit.ts` | omp | sets `AGENT_HARNESS=omp` on commands that run `agent-env` or a skills script, adds the logbook reminder to the session after compaction and shows a notice, and asks GitHub Copilot for 1h prompt-cache entries on Claude models in the main session |
-| `~/.config/opencode/plugins/harness-kit/index.ts` | opencode | sets `AGENT_HARNESS=opencode` for the session's shell commands and adds the logbook reminder as a session instruction after compaction |
-| `~/.config/opencode/plugins/harness-kit/tui.ts` | opencode | shows a toast that the reminder was added |
+| Artefact                                                                                                    | Harness  | What it does                                                                                                                                                                                                                                         |
+| ----------------------------------------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `~/.local/bin/agent-env`                                                                                    | any      | prints `AGENT_HARNESS`, `AGENT_SESSION_ID` and `AGENT_ROOT_SESSION_ID`                                                                                                                                                                               |
+| a `SessionStart` entry in `~/.claude/settings.json`, running `~/.claude/hooks/harness-kit-session-start.sh` | claude   | sets `AGENT_HARNESS=claude` for the session's shell commands and names the logbook after compaction and shows a notice that it did                                                                                                                   |
+| `~/.omp/agent/extensions/harness-kit.ts`                                                                    | omp      | sets `AGENT_HARNESS=omp` on commands that run `agent-env` or a skills script, adds the logbook reminder to the session after compaction and shows a notice, and asks GitHub Copilot for 1h prompt-cache entries on Claude models in the main session |
+| `~/.config/opencode/plugins/harness-kit/index.ts`                                                           | opencode | sets `AGENT_HARNESS=opencode` for the session's shell commands and adds the logbook reminder as a session instruction after compaction                                                                                                               |
+| `~/.config/opencode/plugins/harness-kit/tui.ts`                                                             | opencode | shows a toast that the reminder was added                                                                                                                                                                                                            |
 
 Each installed file carries a `harness-kit <version>` marker line. A target without it is foreign: install keeps it unless the developer confirms replacing it.
 

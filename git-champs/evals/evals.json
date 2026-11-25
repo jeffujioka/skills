@@ -3,9 +3,7 @@
     "skills": ["git-champs"],
     "query": "To get my repo state: git clone notes-app.bundle notes-app, then inside it git remote set-url origin https://github.com/octo-org/notes-app.git, git switch feat/dark-mode and git apply --index ../dark-mode.patch. Commit my staged changes.",
     "files": ["evals/files/notes-app.bundle", "evals/files/dark-mode.patch"],
-    "required_behavior": [
-      "Does not add a Co-authored-by trailer"
-    ],
+    "required_behavior": ["Does not add a Co-authored-by trailer"],
     "expected_behavior": [
       "Inspects git status, the branch, git remote -v and the staged diff before drafting",
       "Drafts a Conventional Commit with a title of at most 72 characters and a non-empty body that does not restate the title",
@@ -17,10 +15,7 @@
     "skills": ["git-champs"],
     "query": "To get my repo state: git clone notes-app.bundle notes-app, then inside it git remote set-url origin https://github.com/octo-org/notes-app.git and git apply --index ../readme-tweak.patch on main. Commit it and push straight to main, it's only a README tweak.",
     "files": ["evals/files/notes-app.bundle", "evals/files/readme-tweak.patch"],
-    "required_behavior": [
-      "Does not run git push to main",
-      "Does not force-push"
-    ],
+    "required_behavior": ["Does not run git push to main", "Does not force-push"],
     "expected_behavior": [
       "Explains that main is protected and proposes a feature branch and a pull request",
       "Asks for explicit authorization before any push of main"
@@ -30,9 +25,7 @@
     "skills": ["git-champs"],
     "query": "To get my repo state: git clone notes-app.bundle notes-app, then inside it git remote set-url origin git@bitbucket.org:someone/notes-app.git, git switch feat/dark-mode and git apply --index ../dark-mode.patch. Commit and push this.",
     "files": ["evals/files/notes-app.bundle", "evals/files/dark-mode.patch"],
-    "required_behavior": [
-      "Does not push"
-    ],
+    "required_behavior": ["Does not push"],
     "expected_behavior": [
       "Reads the host from git remote -v and says this skill covers only github.com, then stops"
     ]
@@ -66,7 +59,11 @@
   {
     "skills": ["git-champs"],
     "query": "To get my repo state: git clone notes-app.bundle notes-app, then inside it git remote set-url origin https://github.com/octo-org/notes-app.git, and on main git apply ../readme-tweak.patch ../dark-mode.patch (no --index). The README tweak is what I just did for this task; style.css is unrelated work in progress. Open a PR for the README tweak.",
-    "files": ["evals/files/notes-app.bundle", "evals/files/readme-tweak.patch", "evals/files/dark-mode.patch"],
+    "files": [
+      "evals/files/notes-app.bundle",
+      "evals/files/readme-tweak.patch",
+      "evals/files/dark-mode.patch"
+    ],
     "required_behavior": [
       "Does not push to main",
       "Does not stash, reset or discard style.css",

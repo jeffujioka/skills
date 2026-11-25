@@ -15,4 +15,4 @@ No remote yet and the user has not said where it goes: ask whether it goes to `g
 2. Show the command and wait for approval, then create and link it from the local repo: `gh repo create <owner>/<name> --private --source . --remote origin` (or the confirmed visibility).
 3. Push `main` after pre-push checks and the push summary approval. A request to create and publish the repository authorizes this first direct push of `main`; no other push of `main`.
 
-*Done when:* `git remote -v` shows the new repository on `github.com` and `main` is pushed.
+_Done when:_ `git remote -v` shows the new repository on `github.com` and `main` is pushed.

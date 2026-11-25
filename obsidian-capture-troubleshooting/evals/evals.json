@@ -7,9 +7,7 @@
       "evals/files/vault/Templates/Troubleshooting Note.md",
       "evals/files/vault/Troubleshooting/Cargo install Fails With SSL Certificate Error Behind Proxy.md"
     ],
-    "required_behavior": [
-      "Writes no file in the vault besides the new note"
-    ],
+    "required_behavior": ["Writes no file in the vault besides the new note"],
     "expected_behavior": [
       "Creates one new note directly under vault/Troubleshooting/ with a short problem-first filename",
       "The H1 is the error text `Author identity unknown` as it appears on screen",
@@ -43,9 +41,7 @@
       "evals/files/vault-no-template/.obsidian/app.json",
       "evals/files/vault-no-template/Troubleshooting/.gitkeep"
     ],
-    "required_behavior": [
-      "Creates no note in vault-no-template/Troubleshooting/"
-    ],
+    "required_behavior": ["Creates no note in vault-no-template/Troubleshooting/"],
     "expected_behavior": [
       "Stops and tells the user that `Templates/Troubleshooting Note.md` is missing",
       "Does not invent a note structure of its own"

@@ -9,6 +9,7 @@ disable-model-invocation: true
 Turns a reference recording plus a text into `final.wav`: the text spoken in the reference speaker's voice, through the VoiceStudio backend running on this machine.
 
 Terms, used only this way:
+
 - **dublagem**: one text spoken in a cloned voice. VoiceStudio's "Video dubbing" (translate a video and time speech to it) is a different feature; this skill never uses it.
 - **reference**: the clip of the speaker the voice is cloned from.
 - **line**: one generation unit of the text.
@@ -18,10 +19,12 @@ Terms, used only this way:
 `<skill-dir>` is the directory that holds this SKILL.md. Scripts are in `<skill-dir>/scripts/`.
 
 Tools the scripts need, with the install check:
+
 - `python3` (stdlib only): `python3 --version`.
 - `ffmpeg`: `ffmpeg -version`.
 
 Run each script as `python3 <skill-dir>/scripts/<name>.py`.
+
 - Pass absolute paths.
 - `<skill-dir>/scripts/voicestudio.py` holds the shared HTTP and audio helpers.
 - Scripts read the backend address from `VOICESTUDIO_URL` (default `http://127.0.0.1:3900`).
@@ -54,7 +57,7 @@ python3 <skill-dir>/scripts/check_backend.py
 - A tool check fails: tell the user to install that tool, then stop.
 - The backend script errors: tell the user to open the VoiceStudio app (or set `VOICESTUDIO_URL`), then stop.
 
-*Done when:* the script prints JSON with `cloning_engines` and `profiles`.
+_Done when:_ the script prints JSON with `cloning_engines` and `profiles`.
 
 ## 2. Ask the settings, one message
 
@@ -69,7 +72,7 @@ Ask only what the user has not given, in one round, each with your recommended a
 
 Output dir: `~/.local/tmp/voicestudio/<slug>/`, slug from the speaker and topic, for example `joao-tesla`.
 
-*Done when:* inputs, language, engine and direction are settled.
+_Done when:_ inputs, language, engine and direction are settled.
 
 ## 3. Pick the reference window
 
@@ -82,16 +85,18 @@ python3 <skill-dir>/scripts/pick_reference.py <ref-audio> <out-dir> --language "
 `<n>`: the engine's `max_ref_seconds`, capped at 20.
 
 The script:
+
 - cuts at natural pauses.
 - prefers the window with the fewest clipped samples.
 - writes `ref.wav` and `ref.json`.
 - transcribes the window.
 
 Show the user: window start-end, seconds, clipped samples, and the transcript. Then:
+
 - `clipped` above 0 or a `fallback` message: say clipping transfers distortion to the clone, offer `cleanest_alternatives`, and ask for a cleaner recording (phone voice recorder, close to the mic, not via WhatsApp). Continue if the user says so.
 - Use the audio as cut. Denoise or declip filters made the clone sound worse in testing; offer them only if the user asks.
 
-*Done when:* `ref.json` exists and the user accepted the window.
+_Done when:_ `ref.json` exists and the user accepted the window.
 
 ## 4. Split the text into lines
 
@@ -102,11 +107,12 @@ Show the user: window start-end, seconds, clipped samples, and the transcript. T
 
 Show the numbered lines with engine, language and direction. Wait for the user's OK.
 
-*Done when:* the user approved the lines.
+_Done when:_ the user approved the lines.
 
 ## 5. Generate
 
 Write `<out-dir>/job.json` following `templates/job.json`:
+
 - `voice`: `{"ref_audio": "ref.wav", "ref_text": "<transcript from ref.json>"}`, or `{"profile_id": "<id>"}` for an existing profile.
 - `instruct`: the direction, or omit it.
 - `lines`: the approved lines.
@@ -116,11 +122,12 @@ python3 <skill-dir>/scripts/dub.py <out-dir>
 ```
 
 The script generates each line, transcribes the take and measures its noise floor.
+
 - A failing take triggers the retry seeds. The closest transcript with the lowest noise wins.
 - It joins the chosen takes with fades and loudness normalization into `final.wav`, and prints a table.
 - A cold engine can take minutes on the first line. Let it run.
 
-*Done when:* the script prints `final:` and the table.
+_Done when:_ the script prints `final:` and the table.
 
 ## 6. Review and tune
 
@@ -128,18 +135,18 @@ Send the report from step 8 and ask the user to listen.
 Lines marked `NO`: say what failed (transcript or noise) and offer a retake.
 Map each tuning request to one action. Run `dub.py` as `python3 <skill-dir>/scripts/dub.py`:
 
-| User says | Action |
-|---|---|
-| line N sounds wrong or noisy | `dub.py <out-dir> --redo N` (three new seeds, never the current take) |
-| take with seed S of line N was better | `dub.py <out-dir> --pick N=S` |
-| too fast, flat, wrong mood | edit `instruct` in `job.json`, rerun `dub.py <out-dir>` |
-| robotic | switch `engine` to `voxcpm2` with a direction, rerun |
-| pauses too long or short | edit `gap_seconds`, rerun |
-| a word is mispronounced | edit that line, rerun (only that line regenerates) |
+| User says                             | Action                                                                |
+| ------------------------------------- | --------------------------------------------------------------------- |
+| line N sounds wrong or noisy          | `dub.py <out-dir> --redo N` (three new seeds, never the current take) |
+| take with seed S of line N was better | `dub.py <out-dir> --pick N=S`                                         |
+| too fast, flat, wrong mood            | edit `instruct` in `job.json`, rerun `dub.py <out-dir>`               |
+| robotic                               | switch `engine` to `voxcpm2` with a direction, rerun                  |
+| pauses too long or short              | edit `gap_seconds`, rerun                                             |
+| a word is mispronounced               | edit that line, rerun (only that line regenerates)                    |
 
 Changing `engine`, `language`, `instruct` or `voice` regenerates every line; changing one line regenerates only that line. The ASR in the table can mishear slang or names; the user's ear wins over `similarity`.
 
-*Done when:* the user accepts `final.wav` or stops tuning.
+_Done when:_ the user accepts `final.wav` or stops tuning.
 
 ## 7. Offer a profile
 
@@ -149,7 +156,7 @@ Skip when an existing profile was used. Ask once whether to save the reference a
 python3 <skill-dir>/scripts/create_profile.py <out-dir> --name "<speaker name>"
 ```
 
-*Done when:* the user declined, or the script printed the new profile id.
+_Done when:_ the user declined, or the script printed the new profile id.
 
 ## 8. Report
 

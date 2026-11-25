@@ -22,8 +22,10 @@ if [[ $action == has ]]; then
   exit 0
 fi
 if [[ $action == add ]]; then
+  # shellcheck disable=SC2016  # $command is a jq variable bound with --arg, not a shell expansion
   filter='.hooks.SessionStart += [{"hooks": [{"type": "command", "command": $command}]}]'
 else
+  # shellcheck disable=SC2016  # $command is a jq variable bound with --arg, not a shell expansion
   filter='.hooks.SessionStart |= map(.hooks |= map(select(.command != $command)) | select(.hooks != []))
     | if .hooks.SessionStart == [] then del(.hooks.SessionStart) else . end
     | if .hooks == {} then del(.hooks) else . end'
