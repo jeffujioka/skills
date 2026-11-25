@@ -36,11 +36,16 @@ Applies to:
 Rules:
 
 - Write for LLMs, not humans.
-- One action per line. Imperative verb first.
-- Split any instruction longer than about 25 words.
+- One action per instruction. Imperative verb first.
+- Write a long sentence when the instruction needs it. Split an instruction that holds more than one action.
 - Cut explanation, background, motivation and filler.
 - Keep a reason only when the rule is non-obvious. One clause.
-- Keep `not`, `never`, `no`, `only`, numbers, paths and exact strings.
+- Keep numbers, paths and exact strings.
+- Use the active voice. Start each instruction with the verb.
+- Prefer the positive form when it is equally exact: "Call the CLI directly", not "Write no wrapper script".
+- Keep a negation when it is the clearest form: hard prohibitions, exceptions, scope limits.
+- Keep a negation when you shorten a line. The rewrite allows and forbids the same cases.
+- Avoid double negation.
 - Prefer lists to paragraphs.
 - Writing or editing a reference `.md`: apply all of the above to it too.
 
@@ -83,11 +88,11 @@ Run steps 1-9.
 4. Change unclear, or a step 1 answer unsettled: ask in one message, max 7 questions. Wait.
 5. Request names no concrete change ("make it better"): treat as unclear.
 6. All clear: ask nothing.
-7. Check the change against the three standards.
+7. Check the change against the three standards. Triage the lines it adds or changes.
 8. Change breaks one: follow the Core rule. Stop.
 9. Copy the skill dir to `/tmp/<name>-before-edit-<timestamp>/`.
 10. Apply the change. Run steps 3-9.
-11. After the report, print the Next options (step 9, After an edit).
+11. After the report, follow step 9, After the report.
 
 ### Audit
 
@@ -97,7 +102,7 @@ Run steps 1-9.
 4. Run steps 5, 6 and 9, report-only.
 5. Record as a finding each FAIL, each WARN, and each rule, note or guardrail the skill breaks.
 6. Change no file. Run none of the skill's scripts.
-7. After the report, print the Next options (step 9, After an audit).
+7. After the report, follow step 9, After the report.
 
 ### Untrusted skill files
 
@@ -133,7 +138,7 @@ Stop early only when:
 After the report:
 
 - Stop.
-- Edit and audit: print the Next options first. Wait for the user's choice.
+- Audit and edit: end the turn after the report. Wait for the user.
 - Build only what the skill needs.
 - List extra files, scripts or sections under Suggestions in the report. Do not add them.
 
@@ -219,6 +224,7 @@ python3 <own-dir>/scripts/run_evals.py <skill-dir> --harness <harness> --baselin
    - rules: Structure, Content, Embedded commands, Safety.
    - model notes: "All current models", "All 5.5 models", and the per-model sections that apply.
    - guardrails: each triggered snippet, copied, nouns adapted.
+   - triage: each line you add. Read [triage](references/triage.md). Write only `keep` and `move` lines.
 5. Put detail needed in some runs only in `<skill-dir>/references/`. Link it from `SKILL.md`. One level deep.
 6. Split before the body nears 500 lines (R03).
 7. Run each script written or changed on a sample input. Check exit code and output. `--help` alone does not count.
@@ -246,6 +252,7 @@ The validator does not check everything. Read the skill against each standard, l
 - rules: every manual rule.
 - model notes: every applicable note.
 - guardrails: each triggered snippet present. Prompt-leak hardening absent.
+- triage: each instruction in scope. Read [triage](references/triage.md).
 
 Per finding record: file:line, rule/note/guardrail broken, fix. Fix it. Re-run step 5.
 
@@ -317,68 +324,21 @@ Sandbox and CLIs:
 2. Print the report in its layout, filled from this run.
 3. Same layout in every mode.
 4. Print as Markdown outside any code block.
-5. Edit and audit: the Next options follow the report as the last lines of the reply.
+5. Edit: end the Files section with the backup path.
 
-### After an audit
+### After the report
 
-Print after the report. End the turn. Change no file until the user answers.
+End the turn. Wait for the user. The user answers in plain words.
 
-```text
-Next: reply with a number, plus an optional reason or detail.
-1. Apply all findings
-2. Apply some: add the finding numbers, e.g. `2 1,3`
-3. Adjust a fix
-4. Ask a question
-5. Challenge a finding
-```
-
-No findings: print only `1. Ask a question` and `2. Challenge the audit`.
-
-Answer handling:
-
-- Text after the number is the user's reason or detail. Weigh it. Record a reason for an override under Conflicts.
-- Adjust, Ask, Challenge need the detail. Missing: ask for it.
-- No number: match to an option. Ask only when two fit.
-
-Options:
-
-- 1 or 2, Apply: switch to Edit mode. The requested change is all or the listed findings. Run the Core check and steps 3-9.
-- 3, Adjust: the user's fix replaces the finding's Fix line. Apply as above. Fix breaks a standard: Core rule, show the compliant version, stop.
-- 4, Ask: answer only from the skill's files and the standards. Cite file:line or rule id. Not there: say "not found in the skill or the standards".
-- 5, Challenge: re-read the cited standard. Text does not support the finding: withdraw it. Else keep it and quote the text. User still overrides: record under Conflicts in the edit report. R10 and triggered guardrails stay.
-
-After an answer or challenge:
-
-1. Print the findings again if changed. Keep the remaining numbers.
-2. Print the options.
-3. Repeat until the user picks apply or ends the session.
-
-### After an edit
-
-Print after the report. End the turn.
-
-```text
-Next: reply with a number, plus an optional reason or detail.
-1. Keep the changes
-2. Adjust something
-3. Revert
-4. Ask a question
-5. Challenge a change
-```
-
-Text after the number: same rules as after an audit.
-
-- 1, Keep: stop.
-- 2, Adjust: treat as a new requested change. Core check, steps 3-9, new report.
-- 3, Revert:
+- Audit: change no file. The user asks for all findings, some, or their own fix: switch to Edit mode for those. The user's fix replaces the finding's Fix line. A fix that breaks a standard: Core rule.
+- Edit, revert request:
   1. Compare each changed file and README entry with what the edit wrote.
   2. File changed by the user since the report: list it. Wait for approval before overwriting.
   3. Restore the skill dir from `/tmp/<name>-before-edit-<timestamp>/`.
   4. Revert the README entry.
   5. Touch no other file.
-- 4, Ask: same as after an audit.
-- 5, Challenge: re-read the standard behind the change. Text does not require the change: say so. Offer to undo it through Adjust. Else quote the text. User still wants it gone: Core rule. Record under Conflicts.
+- Edit, further change: treat as a new requested change. Core check, steps 3-9, new report.
+- Question: answer only from the skill's files and the standards. Cite file:line or rule id. Not there: say "not found in the skill or the standards".
+- Challenge of a finding or change: re-read the cited standard. Text does not support it: withdraw the finding, or offer to undo the change. Else quote the text. User still overrides: apply it. Record under Conflicts in the edit report. R10 and triggered guardrails stay.
 
-After an answer or challenge: print the options again. Repeat until the user picks keep or revert, or ends the session.
-
-*Done when:* report printed in its layout, every finding has a location, a Fix line and a standard. Edit and audit: Next options printed, user's chosen option done.
+*Done when:* report printed in its layout, every finding has a location, a Fix line and a standard.
