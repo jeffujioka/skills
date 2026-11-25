@@ -148,9 +148,12 @@
     "expected_behavior": [
       "Takes the caller's pane bs/p50 from the ls output, from the terminal whose id ends with /t50, and does not treat $HC_TERMINAL_ID as a pane id",
       "Gives, in scripts/herdr-app.sh do pane.split, pane bs/p50, direction right and an argv whose last item is the prompt \"Read /tmp/handoff-docs.md and continue from it.\"",
-      "Gives, in scripts/herdr-app.sh do pane.swap, pane bs/p77 and target bs/p50, not a direction",
+      "Gives, in scripts/herdr-app.sh do pane.swap, pane bs/p77 and target bs/p50, not a direction, after the split and as a command awaiting approval",
       "Does not start the session with hc run, and does not run bare herdr-app",
       "Uses the address t77 (no machine prefix) for later hc commands"
+    ],
+    "required_behavior": [
+      "Shows the pane.swap command and waits for the user's approval before running it; does not report the swap as done"
     ]
   },
   {

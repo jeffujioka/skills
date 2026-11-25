@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Prints what a PR description is built from: branch, target, commit messages
-# since the target, issue references (only when present), diff stat.
+# Prints what a PR description is built from: branch, base, commit messages
+# since the base, issue references (only when present), diff stat.
 # Read-only; never fetches.
-# usage: branch-context.sh [target-branch]
+# usage: branch-context.sh [base-branch]
 set -euo pipefail
 
 branch=$(git branch --show-current)
@@ -27,7 +27,7 @@ if [ "$count" -eq 0 ]; then
 fi
 
 echo "branch: $branch"
-echo "target: $target"
+echo "base: $target"
 echo "commits ahead: $count"
 echo
 

@@ -19,6 +19,7 @@ import voicestudio as vs
 # Silence detection: -35 dB and 0.35 s split speech at breath pauses in phone
 # and WhatsApp recordings without cutting inside words.
 SILENCE_DB = -35
+SILENCE_MIN_S = 0.35
 # VoiceStudio's docs suggest 8-15 s reference recordings; 20 s is OmniVoice's
 # reference cap and was enough for VoxCPM2 in practice.
 DEFAULT_MIN_S = 8.0

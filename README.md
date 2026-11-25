@@ -50,7 +50,7 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s github-cli
 	```
 
-- **gh-pr-create** — Create a GitHub pull request with `gh` from the current branch: find the repo's PR template, fill it, show the draft, create only after approval. Uncommitted changes get a numbered choice: handle them yourself, stash and restore, commit and push (after approval), or continue without them. Nothing to PR (on the base branch or zero commits ahead) is detected before anything is stashed; the base branch is resolved, never guessed.
+- **gh-pr-create** — Create a GitHub pull request with `gh` from the current branch with no approval step: commits the related uncommitted changes (via `git-champs`), pushes the feature branch, fills the repo's PR template and creates the PR; it overrides `git-champs` on approvals. Unrelated uncommitted files stay out of the PR with a warning in the final reply. Gaps become `TODO:` lines. Nothing to PR (on the base branch or zero commits ahead) is detected first; the base branch is resolved, never guessed; the base branch is never pushed.
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s gh-pr-create
 	```
@@ -60,12 +60,12 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s hc-handoff
 	```
 
-- **harness-kit** — Installs the agent environment that logbook, captain-away and hc-handoff need: a claude `SessionStart` hook, an omp extension and an opencode plugin that set `AGENT_HARNESS` in the agent's shell commands, and `agent-env`, which prints the harness, session id and root session id. Lists every file it would write, asks once, installs only for the harnesses found; also checks and removes what it installed.
+- **harness-kit** — Installs the agent environment that logbook, captain-away and hc-handoff need: a claude `SessionStart` hook, an omp extension and an opencode plugin that set `AGENT_HARNESS` in the agent's shell commands, and `agent-env`, which prints the harness, session id and root session id. The omp extension also asks GitHub Copilot for 1h prompt-cache entries on Claude models in the main session (opt out with `HARNESS_KIT_COPILOT_CACHE=5m`). Lists every file it would write, asks once, installs only for the harnesses found; also checks and removes what it installed.
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s harness-kit
 	```
 
-- **hire** — Run a task on a subagent pinned to a chosen model and reasoning level, by rank (intern to cto) or raw `model#effort`.
+- **hire** — Run a task on a subagent pinned to a chosen model and reasoning level, by rank (intern to yoda) or raw `model#effort`. Manual-only: call it by name.
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s hire
 	```
@@ -95,7 +95,7 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s engineer-an-agents
 	```
 
-- **obsidian-capture-troubleshooting** — Capture a solved problem as a note in an Obsidian vault's `Troubleshooting/` folder (symptom, cause, fix, verification). User-invoked only; stores the vault path in `~/.local/state/skills/obsidian-capture-troubleshooting/vault-path`.
+- **obsidian-capture-troubleshooting** — Capture a solved problem as a note in an Obsidian vault's `Troubleshooting/` folder (symptom, cause, fix, verification). User-invoked only; stores the vault path in `~/.local/state/skills/obsidian-capture-troubleshooting/vault-path`. Needs the `obsidian-markdown` skill.
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s obsidian-capture-troubleshooting
 	```
@@ -103,4 +103,9 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 - **dublagem** — Speak a text in a voice cloned from a reference audio through a local [VoiceStudio](https://github.com/debpalash/VoiceStudio) backend: picks the cleanest reference window, generates line by line, retries bad lines with other seeds (transcript and noise checks), joins into one WAV, then tunes with you. Never installs engines; creates a voice profile only after approval. Needs `ffmpeg`. Call with `@dublagem`; never auto-loads.
 	```sh
 	npx skills@latest add https://github.com/jeffujioka/skills.git -s dublagem
+	```
+
+- **refresh-palace** — Manual-only: catches a project's memory-palace wing up with new omp sessions of its checkout and worktrees, for any repo through a profile. A reference script (`rp.py`) helps pick and audit sessions by cwd (flagging unconfirmed worktrees, sibling dirs and remote mismatches) and check drawers; the skill states the goals and the rules that do not bend (secret scan, backup, approved rooms). Subagents distil short drawers (decisions, causes and fixes, preferences); the skill files them and moves a watermark. Call with `/skill:refresh-palace <profile>`; never auto-loads. Needs `python3`, `git` and `mempalace`.
+	```sh
+	npx skills@latest add https://github.com/jeffujioka/skills.git -s refresh-palace
 	```

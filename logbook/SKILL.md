@@ -5,7 +5,7 @@ description: "Use when a long or multi-step session needs its progress, decision
 
 # logbook
 
-State lives on disk, so a compaction can lose conversation detail without losing the work. Each harness compacts on its own; after it does, harness-kit's hook names these files to the agent. This skill keeps the files current so that moment is safe. Per harness: [claude](references/claude.md), [omp](references/omp.md), [opencode](references/opencode.md).
+Per harness: [claude](references/claude.md), [omp](references/omp.md), [opencode](references/opencode.md).
 
 ## Folder
 
@@ -13,9 +13,20 @@ State lives on disk, so a compaction can lose conversation detail without losing
 LOGBOOK=$(bash "<skill dir>/scripts/path.sh")
 ```
 
-`<skill dir>` is the absolute path of this skill's folder. Its `/skills/logbook/scripts/` part is what makes omp treat the command as a skills script. Run the command from the project folder, since the logbook is keyed by the folder it runs in.
+- `<skill dir>` is the absolute path of this skill's folder.
+- Its `/skills/logbook/scripts/` part makes omp treat the command as a skills script.
+- Run the command from the project folder. The logbook is keyed by that folder.
 
-The script creates the folder and prints its path. It needs harness-kit's `agent-env`, on PATH or at `~/.local/bin/agent-env`, and may name an older logbook of this project on stderr. `scripts/require-agent-env.sh` finds `agent-env` for it, and for captain-away's `cost.sh`. When the script exits non-zero, show its stderr to the user word for word and create no logbook anywhere else: a second folder splits the session's state.
+The script:
+
+- Creates the folder and prints its path.
+- Needs harness-kit's `agent-env`, on PATH or at `~/.local/bin/agent-env`. `scripts/require-agent-env.sh` finds it, for this script and for captain-away's `cost.sh`.
+- May name an older logbook of this project on stderr.
+
+On a non-zero exit:
+
+- Show its stderr to the user word for word.
+- Create no logbook anywhere else. A second folder splits the session's state.
 
 | File | Content | Written by |
 |---|---|---|

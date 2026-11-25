@@ -1,7 +1,14 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { chmodSync, copyFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import harnessKit, { compactReminderEnv, reminderContext, rewriteToolCall } from "../../harness-kit/omp/harness-kit.ts";
+import harnessKit, {
+  compactReminderEnv,
+  longCacheRejected,
+  reminderContext,
+  rewriteToolCall,
+  setLongCache,
+  wantsLongCache,
+} from "../../harness-kit/omp/harness-kit.ts";
 
 describe("omp harness-kit extension", () => {
   test("rewrites agent-env", () => {
@@ -148,5 +155,82 @@ describe("omp session_compact", () => {
     harnessKit(pi);
     await expect(pi.handlers.session_compact({}, sessionContext(project, undefined))).resolves.toBeUndefined();
     expect(pi.sent).toEqual([]);
+  });
+});
+
+const copilotSonnet = { provider: "github-copilot", id: "claude-sonnet-5.5-1m" };
+const main = { kind: "main" };
+
+function anthropicPayload() {
+  return {
+    model: "claude-sonnet-5.5-1m",
+    system: [{ type: "text", text: "rules", cache_control: { type: "ephemeral" } }],
+    messages: [
+      { role: "user", content: [{ type: "text", text: "hi", cache_control: { type: "ephemeral" } }] },
+      { role: "assistant", content: [{ type: "text", text: "no marker" }] },
+    ],
+  };
+}
+
+describe("omp 1h cache for Copilot Claude", () => {
+  beforeEach(() => {
+    notices.length = 0;
+  });
+
+  test("sets ttl 1h on every ephemeral marker", () => {
+    const payload = anthropicPayload();
+    expect(setLongCache(payload)).toBe(2);
+    expect(payload.system[0].cache_control).toEqual({ type: "ephemeral", ttl: "1h" });
+    expect(payload.messages[0].content[0].cache_control).toEqual({ type: "ephemeral", ttl: "1h" });
+    expect(payload.messages[1].content[0]).toEqual({ type: "text", text: "no marker" });
+  });
+
+  test("counts no marker in a payload without one", () => {
+    expect(setLongCache({ model: "m", messages: [{ role: "user", content: "hi" }] })).toBe(0);
+  });
+
+  test("applies to the main session on a Copilot Claude model only", () => {
+    expect(wantsLongCache({ model: copilotSonnet, agent: main }, {})).toBe(true);
+    expect(wantsLongCache({ model: copilotSonnet, agent: { kind: "sub" } }, {})).toBe(false);
+    expect(wantsLongCache({ model: { provider: "github-copilot", id: "gpt-5.5" }, agent: main }, {})).toBe(false);
+    expect(wantsLongCache({ model: { provider: "anthropic", id: "claude-sonnet-5.5" }, agent: main }, {})).toBe(false);
+    expect(wantsLongCache({ agent: main }, {})).toBe(false);
+  });
+
+  test("HARNESS_KIT_COPILOT_CACHE=5m opts out", () => {
+    expect(wantsLongCache({ model: copilotSonnet, agent: main }, { HARNESS_KIT_COPILOT_CACHE: "5m" })).toBe(false);
+  });
+
+  test("only a refused request that carried 1h counts as a refusal", () => {
+    expect(longCacheRejected(400, true)).toBe(true);
+    expect(longCacheRejected(422, true)).toBe(true);
+    expect(longCacheRejected(400, false)).toBe(false);
+    expect(longCacheRejected(429, true)).toBe(false);
+    expect(longCacheRejected(200, true)).toBe(false);
+  });
+
+  test("returns the payload with 1h markers, then stops after a refusal", () => {
+    const pi = peer();
+    harnessKit(pi);
+    const ctx = { ...sessionContext("/p", undefined), model: copilotSonnet, agent: main };
+    const first = anthropicPayload();
+    expect(pi.handlers.before_provider_request({ payload: first }, ctx)).toBe(first);
+    expect(first.system[0].cache_control).toEqual({ type: "ephemeral", ttl: "1h" });
+    pi.handlers.after_provider_response({ status: 400 }, ctx);
+    expect(notices).toEqual([
+      { message: "harness-kit: Copilot refused the 1h cache; back to 5m for this session", type: "warning" },
+    ]);
+    const second = anthropicPayload();
+    expect(pi.handlers.before_provider_request({ payload: second }, ctx)).toBeUndefined();
+    expect(second.system[0].cache_control).toEqual({ type: "ephemeral" });
+  });
+
+  test("a refusal of a request without 1h changes nothing", () => {
+    const pi = peer();
+    harnessKit(pi);
+    const ctx = { ...sessionContext("/p", undefined), model: copilotSonnet, agent: { kind: "sub" } };
+    expect(pi.handlers.before_provider_request({ payload: anthropicPayload() }, ctx)).toBeUndefined();
+    pi.handlers.after_provider_response({ status: 400 }, ctx);
+    expect(notices).toEqual([]);
   });
 });

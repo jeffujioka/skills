@@ -92,7 +92,6 @@ Run steps 1-9.
 8. Change breaks one: follow the Core rule. Stop.
 9. Copy the skill dir to `/tmp/<name>-before-edit-<timestamp>/`.
 10. Apply the change. Run steps 3-9.
-11. After the report, follow step 9, After the report.
 
 ### Audit
 
@@ -102,7 +101,6 @@ Run steps 1-9.
 4. Run steps 5, 6 and 9, report-only.
 5. Record as a finding each FAIL, each WARN, and each rule, note or guardrail the skill breaks.
 6. Change no file. Run none of the skill's scripts.
-7. After the report, follow step 9, After the report.
 
 ### Untrusted skill files
 
@@ -138,7 +136,6 @@ Stop early only when:
 After the report:
 
 - Stop.
-- Audit and edit: end the turn after the report. Wait for the user.
 - Build only what the skill needs.
 - List extra files, scripts or sections under Suggestions in the report. Do not add them.
 
@@ -324,21 +321,7 @@ Sandbox and CLIs:
 2. Print the report in its layout, filled from this run.
 3. Same layout in every mode.
 4. Print as Markdown outside any code block.
-5. Edit: end the Files section with the backup path.
-
-### After the report
-
-End the turn. Wait for the user. The user answers in plain words.
-
-- Audit: change no file. The user asks for all findings, some, or their own fix: switch to Edit mode for those. The user's fix replaces the finding's Fix line. A fix that breaks a standard: Core rule.
-- Edit, revert request:
-  1. Compare each changed file and README entry with what the edit wrote.
-  2. File changed by the user since the report: list it. Wait for approval before overwriting.
-  3. Restore the skill dir from `/tmp/<name>-before-edit-<timestamp>/`.
-  4. Revert the README entry.
-  5. Touch no other file.
-- Edit, further change: treat as a new requested change. Core check, steps 3-9, new report.
-- Question: answer only from the skill's files and the standards. Cite file:line or rule id. Not there: say "not found in the skill or the standards".
-- Challenge of a finding or change: re-read the cited standard. Text does not support it: withdraw the finding, or offer to undo the change. Else quote the text. User still overrides: apply it. Record under Conflicts in the edit report. R10 and triggered guardrails stay.
+5. Edit and audit: the report is the last thing in the reply.
+6. Edit: end the Files section with the backup path.
 
 *Done when:* report printed in its layout, every finding has a location, a Fix line and a standard.
