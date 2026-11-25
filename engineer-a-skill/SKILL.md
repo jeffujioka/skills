@@ -36,11 +36,16 @@ Applies to:
 Rules:
 
 - Write for LLMs, not humans.
-- One action per line. Imperative verb first.
-- Split any instruction longer than about 25 words.
+- One action per instruction. Imperative verb first.
+- Write a long sentence when the instruction needs it. Split an instruction that holds more than one action.
 - Cut explanation, background, motivation and filler.
 - Keep a reason only when the rule is non-obvious. One clause.
-- Keep `not`, `never`, `no`, `only`, numbers, paths and exact strings.
+- Keep numbers, paths and exact strings.
+- Use the active voice. Start each instruction with the verb.
+- Prefer the positive form when it is equally exact: "Call the CLI directly", not "Write no wrapper script".
+- Keep a negation when it is the clearest form: hard prohibitions, exceptions, scope limits.
+- Keep a negation when you shorten a line. The rewrite allows and forbids the same cases.
+- Avoid double negation.
 - Prefer lists to paragraphs.
 - Writing or editing a reference `.md`: apply all of the above to it too.
 
@@ -83,7 +88,7 @@ Run steps 1-9.
 4. Change unclear, or a step 1 answer unsettled: ask in one message, max 7 questions. Wait.
 5. Request names no concrete change ("make it better"): treat as unclear.
 6. All clear: ask nothing.
-7. Check the change against the three standards.
+7. Check the change against the three standards. Triage the lines it adds or changes.
 8. Change breaks one: follow the Core rule. Stop.
 9. Copy the skill dir to `/tmp/<name>-before-edit-<timestamp>/`.
 10. Apply the change. Run steps 3-9.
@@ -216,6 +221,7 @@ python3 <own-dir>/scripts/run_evals.py <skill-dir> --harness <harness> --baselin
    - rules: Structure, Content, Embedded commands, Safety.
    - model notes: "All current models", "All 5.5 models", and the per-model sections that apply.
    - guardrails: each triggered snippet, copied, nouns adapted.
+   - triage: each line you add. Read [triage](references/triage.md). Write only `keep` and `move` lines.
 5. Put detail needed in some runs only in `<skill-dir>/references/`. Link it from `SKILL.md`. One level deep.
 6. Split before the body nears 500 lines (R03).
 7. Run each script written or changed on a sample input. Check exit code and output. `--help` alone does not count.
@@ -243,6 +249,7 @@ The validator does not check everything. Read the skill against each standard, l
 - rules: every manual rule.
 - model notes: every applicable note.
 - guardrails: each triggered snippet present. Prompt-leak hardening absent.
+- triage: each instruction in scope. Read [triage](references/triage.md).
 
 Per finding record: file:line, rule/note/guardrail broken, fix. Fix it. Re-run step 5.
 
@@ -315,5 +322,6 @@ Sandbox and CLIs:
 3. Same layout in every mode.
 4. Print as Markdown outside any code block.
 5. Edit and audit: the report is the last thing in the reply.
+6. Edit: end the Files section with the backup path.
 
 *Done when:* report printed in its layout, every finding has a location, a Fix line and a standard.

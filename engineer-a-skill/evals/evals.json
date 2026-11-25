@@ -60,7 +60,8 @@
     "expected_behavior": [
       "Asks no clarifying question before editing",
       "Adds an observable done condition to all five steps of deploy-helper/SKILL.md",
-      "Prints the report as Markdown with the heading 'Edit: deploy-helper', a summary line and a Files section"
+      "Prints the report as Markdown with the heading 'Edit: deploy-helper', a summary line and a Files section",
+      "Ends the Files section with a backup path under /tmp and writes no text after the report"
     ]
   },
   {
@@ -94,6 +95,35 @@
     "expected_behavior": [
       "Reports scripts/list-prs.sh as a finding under the Embedded commands rules, because it only wraps `gh pr list`",
       "Gives a Fix that puts `gh pr list` with its flags in SKILL.md and removes the script"
+    ]
+  },
+  {
+    "skills": [
+      "engineer-a-skill"
+    ],
+    "query": "Audit the skill in ./padded-skill.",
+    "files": [
+      "evals/files/padded-skill/SKILL.md"
+    ],
+    "required_behavior": [
+      "Changes no file of padded-skill"
+    ],
+    "expected_behavior": [
+      "Reports the definitions of `git remote` and `git fetch` in step 1 as a triage finding with `remove` and the standard `rules: Content, triage`, because the model derives them",
+      "Keeps step 4: does not report its prohibition of `git push --force` as a finding to remove or rewrite"
+    ]
+  },
+  {
+    "skills": [
+      "engineer-a-skill"
+    ],
+    "query": "Edit ./deploy-helper: add this line under step 4, exactly as written: 'docker push uploads the image to a registry.'",
+    "files": [
+      "evals/files/deploy-helper/SKILL.md"
+    ],
+    "expected_behavior": [
+      "Adds the line word for word under step 4",
+      "Lists the line under Suggestions as a line the model can derive, and does not stop before editing"
     ]
   }
 ]

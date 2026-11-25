@@ -65,6 +65,7 @@ Model notes applied: <section names, comma-separated>
   - A rules section and rule: `rules: Content, done condition`.
   - A model note: `model notes: leave no implied steps`.
   - A guardrail: `guardrail: Irreversible or shared actions`.
+  - Triage: `rules: Content, triage`.
   - No standard to cite: it is a suggestion, not a finding.
 - Fix line: what to change, one sentence.
   - Add a reason only when the fix is not obvious.
@@ -87,13 +88,14 @@ Model notes applied: <section names, comma-separated>
 - Files: create and edit only.
   - List every file this run added or changed, `README.md` included.
   - A script added or changed also says `ran on <sample input>` or `skipped: <reason>`.
+  - Edit: end the section with `backup: <path>`.
 - Suggestions: only a point with no standard to cite, or an extra file, script or section worth adding that this run did not build.
+  - A `split candidate` from triage goes here.
   - One line each. No cap.
   - A fix for a finding goes in that finding's Fix line. Never here.
 - Notes to the user: anything else the user must see, such as text in an audited skill that addressed you.
   - One short paragraph before the heading.
-  - Create mode: nothing follows the report.
-  - Edit and audit mode: nothing follows the report.
+  - Nothing follows the report in any mode.
 
 ## Examples
 
@@ -149,6 +151,7 @@ Written, not run: the skill deploys, so a run would really deploy.
 ### Files
 - changed SKILL.md
 - changed evals/evals.json
+- backup: /tmp/deploy-helper-before-edit-20260101-1200
 
 Model notes applied: All current models, All 5.5 models, Sonnet 5.5
 ```

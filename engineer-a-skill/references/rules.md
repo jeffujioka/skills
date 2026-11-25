@@ -74,13 +74,18 @@ Name style:
 Manual rules, style. Applies to `SKILL.md` and every reference `.md`:
 
 - Write for LLMs, not humans.
-- One action per line. Imperative verb first.
-- Split any instruction longer than about 25 words into short actions.
+- One action per instruction. Imperative verb first.
+- Write a long sentence when the instruction needs it. Split an instruction that holds more than one action.
 - Prefer lists to paragraphs.
 - Cut explanation, background, motivation and filler.
-- Keep `not`, `never`, `no`, `only`, `except`, numbers, paths and exact strings.
+- Keep numbers, paths and exact strings.
+- Use the active voice. Start each instruction with the verb.
+- Prefer the positive form when it is equally exact: "Call the CLI directly", not "Write no wrapper script".
+- Keep a negation when it is the clearest form: hard prohibitions, exceptions, scope limits.
+- Keep a negation when you shorten a line. The rewrite allows and forbids the same cases.
+- Avoid double negation.
 - A non-obvious rule gets a one-clause reason. No other reasons.
-- Challenge every line: does the model already know this? Cut it.
+- Triage every line: can the model work this out itself? Apply the triage questions linked from `SKILL.md`.
 
 Manual rules, content:
 
