@@ -100,6 +100,11 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
   npx skills@latest add https://github.com/jeffujioka/skills.git -s engineer-a-skill
   ```
 
+- **crafting-readmes** — Rewrite a project's README as a marketing-grade product page. Reads the repo for facts, proposes three creative directions (tone, palette, fonts, hero idea, page outline, sketch), and shows them on a local browser concept board where you pick one or ask for a new round; sketches also export as PNG for GIMP or any editor. Only after the pick does it build the banner SVG, screenshots and demo GIF, move technical detail to `docs/<section>/`, and check links, images and assets with a script. Invents no testimonials, star counts or benchmarks; backs up the old README in `/tmp`; commits and pushes nothing. Needs `python3`, `rsvg-convert`, `magick`, `ffmpeg`. Manual-only: call it by name; never auto-loads.
+	```sh
+	npx skills@latest add https://github.com/jeffujioka/skills.git -s crafting-readmes
+	```
+
 - **engineer-an-agents** — Engineer a lean `AGENTS.md` (or `CLAUDE.md`) for a repo. Audits an existing file with three questions: remove what the model can work out, remove what does not apply to every prompt, move important task-specific rules into linked reference files (`docs/agents/`), and flag reusable procedures as skill candidates. With no file, drafts one from the repo's own manifests, configs, CI and git history. Edits only the context file and `docs/agents/`; keeps a backup in `/tmp`; commits nothing. Manual-only: call it by name; never auto-loads.
 
   ```sh
