@@ -78,3 +78,13 @@ _Avoid_: Assertion, check
 **Judge**:
 The model that grades a run's transcript against its scenario's behaviors.
 _Avoid_: Grader, evaluator
+
+### README crafting
+
+**Direction**:
+One complete creative proposal for a README: name, tagline, pitch, tone, palette, fonts, hero idea, page outline and sketch.
+_Avoid_: Option, concept, theme
+
+**Board**:
+The local browser page that shows the directions side by side and records the user's pick in `choice.json`.
+_Avoid_: Gallery, picker, dashboard
