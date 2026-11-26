@@ -60,11 +60,11 @@ Inline `--body "..."` breaks on backticks and `$`, because the shell expands the
 
 ## API and other tasks
 
-| Need | Command |
-|---|---|
-| Any REST endpoint | `gh api repos/{owner}/{repo}/... --paginate` |
-| GraphQL | `gh api graphql -f query='...' -F number=1` |
-| Workflow artifacts | `gh run download <run-id> -D <dir>` |
-| Copilot coding agent | `gh agent-task create` (preview) |
+| Need                 | Command                                      |
+| -------------------- | -------------------------------------------- |
+| Any REST endpoint    | `gh api repos/{owner}/{repo}/... --paginate` |
+| GraphQL              | `gh api graphql -f query='...' -F number=1`  |
+| Workflow artifacts   | `gh run download <run-id> -D <dir>`          |
+| Copilot coding agent | `gh agent-task create` (preview)             |
 
 `gh api` has no `-R` and no `--json`. It fills `{owner}`, `{repo}` and `{branch}` from the current repository (or `GH_REPO`); filter its output with `--jq`. Use `-f` for string fields and `-F` for typed values and GraphQL variables.

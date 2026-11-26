@@ -34,12 +34,12 @@
 
 ## Frontmatter
 
-| Id | Level | Rule |
-|---|---|---|
-| R00 | FAIL | Frontmatter block present. `disable-model-invocation`, if set, is `true` or `false`. A value containing `: ` is quoted. |
-| R01 | FAIL | `name`: lowercase letters, digits, hyphens; max 64; no "claude" or "anthropic"; equals the directory name. |
-| R02 | FAIL | `description`: non-empty, max 1024, no XML tags, third person (no I/my/you/your/we/our). Says what the skill does and when. |
-| W02 | WARN | Description has no "when" clause. Auto skill: trigger terms. Manual-only skill: end with "Manual-only: call it by name." |
+| Id  | Level | Rule                                                                                                                                           |
+| --- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| R00 | FAIL  | Frontmatter block present. `disable-model-invocation`, if set, is `true` or `false`. A value containing a colon followed by a space is quoted. |
+| R01 | FAIL  | `name`: lowercase letters, digits, hyphens; max 64; no "claude" or "anthropic"; equals the directory name.                                     |
+| R02 | FAIL  | `description`: non-empty, max 1024, no XML tags, third person (no I/my/you/your/we/our). Says what the skill does and when.                    |
+| W02 | WARN  | Description has no "when" clause. Auto skill: trigger terms. Manual-only skill: end with "Manual-only: call it by name."                       |
 
 Name style:
 
@@ -48,28 +48,28 @@ Name style:
 
 ## Structure
 
-| Id | Level | Rule |
-|---|---|---|
-| R03 | FAIL | `SKILL.md` body (after frontmatter) max 500 lines. |
-| R04 | FAIL | References one level deep: a reference file never links to another `.md`. |
-| R05 | FAIL | Reference file over 100 lines has a `## Contents` section. |
-| R08 | FAIL | Every linked file or `scripts/`, `references/`, `templates/` path named in backticks exists. |
-| R09 | FAIL | Script with a shebang is executable. |
-| W05 | WARN | File under `references/`, `templates/` or `scripts/` is not mentioned in `SKILL.md`. |
+| Id  | Level | Rule                                                                                         |
+| --- | ----- | -------------------------------------------------------------------------------------------- |
+| R03 | FAIL  | `SKILL.md` body (after frontmatter) max 500 lines.                                           |
+| R04 | FAIL  | References one level deep: a reference file never links to another `.md`.                    |
+| R05 | FAIL  | Reference file over 100 lines has a `## Contents` section.                                   |
+| R08 | FAIL  | Every linked file or `scripts/`, `references/`, `templates/` path named in backticks exists. |
+| R09 | FAIL  | Script with a shebang is executable.                                                         |
+| W05 | WARN  | File under `references/`, `templates/` or `scripts/` is not mentioned in `SKILL.md`.         |
 
 - Name reference files by content (`finance.md`). Never `doc2.md`.
 - Use forward slashes only.
 
 ## Content
 
-| Id | Level | Rule |
-|---|---|---|
-| R06 | FAIL | No backslash paths in prose or inline code. |
-| R11 | FAIL | No time-sensitive phrases ("before <year>", "as of <year>"). |
-| R12 | FAIL | No unfilled scaffold placeholders left in `.md` files. |
-| W01 | WARN | House rule. Max 3 emphasis words in capitals per file. Plain imperatives otherwise. |
-| W03 | WARN | No instruction to print reasoning in the output. |
-| W04 | WARN | One term per concept across the skill. |
+| Id  | Level | Rule                                                                                |
+| --- | ----- | ----------------------------------------------------------------------------------- |
+| R06 | FAIL  | No backslash paths in prose or inline code.                                         |
+| R11 | FAIL  | No time-sensitive phrases ("before <year>", "as of <year>").                        |
+| R12 | FAIL  | No unfilled scaffold placeholders left in `.md` files.                              |
+| W01 | WARN  | House rule. Max 3 emphasis words in capitals per file. Plain imperatives otherwise. |
+| W03 | WARN  | No instruction to print reasoning in the output.                                    |
+| W04 | WARN  | One term per concept across the skill.                                              |
 
 Manual rules, style. Applies to `SKILL.md` and every reference `.md`:
 
@@ -112,9 +112,9 @@ Manual rules, content:
 
 ## Embedded commands
 
-| Id | Level | Rule |
-|---|---|---|
-| W06 | WARN | House rule. In `SKILL.md`, a code block has max 40 non-blank lines. Longer goes to `scripts/` or `references/`. |
+| Id  | Level | Rule                                                                                                            |
+| --- | ----- | --------------------------------------------------------------------------------------------------------------- |
+| W06 | WARN  | House rule. In `SKILL.md`, a code block has max 40 non-blank lines. Longer goes to `scripts/` or `references/`. |
 
 - Fences tagged text, markdown, yaml, json, xml or diff are not code. They are exempt.
 - Shell snippets of any shape (pipes, `&&`, loops, heredocs) are fine inline.
@@ -151,18 +151,18 @@ Manual rules:
 
 ## Safety
 
-| Id | Level | Rule |
-|---|---|---|
-| R10 | FAIL | No secrets in any file: keys, tokens, private keys, `password=` values. Read secrets at runtime or ask the user. |
+| Id  | Level | Rule                                                                                                             |
+| --- | ----- | ---------------------------------------------------------------------------------------------------------------- |
+| R10 | FAIL  | No secrets in any file: keys, tokens, private keys, `password=` values. Read secrets at runtime or ask the user. |
 
 - Conditional guardrails live in the guardrails file.
 - Add no prompt-leak hardening. It degrades task performance.
 
 ## Sources
 
-- Skill authoring best practices: https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
-- Prompting best practices: https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices
-- Reduce hallucinations: https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations
-- Increase consistency: https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/increase-consistency
-- Mitigate jailbreaks: https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/mitigate-jailbreaks
-- Reduce prompt leak: https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-prompt-leak
+- Skill authoring best practices: <https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices>
+- Prompting best practices: <https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices>
+- Reduce hallucinations: <https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations>
+- Increase consistency: <https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/increase-consistency>
+- Mitigate jailbreaks: <https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/mitigate-jailbreaks>
+- Reduce prompt leak: <https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-prompt-leak>

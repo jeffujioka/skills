@@ -1,0 +1,37 @@
+# The file checks run at pre-commit only; the commit-msg hook checks the message
+# against Conventional Commits 1.0.0.
+default_stages: [pre-commit]
+default_install_hook_types: [pre-commit, commit-msg]
+
+repos:
+  - repo: local
+    hooks:
+      - id: biome
+        name: biome check
+        entry: npx --no-install biome check --no-errors-on-unmatched --files-ignore-unknown=true
+        language: system
+        types_or: [markdown, json, ts]
+        exclude: '(/evals/files/|^obsidian-sessions/)'
+      - id: rumdl
+        name: rumdl check
+        entry: rumdl check
+        language: system
+        types: [markdown]
+        exclude: '(/evals/files/|^obsidian-sessions/)'
+      - id: shellcheck
+        name: shellcheck
+        entry: shellcheck
+        language: system
+        types: [shell]
+        exclude: '(/evals/files/|^obsidian-sessions/)'
+      - id: shfmt
+        name: shfmt
+        entry: shfmt -d
+        language: system
+        types: [shell]
+        exclude: '(/evals/files/|^obsidian-sessions/)'
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.5.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]

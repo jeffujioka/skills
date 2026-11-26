@@ -11,7 +11,11 @@
 # user's locale.
 set -euo pipefail
 require=$(dirname "${BASH_SOURCE[0]}")/../../logbook/scripts/require-agent-env.sh
-[[ -f "$require" ]] || { echo "cost.sh: needs the logbook skill beside captain-away" >&2; exit 1; }
+[[ -f "$require" ]] || {
+  echo "cost.sh: needs the logbook skill beside captain-away" >&2
+  exit 1
+}
+# shellcheck source=../../logbook/scripts/require-agent-env.sh
 source "$require"
 
 harness=$("$AGENT_ENV" | sed -n 's/^AGENT_HARNESS=//p')
@@ -22,13 +26,19 @@ case "$harness" in
   claude)
     transcript=$(values TRANSCRIPT)
     amount=$(jq -rRn '[inputs | fromjson? | select(.type? == "cost-state") | .totalCostUSD | numbers] | last // empty' "$transcript")
-    [[ -n "$amount" ]] || { echo "cost.sh: no cost-state.totalCostUSD in $transcript" >&2; exit 1; }
+    [[ -n "$amount" ]] || {
+      echo "cost.sh: no cost-state.totalCostUSD in $transcript" >&2
+      exit 1
+    }
     LC_ALL=C printf '%.2f (estimate)\n' "$amount"
     ;;
   omp)
     mapfile -t files < <(values JSONL)
     amount=$(jq -rRn '[inputs | fromjson? | select(.type? == "message" and .message.role? == "assistant") | .message.usage.cost.total? | numbers] | if length == 0 then empty else add end' "${files[@]}")
-    [[ -n "$amount" ]] || { echo "cost.sh: no usage.cost.total in ${files[0]}" >&2; exit 1; }
+    [[ -n "$amount" ]] || {
+      echo "cost.sh: no usage.cost.total in ${files[0]}" >&2
+      exit 1
+    }
     LC_ALL=C printf '%.2f\n' "$amount"
     ;;
   opencode)
@@ -43,7 +53,10 @@ case "$harness" in
       order by 1, 2")
     amount=$(sed -n 's/^0|//p' <<<"$rows")
     missing=$(sed -n 's/^1|//p' <<<"$rows" | paste -sd' ')
-    [[ -z "$missing" ]] || { echo "cost.sh: sessions not found in session_v2 of $db: $missing" >&2; exit 1; }
+    [[ -z "$missing" ]] || {
+      echo "cost.sh: sessions not found in session_v2 of $db: $missing" >&2
+      exit 1
+    }
     LC_ALL=C printf '%.2f\n' "$amount"
     ;;
   *)

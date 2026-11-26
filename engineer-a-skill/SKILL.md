@@ -144,7 +144,6 @@ After the report:
 1. Target dir not given: ask for it first.
 2. Look up facts yourself: target dir contents, sibling skills, existing scripts, README presence.
 3. Ask only what is missing. One message, max 7 questions:
-
    1. Purpose and the one-line "when".
    2. Auto or manual-only? Undecided: manual-only if side effects, auto if read-only reference.
    3. Inputs and outputs. Fixed output format: template plus example.
@@ -153,7 +152,7 @@ After the report:
    6. Reads untrusted content, states facts from documents, or takes irreversible or shared actions? Answers pick the guardrails.
    7. Models: Haiku 5.5, Sonnet 5.5, Opus 5.5? Unknown means all three.
 
-*Done when:* all seven answered, and each guardrail is marked triggered or not with a one-clause reason.
+_Done when:_ all seven answered, and each guardrail is marked triggered or not with a one-clause reason.
 
 ## 2. Scaffold
 
@@ -167,7 +166,7 @@ python3 <own-dir>/scripts/scaffold.py <target-dir> <name> --invocation <auto|man
 - The script fills `templates/SKILL.md.tmpl` and `templates/frontmatter-auto.txt` or `templates/frontmatter-manual.txt`.
 - The script refuses an existing name.
 
-*Done when:* the script prints `created <path>/SKILL.md`.
+_Done when:_ the script prints `created <path>/SKILL.md`.
 
 ## 3. Evals
 
@@ -210,7 +209,7 @@ python3 <own-dir>/scripts/run_evals.py <skill-dir> --harness <harness> --baselin
 - The run uses no skill.
 - Note which behaviors fail.
 
-*Done when:* `evals/evals.json` holds at least three scenarios, each with at least two behaviors.
+_Done when:_ `evals/evals.json` holds at least three scenarios, each with at least two behaviors.
 
 ## 4. Write
 
@@ -228,7 +227,7 @@ python3 <own-dir>/scripts/run_evals.py <skill-dir> --harness <harness> --baselin
 8. Script cannot run (missing dependency, network, credentials): record it as skipped with the reason.
 9. A CLI the skill only names needs no run.
 
-*Done when:* every step written, each triggered guardrail in place, no script wraps a CLI callable directly, each script run once or recorded as skipped.
+_Done when:_ every step written, each triggered guardrail in place, no script wraps a CLI callable directly, each script run once or recorded as skipped.
 
 ## 5. Validate
 
@@ -240,7 +239,7 @@ python3 <own-dir>/scripts/validate.py <skill-dir>
 - Fix each WARN, or keep it as a Should fix finding with the reason in its Fix line.
 - WARN caused by the user's request: keep only after the user chose their version (Core). Record under Conflicts.
 
-*Done when:* exit 0. Audit: every FAIL and WARN recorded.
+_Done when:_ exit 0. Audit: every FAIL and WARN recorded.
 
 ## 6. Standards audit
 
@@ -253,7 +252,7 @@ The validator does not check everything. Read the skill against each standard, l
 
 Per finding record: file:line, rule/note/guardrail broken, fix. Fix it. Re-run step 5.
 
-*Done when:* zero open findings except Conflicts. Audit: every finding recorded.
+_Done when:_ zero open findings except Conflicts. Audit: every finding recorded.
 
 ## 7. Run evals
 
@@ -303,7 +302,7 @@ Sandbox and CLIs:
 - Give the agent only read-only CLI commands to run.
 - A command that posts, pushes, deletes or edits: the agent prepares and shows it. It never runs it.
 
-*Done when:* script exits 0, scenarios still fail after two rounds, or evals reported as not run with the reason.
+_Done when:_ script exits 0, scenarios still fail after two rounds, or evals reported as not run with the reason.
 
 ## 8. README
 
@@ -313,7 +312,7 @@ Sandbox and CLIs:
 4. No `README.md`: skip.
 5. Leave all changes uncommitted and uninstalled.
 
-*Done when:* entry added or updated, or no `README.md` found.
+_Done when:_ entry added or updated, or no `README.md` found.
 
 ## 9. Report
 
@@ -324,4 +323,4 @@ Sandbox and CLIs:
 5. Edit and audit: the report is the last thing in the reply.
 6. Edit: end the Files section with the backup path.
 
-*Done when:* report printed in its layout, every finding has a location, a Fix line and a standard.
+_Done when:_ report printed in its layout, every finding has a location, a Fix line and a standard.

@@ -105,8 +105,8 @@ Source: the Opus 5.5 guide.
 
 ## Sources
 
-- https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-haiku-5-5
-- https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5-5
-- https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5
-- https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices
-- https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
+- <https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-haiku-5-5>
+- <https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5-5>
+- <https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5>
+- <https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices>
+- <https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices>

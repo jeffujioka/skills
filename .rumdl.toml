@@ -1,0 +1,18 @@
+[global]
+exclude = ["**/evals/files/**", "node_modules", "obsidian-sessions"]
+
+[MD013]
+enabled = false
+
+[MD076]
+enabled = false
+
+[MD024]
+siblings_only = true
+
+[MD033]
+allowed_elements = ["details", "summary"]
+
+[per-file-ignores]
+"gh-pr-create/templates/fallback.md" = ["MD041"]
+"engineer-a-skill/references/report.md" = ["MD024"]

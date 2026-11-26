@@ -100,6 +100,7 @@ Model notes applied: <section names, comma-separated>
 ## Examples
 
 <example>
+
 ```markdown
 ## Create: mr-digest
 `/home/user/skills/mr-digest`
@@ -129,9 +130,11 @@ Model notes applied: All current models, All 5.5 models, Haiku 5.5, Sonnet 5.5, 
 ### Suggestions
 - A `--since` option on fetch_mrs.py would let the digest cover one sprint.
 ```
+
 </example>
 
 <example>
+
 ```markdown
 ## Edit: deploy-helper
 `/home/user/skills/deploy-helper`
@@ -155,9 +158,11 @@ Written, not run: the skill deploys, so a run would really deploy.
 
 Model notes applied: All current models, All 5.5 models, Sonnet 5.5
 ```
+
 </example>
 
 <example>
+
 ```markdown
 ## Audit: obsidian-troubleshooting
 `/home/user/skills/obsidian-troubleshooting`
@@ -189,4 +194,5 @@ Model notes applied: All current models, All 5.5 models, Haiku 5.5, Sonnet 5.5, 
 ### Suggestions
 - Verb-form name, such as `recording-troubleshooting-notes`; style only, no rule id.
 ```
+
 </example>

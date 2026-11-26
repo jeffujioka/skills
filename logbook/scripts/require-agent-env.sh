@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+# shellcheck disable=SC2034  # AGENT_ENV is read by the script that sources this file
 # Sourced: set AGENT_ENV to the agent-env command, or stop when harness-kit is missing.
 if AGENT_ENV=$(command -v agent-env); then
   :

@@ -140,7 +140,10 @@ main() {
   local harness session root dir
   case "${1-}" in
     '' | logbook-dir | compact-reminder | root-source) ;;
-    *) printf 'agent-env: unknown command %s\n' "$1" >&2; exit 2 ;;
+    *)
+      printf 'agent-env: unknown command %s\n' "$1" >&2
+      exit 2
+      ;;
   esac
   harness=$(harness)
   session=$(session_id "$harness")
@@ -157,6 +160,7 @@ main() {
       ;;
     compact-reminder)
       if [[ -f "$dir/progress.md" ]]; then
+        # shellcheck disable=SC2016  # the backticks are literal Markdown in the reminder text
         printf 'Context was compacted. Read `%s/progress.md`, `decisions.md`, `needs-you.md` before anything else; continue from `## Next`.\n' "$dir"
       fi
       return

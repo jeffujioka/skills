@@ -16,6 +16,7 @@ cd "$(jq -r '.cwd' <<<"$payload")"
 reminder=$(AGENT_HARNESS=claude CLAUDE_CODE_SESSION_ID="$(jq -r '.session_id' <<<"$payload")" \
   "$HOME/.local/bin/agent-env" compact-reminder)
 [[ -n "$reminder" ]] || exit 0
+# shellcheck disable=SC2016  # sed script: the backticks are literal
 logbook=$(sed -n 's/.*`\([^`]*\)\/progress\.md`.*/\1/p' <<<"$reminder" | head -n 1)
 notice='harness-kit: logbook reminder sent to the model'
 [[ -z "$logbook" ]] || notice="$notice ($logbook)"

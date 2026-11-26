@@ -58,7 +58,7 @@ The work is done when the requested commit, push or pull request exists. Stop ea
 
 Check `git status`, the current branch and `git remote -v`. Read the full diff. Check recent history when branch context matters. On the base branch (`main`, `master`, or the branch `origin/HEAD` points to) with work that needs review: create a feature branch first, as in [Start From the Base Branch](references/start-from-base.md).
 
-*Done when:* the remote host, the branch and the full diff are known.
+_Done when:_ the remote host, the branch and the full diff are known.
 
 ### 2. Commit
 
@@ -69,25 +69,25 @@ Stage one logical change.
 - `<skill-dir>` is the directory that holds this SKILL.md. Run the script with the repo as working directory.
 - Write the message from Conventional Commits and Commit Message Content, then commit.
 
-*Done when:* `git log -1` shows the commit with a body.
+_Done when:_ `git log -1` shows the commit with a body.
 
 ### 3. Pre-push checks
 
 See [Push and Pull Requests](references/push-and-pull-requests.md): sync, tests and linters, rebase onto the base.
 
-*Done when:* checks pass or are reported as skipped with the reason, and the branch is up to date with its base.
+_Done when:_ checks pass or are reported as skipped with the reason, and the branch is up to date with its base.
 
 ### 4. Push
 
 Show the push summary from Review Defaults and wait for approval, then push the feature branch. Uncommitted changes left over and a pull request to follow: show the push summary and the `gh-pr-create` leftover choice in one message, as [Start From the Base Branch](references/start-from-base.md) describes.
 
-*Done when:* `git status -sb` shows the branch in sync with its remote.
+_Done when:_ `git status -sb` shows the branch in sync with its remote.
 
 ### 5. Pull request
 
 Create it with the `gh-pr-create` skill: it finds the repo template, drafts, and creates only after approval. Not installed: draft the title and description, show them, and run `gh pr create` only after approval. Updates use `gh pr edit`, with the same approval.
 
-*Done when:* the pull request URL is printed.
+_Done when:_ the pull request URL is printed.
 
 ## Conventional Commits
 
@@ -99,10 +99,10 @@ Create it with the `gh-pr-create` skill: it finds the repo template, drafts, and
 [footer(s)]
 ```
 
-| Element | Max length |
-|---|---|
+| Element            | Max length    |
+| ------------------ | ------------- |
 | Title (first line) | 72 characters |
-| Body lines | 75 characters |
+| Body lines         | 75 characters |
 
 - Title over 72 characters: rewrite it shorter.
 - No vague titles like `misc updates`.
@@ -113,24 +113,27 @@ Create it with the `gh-pr-create` skill: it finds the repo template, drafts, and
 
 The subject serves changelog readers: what changed, in functional terms. The body serves archaeology: why, or what a reader cannot see at a glance.
 
-| Information | Location |
-|---|---|
-| What changed (functionality) | Subject |
-| Why it changed, key changes | Body |
-| How it works technically | Code comments |
-| Broad context, validation | Pull request description |
+| Information                  | Location                 |
+| ---------------------------- | ------------------------ |
+| What changed (functionality) | Subject                  |
+| Why it changed, key changes  | Body                     |
+| How it works technically     | Code comments            |
+| Broad context, validation    | Pull request description |
 
 Every commit has a body: sharp and concise, never a restatement of the subject. Nothing non-obvious to record: one or two bullets with the key change. Breaking changes, migrations, security-relevant changes, or subtle trade-offs earn more depth; size alone does not. Squash commits summarize the functional change, not the development steps.
 
 <example>
+
 ```text
 fix(readme): correct install URL
 
 - install URL pointed at the old repository path
 ```
+
 </example>
 
 <example>
+
 ```text
 feat(cleanup): add glob-aware --exclude flag
 
@@ -138,9 +141,11 @@ feat(cleanup): add glob-aware --exclude flag
 - guards ~/.agents/skills from self-deletion
 - rejects ambiguous ~user patterns instead of silent no-match
 ```
+
 </example>
 
 <example>
+
 ```text
 feat!: replace session-token storage with encrypted-at-rest model
 
@@ -149,6 +154,7 @@ Existing sessions are invalidated on deploy; users must re-authenticate.
 Chose encrypt-at-rest over token rotation because rotation needs a
 30-day parallel-run window the compliance deadline does not allow.
 ```
+
 </example>
 
 Too verbose: implementation detail, test counts and the TDD history in the body. Those belong in code comments or the pull request description.

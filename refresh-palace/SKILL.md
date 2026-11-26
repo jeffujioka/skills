@@ -77,14 +77,14 @@ No profile for the name: create one before step 1.
 3. Run `RP init <name> --wing <wing> --root <path> [--glob '<worktree glob>'] [--description '<one line>'] [--room <room>]...`. Names are lowercase slugs.
 4. Add the `known_docs` candidates and git worktrees it prints that the developer accepts: `--known-docs` on init, or edit the profile.
 
-*Done when:* `RP show <name>` prints the profile.
+_Done when:_ `RP show <name>` prints the profile.
 
 ## 1. Check
 
 1. Run `mempalace status`. The profile's wing is listed, unless this is its first run.
 2. Make the backup (rule above).
 
-*Done when:* status runs and the backup folder for today exists.
+_Done when:_ status runs and the backup folder for today exists.
 
 ## 2. Find sessions
 
@@ -108,7 +108,7 @@ Goal: transcripts for every new session of this project, and no other.
 - It refuses to delete unfiled drafts (`out-*.jsonl`) unless you pass `--force`.
 - First run: it takes every session. Pass `--since YYYY-MM-DDTHH-MM-SS` to start later.
 
-*Done when:* `prepare` lists the batches, or prints `nothing new`.
+_Done when:_ `prepare` lists the batches, or prints `nothing new`.
 
 - `nothing new` with no `PENDING` and no `deferred` line printed: report it. Run no other step. Stop.
 - `nothing new` with a `deferred` line or a pending cwd: resolve that first. Then run `RP prepare <name>` again.
@@ -124,7 +124,7 @@ Goal: one `out-N.jsonl` per batch. Each drawer is one durable fact its transcrip
 The contract is the quality bar.
 Unusual batch (research-heavy, no preferences): edit the contract copy in `<work>` for this run.
 
-*Done when:* every `out-N.jsonl` exists.
+_Done when:_ every `out-N.jsonl` exists.
 
 ## 4. Review
 
@@ -141,7 +141,7 @@ Goal: every drawer is true, durable, free of secrets and in the right room.
 6. One room holds more than half the drawers: re-room by subject.
 7. Run `RP check <name>` again after fixes.
 
-*Done when:* `check` reports no schema problem, no secret hit and no unknown room, and every checked drawer is backed.
+_Done when:_ `check` reports no schema problem, no secret hit and no unknown room, and every checked drawer is backed.
 
 ## 5. File
 
@@ -151,14 +151,14 @@ Goal: every drawer is true, durable, free of secrets and in the right room.
 4. Run `mempalace status`. The drawer count grew.
 5. Search once for a fact you filed (see Searching).
 
-*Done when:* every payload returned empty `errors` and the search finds the fact.
+_Done when:_ every payload returned empty `errors` and the search finds the fact.
 
 ## 6. Watermark
 
 Run `RP done <name>`.
 It prints `watermark -> <timestamp>` and renames `out-N.jsonl` to `filed-N.jsonl`.
 
-*Done when:* it prints the watermark line.
+_Done when:_ it prints the watermark line.
 
 ## 7. Report
 
@@ -169,7 +169,7 @@ Print:
 - Each cwd confirmed or ignored and each room approved in this run.
 - Each step you adapted from the script.
 
-*Done when:* the report is printed.
+_Done when:_ the report is printed.
 
 ## Fixing filed drawers
 

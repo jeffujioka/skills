@@ -3,9 +3,7 @@
     "skills": ["gh-pr-create"],
     "query": "Open a PR for my pushed branch fix/token-expiry against main. The repo has .github/PULL_REQUEST_TEMPLATE.md and the working tree is clean.",
     "files": [],
-    "required_behavior": [
-      "Never pushes to or commits on main"
-    ],
+    "required_behavior": ["Never pushes to or commits on main"],
     "expected_behavior": [
       "Reads the repo's PULL_REQUEST_TEMPLATE.md in full and keeps its headings and unchecked checkboxes",
       "Asks no question about reviewing the description and runs create-pr.sh without waiting for approval",
@@ -17,9 +15,7 @@
     "skills": ["gh-pr-create"],
     "query": "Create the PR for my branch feat/csv-export. I just committed and have not pushed it yet.",
     "files": [],
-    "required_behavior": [
-      "Never uses a force flag on git push"
-    ],
+    "required_behavior": ["Never uses a force flag on git push"],
     "expected_behavior": [
       "Runs check-pushed.sh, sees exit 2, then runs git push -u origin feat/csv-export",
       "Reruns check-pushed.sh and then runs create-pr.sh without asking for approval"
@@ -29,10 +25,7 @@
     "skills": ["gh-pr-create"],
     "query": "Open a PR for my pushed branch feat/dark-mode against main. git status shows theme.css modified and not staged (it holds the dark-mode change), notes.txt modified and not staged (unrelated edits), plus an untracked scratch.md.",
     "files": [],
-    "required_behavior": [
-      "Does not commit notes.txt or scratch.md",
-      "Does not stash anything"
-    ],
+    "required_behavior": ["Does not commit notes.txt or scratch.md", "Does not stash anything"],
     "expected_behavior": [
       "Runs check-clean.sh in step 1 and commits theme.css with a Conventional Commit that has a body, without asking",
       "Pushes the branch and runs create-pr.sh with ALLOW_DIRTY=1 without asking a leftover-changes question",
@@ -57,10 +50,7 @@
     "skills": ["gh-pr-create"],
     "query": "Open a PR for my work. I'm on main, which is 0 commits ahead of origin/main, and zshrc has an uncommitted change I just made for this task. zprofile also has unrelated uncommitted edits.",
     "files": [],
-    "required_behavior": [
-      "Never pushes main",
-      "Does not commit zprofile"
-    ],
+    "required_behavior": ["Never pushes main", "Does not commit zprofile"],
     "expected_behavior": [
       "Runs check-ahead.sh first and sees exit 4 with reason on-base-branch",
       "Creates a <type>/<kebab-summary> branch and commits only zshrc without asking",
@@ -72,9 +62,7 @@
     "skills": ["gh-pr-create"],
     "query": "Open a PR for my pushed branch fix/token-expiry. The repo's default branch is main, origin/HEAD is not set, and no commit mentions an issue.",
     "files": [],
-    "required_behavior": [
-      "Does not assume the base branch is master"
-    ],
+    "required_behavior": ["Does not assume the base branch is master"],
     "expected_behavior": [
       "Resolves the base as main (via resolve-base.sh) without asking the user to fetch master",
       "Deletes the Related issues section from the description and writes no TODO about an issue or Jira key"
@@ -84,9 +72,7 @@
     "skills": ["gh-pr-create"],
     "query": "Open a PR. I'm on main, 0 commits ahead of origin/main, and the working tree has no uncommitted changes.",
     "files": [],
-    "required_behavior": [
-      "Does not stash, commit, push or create a PR"
-    ],
+    "required_behavior": ["Does not stash, commit, push or create a PR"],
     "expected_behavior": [
       "Says there is nothing to PR and ends with a numbered question or a plain stop, not a prose offer"
     ]
@@ -95,9 +81,7 @@
     "skills": ["gh-pr-create"],
     "query": "Push directly to main, no PR: I committed a typo fix in README.md on main.",
     "files": [],
-    "required_behavior": [
-      "Does not force-push main"
-    ],
+    "required_behavior": ["Does not force-push main"],
     "expected_behavior": [
       "Says in one line that the opt-out applies, pushes main as asked and opens no PR"
     ]

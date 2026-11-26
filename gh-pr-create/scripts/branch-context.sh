@@ -31,10 +31,14 @@ echo "base: $target"
 echo "commits ahead: $count"
 echo
 
-refs=$({ echo "$branch"; git log --no-merges --format=%B "$base..HEAD"; } \
+refs=$({
+  echo "$branch"
+  git log --no-merges --format=%B "$base..HEAD"
+} \
   | grep -oE '(^|[[:space:](])#[0-9]+|[A-Z][A-Z0-9]+-[0-9]+' | sed -E 's/^[[:space:](]+//' | sort -u || true)
 if [ -n "$refs" ]; then
   echo "issue references (branch name and commit messages):"
+  # shellcheck disable=SC2001  # a leading-space prefix per line; ${var//} needs a multi-line pattern
   echo "$refs" | sed 's/^/  /'
   echo
 fi

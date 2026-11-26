@@ -1,0 +1,7 @@
+# Repo ShellCheck config, copied from the dotfiles user-level one. ShellCheck
+# uses it for every script below the repo root, in place of ~/.shellcheckrc.
+#
+# Follow `source`d files even when they are not passed on the command line,
+# looking for them relative to the script that sources them.
+external-sources=true
+source-path=SCRIPTDIR

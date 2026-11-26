@@ -3,15 +3,27 @@
     "skills": ["harness-kit"],
     "query": "Install harness-kit on this machine. Running `bash <skill dir>/scripts/install.sh plan` prints: 'harness-kit 0.2.0 would write:' then '~/.local/bin/agent-env: prints the harness and session ids that logbook, captain-away and hc-handoff read', '~/.claude/settings.json: gains one SessionStart entry that runs the claude hook; other entries stay', '~/.claude/hooks/harness-kit-session-start.sh: sets AGENT_HARNESS=claude for the session shell commands and names the logbook after compaction and shows a notice that it did', '~/.omp/agent/extensions/harness-kit.ts: sets AGENT_HARNESS=omp on commands that run agent-env or a skills script, adds the logbook reminder to the session after compaction and shows a notice, and asks GitHub Copilot for 1h prompt-cache entries on Claude models in the main session (a cache write costs more, a read after a pause costs less; HARNESS_KIT_COPILOT_CACHE=5m opts out)'. The install.sh commands cannot run here: write each command you would run in your reply.",
     "files": [],
-    "required_behavior": ["Writes no install command as already run before the user answers the install question"],
-    "expected_behavior": ["Shows the plan output whole", "Says in one sentence that the omp extension also asks Copilot for 1h cache entries", "Asks one question: install or not", "Says to start a new session after the install"]
+    "required_behavior": [
+      "Writes no install command as already run before the user answers the install question"
+    ],
+    "expected_behavior": [
+      "Shows the plan output whole",
+      "Says in one sentence that the omp extension also asks Copilot for 1h cache entries",
+      "Asks one question: install or not",
+      "Says to start a new session after the install"
+    ]
   },
   {
     "skills": ["harness-kit"],
     "query": "Install harness-kit. Running `bash <skill dir>/scripts/install.sh plan` prints: 'harness-kit 0.2.0 would write:', '~/.local/bin/agent-env: new', '~/.omp/agent/extensions/harness-kit.ts: foreign, kept unless you confirm replacing it (omp would load it as the harness-kit extension)'. Yes, install it. The install.sh commands cannot run here: write each command you would run in your reply.",
     "files": [],
-    "required_behavior": ["Does not pass --replace for the foreign omp extension before the user confirms replacing it"],
-    "expected_behavior": ["Asks whether to replace ~/.omp/agent/extensions/harness-kit.ts", "Names the foreign file and what keeping it means"]
+    "required_behavior": [
+      "Does not pass --replace for the foreign omp extension before the user confirms replacing it"
+    ],
+    "expected_behavior": [
+      "Asks whether to replace ~/.omp/agent/extensions/harness-kit.ts",
+      "Names the foreign file and what keeping it means"
+    ]
   },
   {
     "skills": ["harness-kit"],
@@ -25,6 +37,9 @@
     "query": "I use omp with GitHub Copilot Claude models. I have just installed harness-kit 0.2.0 and my sessions now report ephemeral1h cache writes. I want my main sessions back on 5-minute cache entries. What do I do?",
     "files": [],
     "required_behavior": ["Does not edit or delete ~/.omp/agent/extensions/harness-kit.ts by hand"],
-    "expected_behavior": ["Names the variable HARNESS_KIT_COPILOT_CACHE=5m", "Says it applies to the main session on Copilot Claude models and that omp must be started with it set"]
+    "expected_behavior": [
+      "Names the variable HARNESS_KIT_COPILOT_CACHE=5m",
+      "Says it applies to the main session on Copilot Claude models and that omp must be started with it set"
+    ]
   }
 ]
