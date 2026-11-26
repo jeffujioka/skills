@@ -18,11 +18,11 @@ Verified with: omp 18.20.0 for the reminder, omp 18.22.2 for the 1h cache. Both 
 The working route:
 
 ```ts
-pi.on('session_compact', (event, ctx) => {
-  pi.sendMessage(
-    { customType: 'harness-kit-reminder', content: REMINDER, display: false },
-    { deliverAs: 'steer' },
-  );
+pi.on("session_compact", (event, ctx) => {
+	pi.sendMessage(
+		{ customType: "harness-kit-reminder", content: REMINDER, display: false },
+		{ deliverAs: "steer" },
+	);
 });
 ```
 

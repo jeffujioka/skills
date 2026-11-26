@@ -126,12 +126,14 @@ npx skills@latest add https://github.com/jeffujioka/skills.git --all -g
 
 ## Development
 
-Markdown, JSON and TypeScript are formatted and linted with [Biome](https://biomejs.dev); Markdown is also linted (not formatted) with [rumdl](https://rumdl.dev). Fixtures under `**/evals/files/` are excluded.
+Biome formats Markdown, JSON and TypeScript and lints JSON and TypeScript; [rumdl](https://rumdl.dev) lints (never formats) Markdown; ShellCheck and shfmt cover the shell scripts. Fixtures under `**/evals/files/` are excluded. The pre-commit hooks only check; commit messages must follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ```sh
-npm install        # pinned Biome
-uv tool install rumdl pre-commit
-npm run check      # biome check + rumdl check
-npm run fix        # biome check --write
-pre-commit run --all-files
+npm install                    # pinned Biome
+uv tool install rumdl
+uv tool install pre-commit
+brew install shellcheck shfmt
+npm run check                  # biome, rumdl, shellcheck, shfmt -d
+npm run fix                    # biome check --write, shfmt -w
+pre-commit run --all-files     # the same checks as the hooks
 ```

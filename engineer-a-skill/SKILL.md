@@ -171,13 +171,7 @@ Write evals before the body.
 2. Format: a JSON array of objects like this one.
 
 ```json
-{
-  "skills": ["mr-digest"],
-  "query": "Summarize the open merge requests assigned to me in group platform/infra.",
-  "files": [],
-  "required_behavior": ["Changes no MR"],
-  "expected_behavior": ["Lists each open MR on one line with its title and URL"]
-}
+{"skills": ["mr-digest"], "query": "Summarize the open merge requests assigned to me in group platform/infra.", "files": [], "required_behavior": ["Changes no MR"], "expected_behavior": ["Lists each open MR on one line with its title and URL"]}
 ```
 
 Scenarios:

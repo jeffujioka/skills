@@ -17,6 +17,11 @@
   "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "markdown": {
     "parser": { "frontmatter": true },
-    "formatter": { "enabled": true, "indentStyle": "space", "proseWrap": "preserve" }
+    "formatter": {
+      "enabled": true,
+      "indentStyle": "space",
+      "proseWrap": "preserve",
+      "formatEmbeds": false
+    }
   }
 }

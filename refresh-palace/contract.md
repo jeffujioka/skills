@@ -10,7 +10,7 @@ Use only the transcript text. If it does not state the fact, write no drawer. Qu
 
 Whose words count:
 
-- `kind: decision` needs the developer's own answer or instruction in the text (a `>` line). An assistant recommendation is a `discovery` at most.
+- `kind: decision` needs the developer's own answer or instruction in the text (a line starting with `>` and a space). An assistant recommendation is a `discovery` at most.
 - A statement the assistant marks as untested or `[INFERENCE]`, or later retracts, is `confidence: low` or dropped. Use the later correction.
 - Text the developer pasted as an example or test input (made-up questions, logs from other projects) is not a fact about this project.
 - `date` is the date of the turn that states the fact (see the time markers), not the session's start.
@@ -43,21 +43,13 @@ Rooms, exactly one per drawer: @@rooms@@. Choose the room by what the fact is ab
 - The room that names the system the fact is about wins over a generic one.
 - `tooling` is only for a tool that fits no other room. When unsure, use the closest subject room, not `tooling`.
 - A room is not a kind: the `kind` field already says troubleshooting or decision.
-  If no room fits and the fact is durable, use a new lowercase-kebab room name and set `"new_room": true`. The developer approves every new room.
+
+If no room fits and the fact is durable, use a new lowercase-kebab room name and set `"new_room": true`. The developer approves every new room.
 
 Output: JSONL, one object per line, these keys (`new_room` only for a new room):
 
 ```json
-{
-  "room": "tooling",
-  "kind": "discovery",
-  "title": "install-path is one global file; prototypes need a per-session state home",
-  "body": "`~/.local/state/x/install-path` is a single global file. Give each prototype session its own state home.",
-  "session": "01a1cd30-ca3f-7e2b-9b1d-5c1f2a3b4c5d",
-  "date": "2026-11-12",
-  "worktree": "@@main_worktree@@",
-  "confidence": "high"
-}
+{"room": "tooling", "kind": "discovery", "title": "install-path is one global file; prototypes need a per-session state home", "body": "`~/.local/state/x/install-path` is a single global file. Give each prototype session its own state home.", "session": "01a1cd30-ca3f-7e2b-9b1d-5c1f2a3b4c5d", "date": "2026-11-12", "worktree": "@@main_worktree@@", "confidence": "high"}
 ```
 
 - `kind`: `decision`, `discovery`, `troubleshooting` or `preference`.

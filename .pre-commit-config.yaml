@@ -8,9 +8,10 @@ repos:
     hooks:
       - id: biome
         name: biome check
-        entry: npx --no-install biome check --staged --no-errors-on-unmatched
+        entry: npx --no-install biome check --no-errors-on-unmatched --files-ignore-unknown=true
         language: system
-        pass_filenames: false
+        types_or: [markdown, json, ts]
+        exclude: '(/evals/files/|^obsidian-sessions/)'
       - id: rumdl
         name: rumdl check
         entry: rumdl check

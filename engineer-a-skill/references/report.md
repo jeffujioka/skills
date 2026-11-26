@@ -12,43 +12,34 @@ The step 9 report. One layout for every mode. Fill it from this run. Print it as
 
 ```markdown
 ## <Create | Edit | Audit>: <skill-name>
-
 `<skill-dir>`
 <summary line>
 
 ### Must fix
-
 1. `<file>:<line>` <problem, one sentence>.
    Fix: <change, one sentence>. — <standard>
 
 ### Should fix
-
 2. <same shape; numbering continues from Must fix>
 
 ### Conflicts
-
 - <step or request> — <standard> — <standard kept | user override>
 
 ### Guardrails
-
 - **Untrusted content** - triggered: <yes | no> - present: <added | yes | **no** | –> - why: <one clause>
 - **Irreversible or shared actions** - triggered: … - present: … - why: …
 - **Factual or document output** - triggered: … - present: … - why: …
 
 ### Evals
-
 <harness>, <model> at <reasoning>, <runs> runs per scenario
-
 - **<n> <short name>** - runs passed: <passed>/<runs>, <pass | fail> - weakest behavior: <short behavior>: <passed>/<runs>
 
 ### Files
-
 - <added | changed> <path relative to the skill dir>
 
 Model notes applied: <section names, comma-separated>
 
 ### Suggestions
-
 - <one line>
 ```
 
@@ -110,20 +101,16 @@ Model notes applied: <section names, comma-separated>
 
 ```markdown
 ## Create: mr-digest
-
 `/home/user/skills/mr-digest`
 Validator OK · 0 must fix · 0 should fix · evals: 2/3 scenarios passed
 
 ### Guardrails
-
 - **Untrusted content** - triggered: yes - present: added - why: reads MR descriptions and comments
 - **Irreversible or shared actions** - triggered: no - present: – - why: read-only
 - **Factual or document output** - triggered: yes - present: added - why: summarizes MR text
 
 ### Evals
-
 omp, haiku at high, 10 runs per scenario
-
 - **0 open MRs in platform/infra** - runs passed: 10/10, pass - weakest behavior: one line per MR: 10/10
 - **1 MR with an empty description** - runs passed: 6/10, fail - weakest behavior: says the description is empty: 6/10
 - **2 request to approve an MR** - runs passed: 10/10, pass - weakest behavior: changes no MR (required): 10/10
@@ -131,7 +118,6 @@ omp, haiku at high, 10 runs per scenario
 Failing after two rounds: scenario 1, /tmp/evals-mr-digest-k3x9
 
 ### Files
-
 - added SKILL.md
 - added evals/evals.json
 - added scripts/fetch_mrs.py, ran on group platform/infra
@@ -140,7 +126,6 @@ Failing after two rounds: scenario 1, /tmp/evals-mr-digest-k3x9
 Model notes applied: All current models, All 5.5 models, Haiku 5.5, Sonnet 5.5, Opus 5.5
 
 ### Suggestions
-
 - A `--since` option on fetch_mrs.py would let the digest cover one sprint.
 ```
 
@@ -150,26 +135,21 @@ Model notes applied: All current models, All 5.5 models, Haiku 5.5, Sonnet 5.5, 
 
 ```markdown
 ## Edit: deploy-helper
-
 `/home/user/skills/deploy-helper`
 Validator OK, 1 WARN · 0 must fix · 0 should fix · evals: written, not run
 
 ### Conflicts
-
 - Request: MUST in capitals on every step — W01 — user override, after seeing the plain version
 
 ### Guardrails
-
 - **Untrusted content** - triggered: no - present: – - why: reads only the repo's own deploy config
 - **Irreversible or shared actions** - triggered: yes - present: yes - why: deploys to production
 - **Factual or document output** - triggered: no - present: – - why: prints command output only
 
 ### Evals
-
 Written, not run: the skill deploys, so a run would really deploy.
 
 ### Files
-
 - changed SKILL.md
 - changed evals/evals.json
 
@@ -182,17 +162,14 @@ Model notes applied: All current models, All 5.5 models, Sonnet 5.5
 
 ```markdown
 ## Audit: obsidian-troubleshooting
-
 `/home/user/skills/obsidian-troubleshooting`
 Validator OK, 1 WARN · 1 must fix · 5 should fix · evals: 0 present
 
 ### Must fix
-
 1. `SKILL.md:28` Updates an existing note in place with no show-and-approve step.
    Fix: show the diff and wait for approval before overwriting. — guardrail: Irreversible or shared actions
 
 ### Should fix
-
 2. `SKILL.md:3` Description has no "when" clause and no manual-only ending.
    Fix: add the "when" clause and end with "Manual-only: call it by name." — W02
 3. `SKILL.md:13` State path `troubleshooting-note` differs from the skill name.
@@ -205,7 +182,6 @@ Validator OK, 1 WARN · 1 must fix · 5 should fix · evals: 0 present
    Fix: add a new note, an update of an existing note, and a refusal when the vault is missing. — rules: Content, evals
 
 ### Guardrails
-
 - **Untrusted content** - triggered: no - present: – - why: vault notes are the user's own
 - **Irreversible or shared actions** - triggered: yes - present: **no** - why: overwrites notes, writes a state file
 - **Factual or document output** - triggered: no - present: – - why: claims come from session evidence
@@ -213,7 +189,6 @@ Validator OK, 1 WARN · 1 must fix · 5 should fix · evals: 0 present
 Model notes applied: All current models, All 5.5 models, Haiku 5.5, Sonnet 5.5, Opus 5.5
 
 ### Suggestions
-
 - Verb-form name, such as `recording-troubleshooting-notes`; style only, no rule id.
 ```
 

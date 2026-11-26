@@ -7,20 +7,7 @@ Verified with: claude 2.1.325, run as `claude -p` in a temporary HOME, so nothin
 Install adds one entry to `~/.claude/settings.json` with `jq` and keeps every other key:
 
 ```json
-{
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$HOME/.claude/hooks/harness-kit-session-start.sh\""
-          }
-        ]
-      }
-    ]
-  }
-}
+{"hooks": {"SessionStart": [{"hooks": [{"type": "command", "command": "bash \"$HOME/.claude/hooks/harness-kit-session-start.sh\""}]}]}}
 ```
 
 - The command text is the entry's fixed id: install adds the entry only when no `SessionStart` hook runs that command, and remove drops only that command, then any list or `hooks` object it leaves empty.

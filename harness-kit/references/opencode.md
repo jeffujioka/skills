@@ -22,11 +22,7 @@ Subscribe with `ctx.event.subscribe({ types: ["session.compaction.ended"] })`, a
   "data": {
     "sessionID": "ses_…",
     "reason": "auto",
-    "model": {
-      "id": "claude-haiku-5.5",
-      "providerID": "github-copilot",
-      "variant": "default"
-    },
+    "model": { "id": "claude-haiku-5.5", "providerID": "github-copilot", "variant": "default" },
     "text": "<the compaction summary>",
     "cost": 0.0,
     "tokens": {}

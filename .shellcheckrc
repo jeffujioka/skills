@@ -1,6 +1,5 @@
-# User-level ShellCheck config, linked to ~/.shellcheckrc. ShellCheck reads it
-# only when no .shellcheckrc exists in the script's directory or a parent, so
-# any repo with its own file overrides it entirely.
+# Repo ShellCheck config, copied from the dotfiles user-level one. ShellCheck
+# uses it for every script below the repo root, in place of ~/.shellcheckrc.
 #
 # Follow `source`d files even when they are not passed on the command line,
 # looking for them relative to the script that sources them.
